@@ -13,11 +13,12 @@ This package contains Python utilities to run and benchmark the IFS.
 
 from importlib.metadata import version, PackageNotFoundError
 
+from .application import * # noqa
 from .arch import * # noqa
-from .benchmark import * # noqa
 from .cli import * # noqa
 from .darshanreport import * # noqa
 from .drhook import * # noqa
+from .env import * # noqa
 from .files import * # noqa
 from .gribfile import * # noqa
 from .ifs import * # noqa
