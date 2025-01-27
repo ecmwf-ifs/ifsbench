@@ -7,6 +7,7 @@
 
 from pathlib import Path
 from collections import OrderedDict
+from collections.abc import Iterable
 from enum import Enum, unique
 import re
 import pandas as pd
@@ -202,3 +203,20 @@ class DrHookRecord:
         data['imbalance'] = (data['maxTime'] - data['minTime']) / data['maxTime'] * 100
 
         return data, meta
+
+    def get(self, routine, metric='avgTimeTotal'):
+        """
+        Extract timing values for one or more specific routines.
+
+        Parameters
+        ----------
+        routine : str or list of str
+            Single of list of subroutine names for which to extract values.
+        metric : str
+            Name of the measurement metric for which to extract values.
+        """
+        if isinstance(routine, Iterable) and not isinstance(routine, str):
+            # Extract a list of entries if an iterable of keys is given
+            return [self.data.loc[self.data['routine'] == r][metric][0] for r in routine]
+
+        return self.data.loc[self.data['routine'] == routine][metric][0]
