@@ -82,7 +82,7 @@ else:
     colors.disable()
 
 
-logger = logging.getLogger('ecbundle')
+logger = logging.getLogger('ifsbench')
 _ch = logging.StreamHandler()
 logger.addHandler(_ch)
 logger.setLevel(logging.INFO)
