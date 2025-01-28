@@ -11,7 +11,7 @@ Some sanity tests for the :class:`DefaultArch` implementation.
 
 import pytest
 
-from ifsbench import logger, DefaultArch, CpuConfiguration, Job, MpirunLauncher, SrunLauncher
+from ifsbench import DefaultArch, CpuConfiguration, Job, MpirunLauncher, SrunLauncher
 
 _cpu_config_1 = CpuConfiguration(
     sockets_per_node = 2,
@@ -56,7 +56,7 @@ _cpu_config_2 = CpuConfiguration(
     )])
 def test_defaultarch_process(arch_in, job_in, job_out, launcher_out):
     """
-    Test the :meth:`DefaultArch.process_job` implementation by checking that 
+    Test the :meth:`DefaultArch.process_job` implementation by checking that
     the resulting Job and Launcher objects are correct.
     """
     arch = DefaultArch(**arch_in)
@@ -73,8 +73,9 @@ def test_defaultarch_process(arch_in, job_in, job_out, launcher_out):
     assert result.env_handlers == []
     assert result.default_launcher_flags == []
 
-    # Check that the right launcher is returned. Check only the type here, 
+    # Check that the right launcher is returned. Check only the type here,
     # as the launchers dont implement __eq__ by default.
+    # pylint: disable=C0123
     assert type(result.default_launcher) == type(launcher_out)
 
     # Check that the resulting job is what we expect.
