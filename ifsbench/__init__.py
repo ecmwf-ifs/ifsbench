@@ -27,6 +27,7 @@ from .logging import * # noqa
 from .namelist import * # noqa
 from .nodefile import * # noqa
 from .paths import * # noqa
+from .plot import * # noqa
 from .runrecord import * # noqa
 from .util import * # noqa
 
