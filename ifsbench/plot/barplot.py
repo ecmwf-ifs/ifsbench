@@ -6,12 +6,13 @@
 # nor does it submit to any jurisdiction.
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 from ifsbench.logging import debug
 
 
-__all__ = ['GroupedBarPlot']
+__all__ = ['GroupedBarPlot', 'StackedBarPlot']
 
 
 class GroupedBarPlot:
@@ -71,6 +72,68 @@ class GroupedBarPlot:
         self.ax.set_title(title)
         self.ax.set_xticks(self.x + self.width, self.groups)
         self.ax.legend(loc='upper left', ncols=3)
+        self.ax.set_ylim(ylim)
+
+        plt.savefig(filename, bbox_inches='tight', pad_inches=0.1)
+
+
+class StackedBarPlot:
+    """
+    A stacked bar plot that clusters multiple bars in a stack for each x-entry.
+
+    Parameters
+    ----------
+    groups : list of str
+        Names of the groups by which to cluster bars.
+    cmap : str, optional
+        Name of the colormap to use, as defined in matplotlib.
+    """
+
+    def __init__(self, groups, cmap='viridis'):
+        self.groups = groups
+
+        self.fig, self.ax = plt.subplots()
+
+        # Define and discretise colormap
+        self.cmap = mpl.colormaps[cmap]
+        self.colors = self.cmap(np.linspace(0, 1, len(groups)))
+
+    def add_stack(self, values, label):
+        """
+        Add stacked bar data for defined groups from a single run.
+
+        Parameters
+        ----------
+        values : list of float
+            The run time values to stack for each bar column
+        label : str
+            Label for the x-axis of this entry
+        """
+        assert len(values) == len(self.groups)
+
+        total = 0.
+        for i, v in enumerate(values):
+            plt.bar(label, v, bottom=total, label=self.groups[i], color=self.colors[i])
+            total += v
+
+    def plot(self, filename, title=None, ylabel=None, ylim=None):
+        """
+        Plot figure to file and configure labels and legends.
+
+        Parameters
+        ----------
+        filename : str
+            Path and name of output file.
+        title : str, optional
+            A title to add to the top of the plot.
+        ylabel : str, optional
+            Label for the y-axis
+        ylim : tuple of float, optional
+            Min and max value for the y-axis
+        """
+        self.ax.set_ylabel(ylabel)
+        self.ax.set_title(title)
+        self.ax.legend(self.groups, loc='best')
         self.ax.set_ylim(ylim)
 
         plt.savefig(filename, bbox_inches='tight', pad_inches=0.1)
