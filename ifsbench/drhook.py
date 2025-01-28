@@ -116,6 +116,7 @@ class DrHookRecord:
         Load raw drhook output and aggregate into merged performance record
         """
         filepath = Path(filepath)
+        filepath = filepath/'drhook.prof.*' if filepath.is_dir() else filepath
         data, metadata = cls.parse_profiles(filepath)
         return DrHookRecord(data, metadata)
 
