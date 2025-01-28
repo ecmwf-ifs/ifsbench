@@ -6,12 +6,6 @@
 # nor does it submit to any jurisdiction.
 
 from abc import ABC, abstractmethod
-from pathlib import Path
-
-
-from ifsbench.data import DataHandler
-from ifsbench.env import EnvHandler
-from ifsbench.job import Job
 
 __all__ = ['Application', 'DefaultApplication']
 
@@ -153,4 +147,3 @@ class DefaultApplication(Application):
 
     def get_command(self, run_dir, job):
         return list(self._command)
-    

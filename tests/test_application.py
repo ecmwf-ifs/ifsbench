@@ -25,6 +25,10 @@ def test_default_application(tmp_path, job, command, data_handlers, env_handlers
 
     assert application.get_command(tmp_path, job) == command
 
+    # Pylint doesn't like checks of the kind something == []. We still want to
+    # do this here to check that the application methods return empty lists.
+    # pylint: disable=C1803
+
     if library_paths:
         assert application.get_library_paths(tmp_path, job) == library_paths
     else:
