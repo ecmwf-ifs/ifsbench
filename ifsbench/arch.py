@@ -10,6 +10,7 @@ Architecture specifications
 """
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import List
 
 from ifsbench.env import EnvHandler
 from ifsbench.launcher.launcher import Launcher
@@ -33,9 +34,9 @@ class ArchResult:
         Additional launcher flags that should be added to launcher invocations.
     """
     job = None
-    env_handlers : list[EnvHandler] = field(default_factory=list)
+    env_handlers : List[EnvHandler] = field(default_factory=list)
     default_launcher : Launcher = None
-    default_launcher_flags : list[str] = field(default_factory=list)
+    default_launcher_flags : List[str] = field(default_factory=list)
 
 
 class Arch(ABC):
@@ -86,7 +87,7 @@ class Arch(ABC):
         ----------
         job: Job
             The initial job specification. This object is not updated.
-        
+
         Returns
         -------
         ArchResult
@@ -107,7 +108,7 @@ class DefaultArch(Arch):
         cpu_config : CpuConfiguration
             The hardware setup of the system.
         set_explicit : bool
-            If set to True, the following attributes in result.job are 
+            If set to True, the following attributes in result.job are
             calculated and set explicitly, using ``cpu_config``:
                 * tasks
                 * nodes
