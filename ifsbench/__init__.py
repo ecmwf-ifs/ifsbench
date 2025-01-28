@@ -13,6 +13,7 @@ This package contains Python utilities to run and benchmark the IFS.
 
 from importlib.metadata import version, PackageNotFoundError
 
+<<<<<<< HEAD
 from ifsbench.application import * # noqa
 from ifsbench.arch import * # noqa
 from ifsbench.benchmark import * # noqa
@@ -36,6 +37,7 @@ from ifsbench.pydantic_utils import * # noqa
 from ifsbench.serialisation_mixin import * # noqa
 from ifsbench.runrecord import * # noqa
 from ifsbench.util import * # noqa
+from ifsbench.plot import * # noqa
 
 try:
     __version__ = version("ifsbench")
