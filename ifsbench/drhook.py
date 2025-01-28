@@ -205,7 +205,7 @@ class DrHookRecord:
 
         return data, meta
 
-    def get(self, routine, metric='avgTimeTotal'):
+    def get(self, routine, metric='avgTimeTotal', fill=None):
         """
         Extract timing values for one or more specific routines.
 
@@ -215,9 +215,13 @@ class DrHookRecord:
             Single of list of subroutine names for which to extract values.
         metric : str
             Name of the measurement metric for which to extract values.
+        fill : any, optional
+            Fill value to use for missing result entries
         """
         if isinstance(routine, Iterable) and not isinstance(routine, str):
             # Extract a list of entries if an iterable of keys is given
-            return [self.data.loc[self.data['routine'] == r][metric][0] for r in routine]
+            result = [self.data.loc[self.data['routine'] == r][metric] for r in routine]
+            return [fill if r.empty else r[0] for r in result]
 
-        return self.data.loc[self.data['routine'] == routine][metric][0]
+        result = self.data.loc[self.data['routine'] == routine][metric]
+        return fill if result.empty else result[0]
