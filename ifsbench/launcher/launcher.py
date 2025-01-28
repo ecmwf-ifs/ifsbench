@@ -11,6 +11,7 @@ Implementation of launch commands for various MPI launchers
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import List
 
 from ifsbench.logging import debug, info
 from ifsbench.util import execute
@@ -34,7 +35,7 @@ class LaunchData:
         The environment variables that are used.
     """
     run_dir : Path
-    cmd : list[str]
+    cmd : List[str]
     env: dict = field(default_factory=dict)
 
     def launch(self):
