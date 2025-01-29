@@ -15,8 +15,8 @@ import sys
 
 import click
 
-from .logging import logger, DEBUG
-from .util import auto_post_mortem_debugger
+from ifsbench.logging import logger, DEBUG
+from ifsbench.util import auto_post_mortem_debugger
 
 
 __all__ = ['cli', 'RunOptions', 'run_options', 'ReferenceOptions', 'reference_options']
