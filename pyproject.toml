@@ -1,11 +1,34 @@
 # Make sure we use setuptools and have all required dependencies for that
 [build-system]
 requires = [
-  "setuptools >= 45",
+  "setuptools >= 61",
   "wheel",
   "setuptools_scm >= 6.2",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "ifsbench"
+authors = [
+  {name = "ECMWF", email = "user_support_section@ecmwf.int"},
+]
+description = "Toolbox for running, testing and benchmarking the IFS"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+dynamic = ["version", "readme"]
+dependencies = [
+  "pandas",  # essential for benchmarking data
+  "PyYAML",  # essential for file handling
+  "click",   # essential for CLI scripts
+  "f90nml",  # essential for namelist handling
+]
+
+[project.optional-dependencies]
+tests = [
+  "pytest",
+  "pytest-cov",
+]
+
 
 # Enable SCM versioning
 [tool.setuptools_scm]
