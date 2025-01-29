@@ -29,6 +29,9 @@ tests = [
   "pytest-cov",
 ]
 
+[project.scripts]
+"ifs-perfplot.py" = "ifsbench.cli.perfplot:perfplot"
+
 
 # Enable SCM versioning
 [tool.setuptools_scm]
