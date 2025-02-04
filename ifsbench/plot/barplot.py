@@ -92,7 +92,7 @@ class StackedBarPlot:
     def __init__(self, groups, cmap='viridis'):
         self.groups = groups
 
-        self.fig, self.ax = plt.subplots()
+        self.fig, self.ax = plt.subplots(figsize=(12,9))
 
         # Define and discretise colormap
         self.cmap = mpl.colormaps[cmap]
@@ -116,6 +116,8 @@ class StackedBarPlot:
             plt.bar(label, v, bottom=total, label=self.groups[i], color=self.colors[i])
             total += v
 
+        debug(dict(zip(self.groups, values)))
+
     def plot(self, filename, title=None, ylabel=None, ylim=None):
         """
         Plot figure to file and configure labels and legends.
@@ -133,7 +135,7 @@ class StackedBarPlot:
         """
         self.ax.set_ylabel(ylabel)
         self.ax.set_title(title)
-        self.ax.legend(self.groups, loc='best')
+        self.ax.legend(self.groups, ncols=4, loc='center', bbox_to_anchor=(.5, 1.08))
         self.ax.set_ylim(ylim)
 
         plt.savefig(filename, bbox_inches='tight', pad_inches=0.1)
