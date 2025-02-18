@@ -5,3 +5,6 @@
 build*/
 
 ifsbench.egg-info/*
+
+# Auto-generated docs files
+/docs/source/ifsbench.*

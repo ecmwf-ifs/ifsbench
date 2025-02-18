@@ -38,6 +38,14 @@ grib = [
   "pygrib",
 ]
 
+docs = [
+  "sphinx",           # to build documentation
+  "recommonmark",     # to allow parsing markdown
+  "sphinx-rtd-theme", # ReadTheDocs theme
+  "myst-parser",      # Markdown parser for sphinx
+  "sphinx-design",    # Add panels, cards and dropdowns for sphinx
+]
+
 [project.scripts]
   "ifs-bench.py" = "ifsbench.cli.pack:cli"
   "nml-diff.py" = "ifsbench.cli.nml_diff:cli"
