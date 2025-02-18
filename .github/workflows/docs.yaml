@@ -1,0 +1,56 @@
+name: docs
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events
+  push:
+    branches: [ 'main' ]
+    tags-ignore: [ '**' ]
+
+  # Triggers the workflow on pull request events
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install ifsbench with docs dependencies
+        run:  |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[docs]
+
+      - name: Build Sphinx documentation
+        run: |
+          cd docs
+          make html
+
+      - name: Deploy to sites
+        if: github.repository == 'ecmwf-ifs/ifsbench' && github.event_name != 'pull_request'
+        env:
+          SITES_TOKEN: ${{ secrets.SITES_TOKEN }}
+        run: |
+          mkdir -p ~/bin
+          curl -o ~/bin/sites -L \
+              "https://get.ecmwf.int/service/rest/v1/search/assets/download?sort=name&direction=desc&q=linux&repository=sites-cli"
+          chmod a+x ~/bin/sites
+          ~/bin/sites content \
+            --debug \
+            --space docs \
+            --name ifsbench \
+            --api-authentication-token="${SITES_TOKEN}" \
+            upload \
+              --force \
+              --source "docs/build/html/" \
+              --destination / \
+              --recursive
