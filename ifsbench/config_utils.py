@@ -12,12 +12,14 @@ import yaml
 
 from ifsbench.config_mixin import CLASSNAME, ConfigMixin
 from ifsbench.data import ExtractHandler, NamelistHandler
+from ifsbench.results import EnsembleStats
 
 __all__ = ['read_yaml_config']
 
 _SUPPORTED_CONFIGS = {
     'ExtractHandler': ExtractHandler,
     'NamelistHandler': NamelistHandler,
+    'EnsembleStats': EnsembleStats,
 }
 
 

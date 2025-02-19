@@ -5,13 +5,14 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Union
 
 from pydantic import BaseModel, model_validator
 from typing_extensions import Self
 
-__all__ = ['ConfigMixin', 'CLASSNAME', 'RESERVED_NAMES']
+__all__ = ['ConfigMixin', 'PydanticConfigMixin', 'CLASSNAME', 'RESERVED_NAMES']
 
 # Reserved strings:
 # 'classname' is used in the configuration to indicate which class has to be
@@ -23,7 +24,39 @@ RESERVED_NAMES = [
 ]
 
 
-class ConfigMixin(BaseModel):
+class ConfigMixin(ABC):
+
+    @classmethod
+    @abstractmethod
+    def from_config(
+        cls, config: Dict[str, Union[str, float, int, bool, List, None]]
+    ) -> 'ConfigMixin':
+        """Create instance based on config.
+
+        Args:
+            config: names and values for member variables.
+
+        Returns:
+            class instance
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def dump_config(
+        self, with_class: bool = False
+    ) -> Dict[str, Union[str, float, int, bool, List]]:
+        """Get configuration for output.
+
+        Args:
+            with_class: Add CLASSNAME key with class name to configuration.
+
+        Returns:
+            Configuration that can be used to create instance.
+        """
+        raise NotImplementedError()
+
+
+class PydanticConfigMixin(ConfigMixin, BaseModel):
     """
     Base class for handling configurations in a format that can be used for storage.
 
@@ -33,7 +66,7 @@ class ConfigMixin(BaseModel):
     @classmethod
     def from_config(
         cls, config: Dict[str, Union[str, float, int, bool, List, None]]
-    ) -> 'ConfigMixin':
+    ) -> 'PydanticConfigMixin':
         """Create instance based on config.
 
         Args:
