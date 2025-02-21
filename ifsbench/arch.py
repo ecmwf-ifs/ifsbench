@@ -146,4 +146,3 @@ class DefaultArch(Arch):
         result.default_launcher = self.get_default_launcher()
 
         return result
-
