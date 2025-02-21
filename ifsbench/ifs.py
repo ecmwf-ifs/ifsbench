@@ -9,7 +9,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from os import getenv
 
-from ifsbench.arch import arch_registry, Arch
 from ifsbench.drhook import DrHook
 from ifsbench.logging import warning
 from ifsbench.namelist import IFSNamelist
@@ -222,9 +221,6 @@ class IFS(ABC):
             Further named parameters that will be passed to
             :meth:`IFS.setup_env`, :meth:`IFS.setup_nml` and :meth:`Arch.run`
         """
-        # Select architecture preset from registry
-        if not isinstance(arch, Arch):
-            arch = arch_registry[arch]
 
         # Setup the run environment
         env, kwargs = self.setup_env(namelist=namelist, rundir=rundir, nproc=nproc, nproc_io=nproc_io,

@@ -6,24 +6,18 @@
 # nor does it submit to any jurisdiction.
 
 """
-Hardware and job resource description classes
+Hardware and job resource description classes.
 """
-from abc import ABC
+
+from dataclasses import dataclass, replace
 from enum import Enum, auto
 
-from ifsbench.logging import error
-from ifsbench.util import classproperty
+__all__ = ['CpuBinding', 'CpuDistribution', 'CpuConfiguration', 'Job']
 
-
-__all__ = ['CpuConfiguration', 'CpuBinding', 'CpuDistribution', 'Job']
-
-
-class CpuConfiguration(ABC):
+@dataclass
+class CpuConfiguration:
     """
-    Abstract base class to describe the hardware configuration of compute nodes
-
-    :any:`Arch` should provide an implementation of this class to describe the
-    CPU configuration of the available nodes.
+    This class describes the hardware configuration of compute nodes.
 
     Attributes
     ----------
@@ -36,38 +30,26 @@ class CpuConfiguration(ABC):
         The number of logical cores per physical core (i.e. the number of SMT threads
         each core can execute). Typically, this is 1 (no hyperthreading), 2 or 4.
         This must be specified in a derived class.
-    cores_per_node : int
-        The number of physical cores per node. This value is automatically derived
-        from the above properties.
-    threads_per_node : int
-        The number of logical cores per node (threads). This value is automatically derived
-        from the above properties.
     gpus_per_node : int
         The number of available GPUs per node.
     """
 
-    sockets_per_node: int
+    sockets_per_node : int = 1
+    cores_per_socket : int = 1
+    threads_per_core : int = 1
+    gpus_per_node : int = 0
 
-    cores_per_socket: int
-
-    threads_per_core: int
-
-    gpus_per_node = 0
-
-    @classproperty
     def cores_per_node(self):
         """
         The number of physical cores per node
         """
         return self.sockets_per_node * self.cores_per_socket
 
-    @classproperty
     def threads_per_node(self):
         """
         The number of logical cores (threads) per node
         """
         return self.cores_per_node * self.threads_per_core
-
 
 class CpuBinding(Enum):
     """
@@ -107,206 +89,134 @@ class CpuDistribution(Enum):
     DISTRIBUTE_USER = auto()
     """Indicate that a different user-specified strategy should be used"""
 
+@dataclass
 class Job:
     """
-    Description of a parallel job's resource requirements
-
-    Provided with a CPU configuration (:data:`cpu_config`) and at least one of
-
-    * the total number of MPI tasks (:data:`tasks`)
-    * the number of nodes (:data:`nodes`) and the number of tasks per node
-      (:data:`tasks_per_node`)
-    * the number of nodes (:data:`nodes`) and the number of tasks per socket
-      (:data:`tasks_per_socket`)
-
-    this class specifies the resource requirements for a job.
-
-    The underlying idea is to specify as little as possible which is then passed on
-    to the relevant launch command but with the possibility to estimate those values
-    that can be derived unambigously from the specified values.
-
-    The relevant attributes (with the same names as the parameters to the constructor)
-    are only defined when the corresponding value has been specified explicitly (with
-    the exception of those that have a default value), i.e., accessing undefined
-    attributes will raise a :any:`AttributeError`. The corresponding ``get_`` methods
-    allow to derive the relevant values when it is unambigously possible, or raise an
-    :any:`AttributeError` otherwise.
-
-    Multi-threading can be specified by providing a value larger than 1 (the default)
-    for :data:`cpus_per_task`. Symmetric multi-threading (hyperthreading) can be
-    enabled with a value greater than 1 in :data:`threads_per_core`.
-
-    The desired pinning strategy can be specified with :data:`bind`.
+    Description of a parallel job setup.
 
     Parameters
     ----------
-    cpu_config : :any:`CpuConfiguration`
-        The description of the available CPUs in the target system.
-    tasks : int, optional
-        The total number of MPI tasks to be used.
-    nodes : int, optional
-        The total number of nodes to be used.
-    tasks_per_node : int, optional
-        Launch a specific number of tasks per node. Can be derived from :attr:`tasks_per_socket`
-        if that is specified
-    tasks_per_socket : int, optional
-        Launch a specific number of tasks per socket
-    cpus_per_task : int, optional
-        The number of computing elements (threads) available to each task for hybrid jobs.
-    threads_per_core : int, optional
-        Enable symmetric multi-threading (hyperthreading).
+    tasks : int
+        The number of tasks/processes.
+    nodes : int
+        The number of nodes.
+    tasks_per_node : int
+        The number of tasks per node.
+    tasks_per_socket : int
+        The number of tasks per socket.
+    cpus_per_task : int
+        The number of cpus assigned to each task.
+    threads_per_core : int
+        The number of threads that each CPU core should run.
+    gpus_per_task : int
+        The number of GPUs that are required by each task.
+    account : str, optional
+        The account that is passed to the scheduler.
+    partition: str, optional
+        The partition that is passed to the scheduler.
     bind : :any:`CpuBinding`, optional
         Specify the binding strategy to use for pinning.
     distribute_remote : :any:`CpuDistribution`, optional
-        Specify the distribution strategy to use for task distribution across nodes
+        Specify the distribution strategy to use for task distribution across nodes.
     distribute_local : :any:`CpuDistribution`, optional
-        Specify the distribution strategy to use for task distribution across sockets within a node
-    gpus_per_task : int, optional
-        The number of GPUs that are used per task.
+        Specify the distribution strategy to use for task distribution across
+        sockets within a node.
     """
 
-    def __init__(self, cpu_config, tasks=None, nodes=None, tasks_per_node=None,
-                 tasks_per_socket=None, cpus_per_task=None, threads_per_core=None,
-                 bind=None, distribute_remote=None, distribute_local=None,
-                 gpus_per_task=None):
+    tasks : int = None
+    nodes : int = None
+    tasks_per_node : int = None
+    tasks_per_socket : int = None
+    cpus_per_task : int = None
+    threads_per_core : int = None
+    gpus_per_task : int = None
+    account : str = None
+    partition : str = None
+    bind : CpuBinding = None
+    distribute_remote : CpuDistribution = None
+    distribute_local : CpuDistribution = None
 
-        assert issubclass(cpu_config, CpuConfiguration)
-        self.cpu_config = cpu_config
-        if tasks is not None:
-            self.tasks = tasks
-        if nodes is not None:
-            self.nodes = nodes
-        if tasks_per_node is not None:
-            self.tasks_per_node = tasks_per_node
-        if tasks_per_socket is not None:
-            self.tasks_per_socket = tasks_per_socket
-        if cpus_per_task is not None:
-            self.cpus_per_task = cpus_per_task
-        if threads_per_core is not None:
-            self.threads_per_core = threads_per_core
-        if gpus_per_task is not None:
-            self.gpus_per_task = gpus_per_task
-        if bind is not None:
-            self.bind = bind
-        if distribute_remote is not None:
-            self.distribute_remote = distribute_remote
-        if distribute_local is not None:
-            self.distribute_local = distribute_local
-
-
-        gpus_per_node = self.get_gpus_per_task() * self.get_tasks_per_node()
-        if gpus_per_node > self.cpu_config.gpus_per_node:
-            raise ValueError("More GPUs have been requested than are available.")
-
-        try:
-            tasks = self.get_tasks()
-            nodes = self.get_nodes()
-            threads = self.get_threads()
-        except AttributeError as excinfo:
-            error(('Need to specify at least one of:\n'
-                   'number of tasks or (tasks_per_node and nodes) or (tasks_per_socket and nodes)'))
-            raise excinfo
-
-        if nodes < 1:
-            error(f'Invalid number of nodes: {nodes}')
-            raise ValueError
-        if tasks < 1:
-            error(f'Invalid number of tasks: {nodes}')
-            raise ValueError
-        if threads < tasks:
-            error(f'Invalid number of threads: {threads}')
-            raise ValueError
-
-    def get_tasks(self):
+    def copy(self):
         """
-        The total number of MPI tasks
-
-        If this has not been specified explicitly, it is estimated as
-        ``nodes * tasks_per_node``.
-        """
-        tasks = getattr(self, 'tasks', None)
-        if tasks is None:
-            return self.get_nodes() * self.get_tasks_per_node()
-        return tasks
-
-    def get_nodes(self):
-        """
-        The total number of nodes
-
-        If this has not been specified explicitly, it is estimated as
-        ``ceil(threads / available_threads_per_node)`` with the number of
-        available threads dependent on the use of SMT.
-        """
-        nodes = getattr(self, 'nodes', None)
-        if nodes is None:
-            threads_per_node = self.get_tasks_per_node() * self.get_threads_per_core() * self.get_cpus_per_task()
-
-
-            return (self.get_threads() + threads_per_node - 1) // threads_per_node
-
-        return nodes
-
-    def get_tasks_per_node(self):
-        """
-        The number of tasks on each node
-
-        If this has not been specified explicitly, it is estimated as
-        ``tasks_per_socket * sockets_per_node``.
+        Return a deep copy of this object.
         """
 
-        if hasattr(self, 'tasks_per_node'):
-            # If tasks_per_node was specified just return it.
-            tasks_per_node = self.tasks_per_node
-        else:
+        return replace(self)
+
+
+
+    def calculate_missing(self, cpu_configuration):
+        """
+        If at least one of
+
+        * the total number of MPI tasks (:data:`tasks`)
+        * the number of nodes (:data:`nodes`) and the number of tasks per node
+        (:data:`tasks_per_node`)
+        * the number of nodes (:data:`nodes`) and the number of tasks per socket
+        (:data:`tasks_per_socket`)
+
+        is specified, this function calculates missing values for
+            * tasks
+            * nodes
+            * tasks_per_node
+        given hardware configuration. The resulting values are stored in this
+        object.
+
+        Raises
+        ------
+
+        ValueError
+            If not enough data is available to compute the missing values or if
+            the given values contradict each other.
+        """
+
+        cpus_per_task = self.cpus_per_task
+        if not cpus_per_task:
+            cpus_per_task = 1
+
+        threads_per_core = self.threads_per_core
+        if not threads_per_core:
+            threads_per_core = 1
+
+        gpus_per_task = self.gpus_per_task
+        if not gpus_per_task:
+            gpus_per_task = 0
+
+        if not self.tasks_per_node:
             # If tasks_per_node wasn't specified, calculate it from the other
             # values.
 
-            if hasattr(self, 'tasks_per_socket'):
-                tasks_per_node = self.tasks_per_socket * self.cpu_config.sockets_per_node
-            elif hasattr(self, 'tasks'):
-                tasks_per_node = self.cpu_config.cores_per_node // self.get_cpus_per_task()
+            if self.tasks_per_socket:
+                self.tasks_per_node = self.tasks_per_socket * cpu_configuration.sockets_per_node
+            elif self.tasks:
+                self.tasks_per_node = cpu_configuration.cores_per_node() // cpus_per_task
             else:
                 raise ValueError('The number of tasks per node could not be determined!')
 
             # If GPUs are used, make sure that tasks_per_node is compatible with
             # the number of available GPUs.
-            if self.get_gpus_per_task() > 0:
-                tasks_per_node = min(
-                    tasks_per_node,
-                    self.cpu_config.gpus_per_node // self.get_gpus_per_task()
-                )
+            if gpus_per_task > 0:
+                self.tasks_per_node = min(
+                    self.tasks_per_node,
+                    cpu_configuration.gpus_per_node // gpus_per_task
+            )
 
-        return tasks_per_node
+            if self.tasks_per_node <= 0:
+                raise ValueError('Failed to determine the number of tasks per node!')
 
-    def get_cpus_per_task(self):
-        """
-        The number of CPUs assigned to each task
+        elif gpus_per_task > 0:
+            if self.tasks_per_node * gpus_per_task > cpu_configuration.gpus_per_node:
+                raise ValueError('Not enough GPUs are available on a node.')
 
-        If this has not been specified explicitly, it defaults to 1
-        """
-        return getattr(self, 'cpus_per_task', 1)
 
-    def get_gpus_per_task(self):
-        """
-        The number of GPUs assigned to each task
+        if self.nodes is None:
+            threads_per_node = self.tasks_per_node * threads_per_core * cpus_per_task
 
-        If this has not been specified explicitly, it defaults to 0
-        """
-        return getattr(self, 'gpus_per_task', 0)
+            if not self.tasks:
+                raise ValueError('The number of nodes could not be determined!')
 
-    def get_threads_per_core(self):
-        """
-        The number of threads assigned to each core (symmetric multi threading
-        or hyperthreading for values greater than 1)
+            self.nodes = (self.tasks * cpus_per_task + threads_per_node - 1) // threads_per_node
 
-        If this has not been specified explicitly, it defaults to 1
-        """
-        return getattr(self, 'threads_per_core', 1)
 
-    def get_threads(self):
-        """
-        The total number of threads across all tasks
-
-        This is derived automatically as ``tasks * cpus_per_task``
-        """
-        return self.get_tasks() * self.get_cpus_per_task()
+        if self.tasks is None:
+            self.tasks = self.nodes * self.tasks_per_node

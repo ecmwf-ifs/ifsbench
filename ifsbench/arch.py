@@ -9,467 +9,144 @@
 Architecture specifications
 """
 from abc import ABC, abstractmethod
-import os
+from dataclasses import dataclass, field
 
-from ifsbench.job import CpuConfiguration, CpuBinding, Job
-from ifsbench.launcher import Launcher, MpirunLauncher, SrunLauncher, AprunLauncher
-from ifsbench.util import as_tuple, execute
+from ifsbench.env import EnvHandler
+from ifsbench.launcher.launcher import Launcher
 
+__all__ = ['Arch', 'DefaultArch']
 
-__all__ = ['Arch', 'Workstation', 'XC40Cray', 'XC40Intel', 'AtosAaIntel',
-           'LumiC', 'LumiG', 'arch_registry']
+@dataclass
+class ArchResult:
+    """
+    Holds results of an :meth:`Arch.process` run.
+
+    Attributes:
+    job: Job
+        The updated job after the architecture processing.
+    env_handlers: list[EnvHandler]
+        Additional EnvHandler objects that set architecture-specific environment
+        flags.
+    default_launcher: Launcher
+        The default launcher that is used on this system.
+    default_launcher_flags : list[str]
+        Additional launcher flags that should be added to launcher invocations.
+    """
+    job = None
+    env_handlers : list[EnvHandler] = field(default_factory=list)
+    default_launcher : Launcher = None
+    default_launcher_flags : list[str] = field(default_factory=list)
 
 
 class Arch(ABC):
     """
-    Machine and compiler architecture on which to run the IFS
+    Architecture/system description.
 
-    This provides compiler and environment assumptions for MPI-parallel runs.
-
-    An implementation of this class must be provided for each target system.
-    It must declare the CPU configuration in :attr:`cpu_config` and the
-    launcher in :attr:`launcher` that is used for MPI-parallel execution.
-
-    For multiple toolchains/runtime environments on a single physical system
-    it can be beneficial to create an intermediate class describing common
-    properties (such as :attr:`cpu_config`) and derived classes to specify
-    the bespoke configuration.
+    Additional machine/software environment information that is used to run jobs.
+    It provides information about the parallel setup (number of cores per node,
+    available GPUs, etc.) as well as system-specific environment variables.
     """
 
-    cpu_config: CpuConfiguration
-    """The CPU configuration of the architecture
-
-    This describes the available compute capability on each compute node
-    from which the job resource requirements can be derived.
-    """
-
-    launcher: Launcher
-    """The MPI launcher that is used on the architecture
-
-    This is used to derive the relevant launch command to execute the application
-    using the resource requirements specified in a run's :any:`Job` description.
-    """
-
-    @classmethod
     @abstractmethod
-    def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
-            launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
+    def get_default_launcher(self):
         """
-        Arch-specific general purpose executable execution
+        Return the launcher that is usually used on this system (e.g.
+        SLURM, PBS, MPI).
 
-        This method must be implemented by architecture-specific implementations,
-        either to launch :data:`cmd` directly or to build a job specification
-        :any:`Job` and launch this via :meth:`run_job`.
+        Returns
+        -------
+        Launcher
+            The default launcher used in this architecture.
+        """
+        return NotImplemented
+
+    @abstractmethod
+    def get_cpu_configuration(self):
+        """
+        Return the hardware setup that is used.
+
+        Returns
+        -------
+        CpuConfiguration
+        """
+        return NotImplemented
+
+
+    @abstractmethod
+    def process_job(self, job, **kwargs):
+        """
+        Process a given job and add architecture-dependent tweaks. This will
+        return a :class:`ArchResult` object that
+        * holds an updated Job object.
+        * may specify additional EnvHandler objects needed on this architecture.
+        * may specify additional flags that should be passed to the default
+          launcher.
 
         Parameters
         ----------
-        cmd : list or str
-            The command of the MPI executable (without the launch command)
-        tasks : int
-            The total number of MPI tasks to use
-        cpus_per_task : int
-            The number of threads to start for each MPI task
-        threads_per_core : int
-            The number of hyperthreads to use on each core
-        launch_cmd : list or str, optional
-            User-provided launch command that is used instead of generating
-            a launch command based on :data:`job` specifications
-        launch_user_options : list or str, optional
-            User-provided launch command options that are added to the
-            generated launch command. Ignored if :data:`launch_cmd` is given.
-        logfile : str or :any:`pathlib.Path`, optional
-            An optional logfile to store the output
-        env : dict, optional
-            Custom environment to use
-        gpus_per_task: int, optional
-            The number of GPUs that are used per MPI task
-        kwargs :
-            Other arguments that may be used in the architecture implementation
-            or may be passed on to :any:`execute`
+        job: Job
+            The initial job specification. This object is not updated.
+        
+        Returns
+        -------
+        ArchResult
         """
+        return NotImplemented
 
-    @classmethod
-    def run_job(cls, cmd, job, launch_cmd=None, launch_user_options=None,
-                logfile=None, env=None, **kwargs):
+class DefaultArch(Arch):
+
+    def __init__(self, launcher, cpu_config, set_explicit=False,
+                 account=None, partition=None):
         """
-        Arch-specific general purpose executable execution for :any:`Job` specification
-
-        This method can be used by the architecture-specific implementations.
-
-        It launches :data:`cmd` using the resource requirements specified in :data:`job`.
-
-        The architecture-specific :attr:`launcher` is used to generate the
-        required launch command for that. The user can override this behaviour
-        by providing a custom launch command in :data:`launch_cmd`.
+        Default architecture that can be used for various systems.
 
         Parameters
         ----------
-        cmd : list or str
-            The command of the MPI executable (without the launch command)
-        job : :any:`Job`
-            The resource requirements of the job to be run
-        launch_cmd : list or str, optional
-            User-provided launch command that is used instead of generating
-            a launch command based on :data:`job` specifications
-        launch_user_options : list or str, optional
-            User-provided launch command options that are added to the
-            generated launch command. Ignored if :data:`launch_cmd` is given.
-        logfile : str or :any:`pathlib.Path`, optional
-            An optional logfile to store the output
-        env : dict, optional
-            Custom environment to use
-        kwargs :
-            Other arguments that may be used in the architecture implementation
-            or may be passed on to :any:`execute`
+        launcher : Launcher
+            The default launcher that is used on this system.
+        cpu_config : CpuConfiguration
+            The hardware setup of the system.
+        set_explicit : bool
+            If set to True, the following attributes in result.job are 
+            calculated and set explicitly, using ``cpu_config``:
+                * tasks
+                * nodes
+                * tasks_per_node
+            If not, these values will stay None, if not specified.
+        account : str
+            The account that is passed to the launcher.
+        partition : str
+            The partition that will be passed to the launcher.
         """
-        assert isinstance(job, Job)
-        assert job.cpu_config == cls.cpu_config
+        self._cpu_config = cpu_config
+        self._launcher = launcher
+        self._set_explicit = bool(set_explicit)
+        self._account = account
+        self._partition = partition
 
-        # Just pop a few arguments from kwargs that are used by some
-        # architectures but not by all. If we don't remove them here, they may
-        # cause trouble inside the subsequent "execute" call.
-        kwargs.pop('mpi_gpu_aware', False)
+    def get_default_launcher(self):
+        return self._launcher
 
-        if env is None:
-            env = os.environ.copy()
+    def get_cpu_configuration(self):
+        return self._cpu_config
 
-        if launch_cmd is None:
-            launch_cmd = as_tuple(cls.launcher.get_launch_cmd(job, user_options=launch_user_options))
-        else:
-            launch_cmd = as_tuple(launch_cmd)
+    def process_job(self, job, **kwargs):
+        result = ArchResult()
 
-        full_cmd = ' '.join(launch_cmd + as_tuple(cmd))
-        execute(full_cmd, logfile=logfile, env=env, **kwargs)
+        account = self._account
+        partition = self._partition
 
+        result.job = job.copy()
 
-class Workstation(Arch):
-    """
-    Default setup for ECMWF workstations.
-    """
+        if partition:
+            result.job.set('partition', partition)
+        if account:
+            result.job.set('account', account)
 
-    class WorkstationCpuConfig(CpuConfiguration):
-        """Most workstations have a quad-core CPU with hyperthreading"""
+        if self._set_explicit:
+            result.job.calculate_missing(self._cpu_config)
 
-        sockets_per_node = 1
-        cores_per_socket = 4
-        threads_per_core = 2
+        result.default_launcher = self.get_default_launcher()
 
-    cpu_config = WorkstationCpuConfig
+        return result
 
-    launcher = MpirunLauncher
-
-    @classmethod
-    def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
-            launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
-        """Build job description using :attr:`cpu_config`"""
-
-        # Setup environment
-        if env is None:
-            env = os.environ.copy()
-        env['OMP_NUM_THREADS'] = cpus_per_task
-        # TODO: Ensure proper pinning
-
-        # Build job description
-        job = Job(cls.cpu_config, tasks=tasks, cpus_per_task=cpus_per_task,
-                  threads_per_core=threads_per_core)
-
-        # Launch via generic run
-        cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
-                    logfile=logfile, env=env, **kwargs)
-
-
-class XC40(Arch):
-    """
-    Hardware and launcher setup for ECMWF's Cray XC40 system
-
-    Toolchain specific settings are provided in derived
-    classes :class:`XC40Cray` and :class:`XC40Intel` for Cray compiler and
-    Intel Compiler, respectively
-    """
-
-    class XC40CpuConfig(CpuConfiguration):
-        """Dual-socket Intel Xeon E5-2650 v4 (12 cores/24 threads, 2.2 GHz)"""
-
-        sockets_per_node = 2
-        cores_per_socket = 12
-        threads_per_core = 2
-
-    cpu_config = XC40CpuConfig
-
-    launcher = AprunLauncher
-
-
-class XC40Cray(XC40):
-    """
-    Cray compiler-toolchain setup for :any:`XC40`
-    """
-
-    @classmethod
-    def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
-            launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
-        """Build job description using :attr:`XC40.cpu_config`"""
-
-        # Setup environment
-        if env is None:
-            env = os.environ.copy()
-        env['OMP_NUM_THREADS'] = cpus_per_task
-
-        # Fill nodes without hyperthreading
-        tasks_per_node = kwargs.pop('tasks_per_node', min(tasks, cls.cpu_config.cores_per_node))
-        tasks_per_socket = tasks_per_node // 2
-
-        # Binding-strategy -cc cpu
-        bind = CpuBinding.BIND_CORES
-
-        # Build job description
-        job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
-                  tasks_per_socket=tasks_per_socket, cpus_per_task=cpus_per_task,
-                  threads_per_core=threads_per_core, bind=bind)
-
-        # Strict memory containment
-        if launch_user_options is None:
-            launch_user_options = []
-        launch_user_options += ['-ss']
-
-        # Launch via generic run
-        cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
-                    logfile=logfile, env=env, **kwargs)
-
-
-class XC40Intel(XC40):
-    """
-    Intel compiler-toolchain setup for :any:`XC40`
-    """
-
-    @classmethod
-    def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
-            launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
-        """Build job description using :attr:`XC40.cpu_config`"""
-
-        # Setup environment
-        if env is None:
-            env = os.environ.copy()
-        env['OMP_NUM_THREADS'] = cpus_per_task
-        env['OMP_PLACES'] = 'threads'
-        env['OMP_PROC_BIND'] = 'close'
-
-        # Fill nodes without hyperthreading
-        tasks_per_node = kwargs.pop('tasks_per_node', min(tasks, cls.cpu_config.cores_per_node))
-        tasks_per_socket = tasks_per_node // 2
-
-        # Binding-strategy -cc depth
-        bind = CpuBinding.BIND_THREADS
-
-        # Build job description
-        job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
-                  tasks_per_socket=tasks_per_socket, cpus_per_task=cpus_per_task,
-                  threads_per_core=threads_per_core, bind=bind)
-
-        # Launch via generic run
-        cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
-                    logfile=logfile, env=env, **kwargs)
-
-
-class Atos(Arch):
-    """
-    Hardware setup for ECMWF's aa system in Bologna
-    """
-
-    @classmethod
-    def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
-            launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
-        """Build job description using :attr:`cpu_config`"""
-
-        # Setup environment
-        if env is None:
-            env = os.environ.copy()
-        env['OMP_NUM_THREADS'] = cpus_per_task
-        # TODO: Ensure proper pinning
-
-        # Fill nodes as much as possible
-        max_tasks_per_node = cls.cpu_config.cores_per_node * threads_per_core // cpus_per_task
-        tasks_per_node = kwargs.pop('tasks_per_node', min(tasks, max_tasks_per_node))
-
-        launch_user_options = list(as_tuple(launch_user_options))
-
-        # If GPUs are used, request the GPU partition.
-        if gpus_per_task is not None and gpus_per_task > 0:
-            if cls.cpu_config.gpus_per_node // gpus_per_task <= 0:
-                raise ValueError(f"Not enough GPUs are available on the "
-                    f"architecture {cls.__name__}!")
-
-            launch_user_options.insert(0, '--qos=ng')
-            tasks_per_node = min(
-                tasks_per_node,
-                cls.cpu_config.gpus_per_node // gpus_per_task
-            )
-        elif tasks * cpus_per_task > 32:
-            # By default, stuff on Atos runs on the GPIL nodes which allow only
-            # up to 32 cores. If more resources are needed, the compute
-            # partition should be requested.
-            launch_user_options.insert(0, '--qos=np')
-
-
-        # Bind to cores
-        bind = CpuBinding.BIND_CORES
-
-        # Build job description
-        job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
-                  cpus_per_task=cpus_per_task, threads_per_core=threads_per_core,
-                  bind=bind, gpus_per_task=gpus_per_task)
-
-        # Launch via generic run
-        cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
-                    logfile=logfile, env=env, **kwargs)
-
-class AtosAaIntel(Atos):
-    """
-    Intel compiler-toolchain setup for :any:`AtosAa`
-    """
-
-    class AtosAaCpuConfig(CpuConfiguration):
-        """Dual-socket AMD EPYC 7H12 (64 core/128 thread, 2.6 GHz)"""
-
-        sockets_per_node = 2
-        cores_per_socket = 64
-        threads_per_core = 2
-
-    cpu_config = AtosAaCpuConfig
-
-    launcher = SrunLauncher
-
-
-class AtosAc(Atos):
-    """
-    Architecture for the Atos ac partition that also offers NVIDIA A100 GPUs.
-    """
-
-    class AtosAcCpuConfig(CpuConfiguration):
-        """Dual-socket AMD EPYC 7H12 (64 core/128 thread, 2.6 GHz)"""
-
-        sockets_per_node = 2
-        cores_per_socket = 64
-        threads_per_core = 2
-        gpus_per_node = 4
-
-    cpu_config = AtosAcCpuConfig
-
-    launcher = SrunLauncher
-
-class Lumi(Arch):
-    # Define the default partition
-    partition : str
-
-    @classmethod
-    def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
-            launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
-        """Build job description using :attr:`cpu_config`"""
-
-        # Setup environment
-        if env is None:
-            env = os.environ.copy()
-        env['OMP_NUM_THREADS'] = cpus_per_task
-        # TODO: Ensure proper pinning
-
-        # Fill nodes as much as possible
-        max_tasks_per_node = cls.cpu_config.cores_per_node * threads_per_core // cpus_per_task
-        tasks_per_node = kwargs.pop('tasks_per_node', min(tasks, max_tasks_per_node))
-
-        # Use the correct partition.
-        launch_user_options = list(as_tuple(launch_user_options))
-        launch_user_options.insert(0, f"--partition={cls.partition}")
-
-
-        # If GPUs are used, limit the number of tasks per node.
-        if gpus_per_task is not None and gpus_per_task > 0:
-            if cls.cpu_config.gpus_per_node // gpus_per_task <= 0:
-                raise ValueError(f"Not enough GPUs are available on the "
-                    f"architecture {cls.__name__}!")
-
-            tasks_per_node = min(
-                tasks_per_node,
-                cls.cpu_config.gpus_per_node // gpus_per_task
-            )
-
-            use_gpu_mpi = kwargs.pop('mpi_gpu_aware', False)
-
-            if use_gpu_mpi:
-                env['MPICH_GPU_SUPPORT_ENABLED'] = '1'
-                env['MPICH_SMP_SINGLE_COPY_MODE'] = 'NONE'
-                env['MPICH_GPU_IPC_ENABLED'] = '0'
-
-        # Bind to cores
-        bind = CpuBinding.BIND_CORES
-
-        # Build job description
-        job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
-                  cpus_per_task=cpus_per_task, threads_per_core=threads_per_core,
-                  bind=bind, gpus_per_task=gpus_per_task)
-
-        # Launch via generic run
-        cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
-                    logfile=logfile, env=env, **kwargs)
-
-
-class LumiC(Lumi):
-    """
-    Architecture for the LUMI-C partition.
-    """
-
-    partition = "standard"
-
-    class LumiCCpuConfig(CpuConfiguration):
-        sockets_per_node = 2
-        cores_per_socket = 64
-        threads_per_core = 2
-
-    cpu_config = LumiCCpuConfig
-
-    launcher = SrunLauncher
-
-
-class LumiG(Lumi):
-    """
-    Architecture for the LUMI-G partition. Only 56 cores per node are available
-    per node!
-    """
-
-    partition = "standard-g"
-
-    class LumiGCpuConfig(CpuConfiguration):
-        """
-        Single 64 core AMD EPYC 7A53 "Trento" CPU. One core per L3 region is
-        deactivated, giving 56 usable cores in total.
-        The node is also equipped with four AMD MI250X GPUs which in turn
-        contain two GPU dies (the SLURM scheduler treats this as eight distinct
-        GPUs).
-        The CPU has 128GiB main memory and each MI250X has 2x64GB HBM memory.
-        """
-        sockets_per_node = 1
-        cores_per_socket = 56
-        threads_per_core = 2
-        gpus_per_node = 8
-
-    cpu_config = LumiGCpuConfig
-
-    launcher = SrunLauncher
-
-
-arch_registry = {
-    None: AtosAaIntel,
-    'workstation': Workstation,
-    'xc40': XC40Cray,
-    'xc40cray': XC40Cray,
-    'xc40intel': XC40Intel,
-    'atos_aa': AtosAaIntel,
-    'atos_ac': AtosAc,
-    'lumi_c': LumiC,
-    'lumi_g': LumiG
-}
-"""String-lookup of :any:`Arch` implementations"""
