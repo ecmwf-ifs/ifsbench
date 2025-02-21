@@ -15,22 +15,32 @@ from ifsbench import (Job, MpirunLauncher, EnvHandler, EnvOperation,
     DefaultEnvPipeline, CpuBinding, CpuDistribution)
 
 
-_test_env = DefaultEnvPipeline([
+@pytest.fixture(name='test_env')
+def fixture_test_env():
+    return DefaultEnvPipeline([
         EnvHandler(EnvOperation.SET, 'SOME_VALUE', '5'),
         EnvHandler(EnvOperation.SET, 'OTHER_VALUE', '6'),
         EnvHandler(EnvOperation.DELETE, 'SOME_VALUE'),
-])
+    ])
 
-@pytest.mark.parametrize('cmd,job_in,library_paths,env_pipeline,custom_flags,env_out', [
-    (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], None, [], {}),
-    (['something'], {}, ['/library/path', '/more/paths'], None, [], {'LD_LIBRARY_PATH': '/library/path:/more/paths'}),
-    (['whatever'], {'nodes': 12}, ['/library/path'], _test_env, [],
+@pytest.fixture(name='test_env_none')
+def fixture_test_env_none():
+    return None
+
+@pytest.mark.parametrize('cmd,job_in,library_paths,env_pipeline_name,custom_flags,env_out', [
+    (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], 'test_env_none', [], {}),
+    (['something'], {}, ['/library/path', '/more/paths'], 'test_env_none', [],
+        {'LD_LIBRARY_PATH': '/library/path:/more/paths'}),
+    (['whatever'], {'nodes': 12}, ['/library/path'], 'test_env', [],
         {'LD_LIBRARY_PATH': '/library/path', 'OTHER_VALUE': '6'}),
 ])
-def test_mpirunLauncher_prepare_env(tmp_path, cmd, job_in, library_paths, env_pipeline, custom_flags, env_out):
+def test_mpirunLauncher_prepare_env(tmp_path, cmd, job_in, library_paths, env_pipeline_name,
+                                  custom_flags, env_out, request):
     """
     Test the env component of the LaunchData object that is returned by MpirunLauncher.prepare.
     """
+    env_pipeline = request.getfixturevalue(env_pipeline_name)
+
     launcher = MpirunLauncher()
     job = Job(**job_in)
 
@@ -38,15 +48,18 @@ def test_mpirunLauncher_prepare_env(tmp_path, cmd, job_in, library_paths, env_pi
 
     assert result.env == {**env_out}
 
-@pytest.mark.parametrize('cmd,job_in,library_paths,env_pipeline,custom_flags', [
-    (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], None, []),
-    (['something'], {}, ['/library/path', '/more/paths'], None, []),
-    (['whatever'], {'nodes': 12}, ['/library/path'], _test_env, []),
+@pytest.mark.parametrize('cmd,job_in,library_paths,env_pipeline_name,custom_flags', [
+    (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], 'test_env_none', []),
+    (['something'], {}, ['/library/path', '/more/paths'], 'test_env_none', []),
+    (['whatever'], {'nodes': 12}, ['/library/path'], 'test_env', []),
 ])
-def test_mpirunLauncher_prepare_run_dir(tmp_path, cmd, job_in, library_paths, env_pipeline, custom_flags):
+def test_mpirunLauncher_prepare_run_dir(tmp_path, cmd, job_in, library_paths, env_pipeline_name,
+                                        custom_flags, request):
     """
     Test the run_dir component of the LaunchData object that is returned by MpirunLauncher.prepare.
     """
+    env_pipeline = request.getfixturevalue(env_pipeline_name)
+
     launcher = MpirunLauncher()
     job = Job(**job_in)
 
@@ -54,21 +67,24 @@ def test_mpirunLauncher_prepare_run_dir(tmp_path, cmd, job_in, library_paths, en
 
     assert result.run_dir == tmp_path
 
-@pytest.mark.parametrize('cmd,job_in,library_paths,env_pipeline,custom_flags, cmd_out', [
-    (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], None, [],
+@pytest.mark.parametrize('cmd,job_in,library_paths,env_pipeline_name,custom_flags, cmd_out', [
+    (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], 'test_env_none', [],
         ['mpirun', '--n=64', '--cpus-per-proc=4', 'ls', '-l']),
-    (['something'], {}, ['/library/path', '/more/paths'], None, ['--some-more'],
+    (['something'], {}, ['/library/path', '/more/paths'], 'test_env_none', ['--some-more'],
         ['mpirun', '--some-more', 'something']),
-    (['whatever'], {'nodes': 12, 'gpus_per_task': 2}, ['/library/path'], _test_env, [],
+    (['whatever'], {'nodes': 12, 'gpus_per_task': 2}, ['/library/path'], 'test_env', [],
         ['mpirun', 'whatever']),
     (['bind_hell'], {'bind': CpuBinding.BIND_THREADS, 'distribute_local': CpuDistribution.DISTRIBUTE_CYCLIC},
-        ['/library/path'], _test_env, [],
+        ['/library/path'], 'test_env', [],
         ['mpirun', '--bind-to', 'hwthread', '--map-by', 'numa', 'bind_hell']),
 ])
-def test_mpirunLauncher_prepare_cmd(tmp_path, cmd, job_in, library_paths, env_pipeline, custom_flags, cmd_out):
+def test_mpirunLauncher_prepare_cmd(tmp_path, cmd, job_in, library_paths, env_pipeline_name,
+                                    custom_flags, cmd_out, request):
     """
     Test the cmd component of the LaunchData object that is returned by MpirunLauncher.prepare.
     """
+    env_pipeline = request.getfixturevalue(env_pipeline_name)
+
     launcher = MpirunLauncher()
     job = Job(**job_in)
 
