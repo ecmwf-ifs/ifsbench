@@ -5,6 +5,6 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-from .launcher import * # noqa
-from .mpirunlauncher import * # noqa
-from .srunlauncher import * # noqa
+from ifsbench.launcher.launcher import * # noqa
+from ifsbench.launcher.mpirunlauncher import * # noqa
+from ifsbench.launcher.srunlauncher import * # noqa

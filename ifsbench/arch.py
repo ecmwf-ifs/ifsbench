@@ -59,7 +59,6 @@ class Arch(ABC):
         Launcher
             The default launcher used in this architecture.
         """
-        return NotImplemented
 
     @abstractmethod
     def get_cpu_configuration(self):
@@ -70,8 +69,6 @@ class Arch(ABC):
         -------
         CpuConfiguration
         """
-        return NotImplemented
-
 
     @abstractmethod
     def process_job(self, job, **kwargs):
@@ -92,7 +89,6 @@ class Arch(ABC):
         -------
         ArchResult
         """
-        return NotImplemented
 
 class DefaultArch(Arch):
 

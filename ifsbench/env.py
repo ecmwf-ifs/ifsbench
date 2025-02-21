@@ -8,6 +8,7 @@
 from abc import ABC, abstractmethod
 from collections import UserList
 from enum import auto, Enum
+import os
 
 from ifsbench.logging import debug
 
@@ -96,14 +97,14 @@ class EnvHandler:
             env[self._key] = self._value
         elif self._mode == EnvOperation.APPEND:
             if env.get(self._key, None) is not None:
-                env[self._key] += ":" + self._value
+                env[self._key] += os.pathsep + self._value
             else:
                 env[self._key] = self._value
 
             debug(f"Append {self._value} to environment variable {self._key}.")
         elif self._mode == EnvOperation.PREPEND:
             if env.get(self._key, None) is not None:
-                env[self._key] = self._value + ':' + env[self._key]
+                env[self._key] = self._value + os.pathsep + env[self._key]
             else:
                 env[self._key] = self._value
 
@@ -155,7 +156,7 @@ class DefaultEnvPipeline(EnvPipeline):
 
     Parameters
     ----------
-    overrides: list[EnvHandler]
+    handlers: list[EnvHandler]
         The environment operations that should be incorporated.
     env_initial: dict or None
         The initial environment. If None, an empty environment is used.
@@ -194,4 +195,3 @@ class DefaultEnvPipeline(EnvPipeline):
             handler.execute(env)
 
         return env
-    
