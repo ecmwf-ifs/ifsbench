@@ -13,13 +13,14 @@ This package contains Python utilities to run and benchmark the IFS.
 
 from importlib.metadata import version, PackageNotFoundError
 
+from ifsbench.application import * # noqa
 from ifsbench.arch import * # noqa
-from ifsbench.benchmark import * # noqa
 from ifsbench.cli import * # noqa
 from ifsbench.config_mixin import * # noqa
 from ifsbench.config_utils import * # noqa
 from ifsbench.darshanreport import * # noqa
 from ifsbench.drhook import * # noqa
+from ifsbench.env import * # noqa
 from ifsbench.files import * # noqa
 from ifsbench.gribfile import * # noqa
 from ifsbench.ifs import * # noqa

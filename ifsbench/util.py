@@ -32,7 +32,7 @@ def execute(command, **kwargs):
 
     Parameters
     ----------
-    command : str or list of str
+    command : list of str
         The (components of the) command to execute.
     cwd : str, optional
         Directory in which to execute command.
@@ -51,11 +51,6 @@ def execute(command, **kwargs):
     dryrun = kwargs.pop('dryrun', False)
     logfile = kwargs.pop('logfile', None)
 
-    # Some string mangling to support lists and strings
-    if isinstance(command, list):
-        command = ' '.join(command)
-    if isinstance(command, str):
-        command = command.split(' ')
 
     debug(f'[ifsbench] User env:\n{pformat(env, indent=2)}')
     if env is not None:
