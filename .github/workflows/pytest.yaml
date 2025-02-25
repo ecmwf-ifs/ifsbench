@@ -30,7 +30,7 @@ jobs:
           python -m pip install -e .[tests]
 
       - name: Code check
-        run:  pylint --rcfile=.pylintrc --output-format=parseable:pylint.log,text tests ifsbench scripts
+        run:  pylint --rcfile=.pylintrc --output-format=parseable:pylint.log,text tests ifsbench
 
   pytest:
 

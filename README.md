@@ -52,5 +52,5 @@ See [INSTALL.md](INSTALL.md).
 The code should be checked with pylint in order to conform with the standards
 specified in `.pylintrc`:
 ```
-<build_dir>/ifsbench_env/bin/pylint --rcfile=.pylintrc ifsbench/ scripts/ tests/
+<build_dir>/ifsbench_env/bin/pylint --rcfile=.pylintrc ifsbench/ tests/
 ```
