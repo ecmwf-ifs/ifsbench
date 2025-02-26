@@ -9,6 +9,6 @@
 Command Line Interfaces (CLI) and utilities for ifsbench functionalities.
 """
 
-from ifsbench.cli.cli import * # noqa
-from ifsbench.cli.pack import * # noqa
-from ifsbench.cli.nml_diff import * # noqa
+from ifsbench.command_line.cli import * # noqa
+from ifsbench.command_line.pack import * # noqa
+from ifsbench.command_line.nml_diff import * # noqa

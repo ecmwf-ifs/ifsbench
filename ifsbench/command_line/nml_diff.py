@@ -63,7 +63,7 @@ def print_diff(diff, indent=0):
                 type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True))
 @click.argument('namelist2', required=True,
                 type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True))
-def cli(color, namelist1, namelist2):
+def nml_diff(color, namelist1, namelist2):
     """
     Compare two namelist files and print any differences.
     """

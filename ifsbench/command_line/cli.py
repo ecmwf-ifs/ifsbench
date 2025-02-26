@@ -221,7 +221,7 @@ def reference_options(func):
     * ``--update-reference``: Flag to update reference record with result
     * ``--comment``: Comment to store when updating reference record
 
-    The options are stored in a :any:`ReferencenOptions` object that is passed to
+    The options are stored in a :any:`ReferenceOptions` object that is passed to
     the sub-command.
 
     To make these options available to a `click` command, simply apply the
