@@ -100,7 +100,7 @@ def sanitize_namelist(nml, merge_strategy='first', mode='auto'):
 
     Parameters
     ----------
-    nml : :any:`f90nml.Namelist`
+    nml : :any:`f90nml.namelist.Namelist`
         The namelist to sanitise
     merge_strategy : str, optional
         The merge strategy to use.
@@ -109,7 +109,7 @@ def sanitize_namelist(nml, merge_strategy='first', mode='auto'):
 
     Returns
     -------
-    f90nml.Namelist
+    f90nml.namelist.Namelist
         The sanitised namelist
     """
     unique_namelist_names = list(dict.fromkeys(nml.keys()))
@@ -153,19 +153,19 @@ def sanitize_namelist(nml, merge_strategy='first', mode='auto'):
 
 def namelist_diff(nml, other_nml):
     """
-    Find differences between :any:`f90nml.Namelist` objects :attr:`nml` and
+    Find differences between :any:`f90nml.namelist.Namelist` objects :attr:`nml` and
     :attr:`other_nml`
 
     Parameters
     ----------
-    nml : :any:`f90nml.Namelist`
+    nml : :any:`f90nml.namelist.Namelist`
         A namelist object
-    other_nml : :any:`f90nml.Namelist`
+    other_nml : :any:`f90nml.namelist.Namelist`
         A namelist object to compare to the first
 
     Returns
     -------
-    :any:`OrderedDict`
+    :class:`collections.OrderedDict`
         Differences between the two namelists as 2-tuple with the corresponding
         values from :attr:`nml` and :attr:`other_nml`. Values or groups that
         are present only in one are reported as `None` for the other.

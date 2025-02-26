@@ -37,13 +37,15 @@ class CpuConfiguration:
 
     def cores_per_node(self):
         """
-        The number of physical cores per node
+        The number of physical cores per node. This value is automatically derived
+        from the above properties.
         """
         return self.sockets_per_node * self.cores_per_socket
 
     def threads_per_node(self):
         """
-        The number of logical cores (threads) per node
+        The number of logical cores per node (threads). This value is automatically derived
+        from the above properties.
         """
         return self.cores_per_node * self.threads_per_core
 

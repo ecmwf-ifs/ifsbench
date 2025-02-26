@@ -38,24 +38,21 @@ class SpecialRelativePath:
     class NameMatch(Enum):
         """
         Enumeration of available types of name matches
-
-        Attributes
-        ----------
-        EXACT :
-            Match the name exactly as is
-        LEFT_ALIGNED :
-            Match the name from the start but it can be followed
-            by other characters
-        RIGHT_ALIGNED :
-            Match the name from the end but it can be preceded by
-            other characters
-        FREE :
-            Match the name but allow for other characters before
-            and after
         """
+
+        #: Match the name exactly as is
         EXACT = auto()
+
+        #: Match the name from the start but it can be followed
+        #: by other characters
         LEFT_ALIGNED = auto()
+
+        #: Match the name from the end but it can be preceded by
+        #: other characters
         RIGHT_ALIGNED = auto()
+
+        #: Match the name but allow for other characters before
+        #: and after
         FREE = auto()
 
     @classmethod

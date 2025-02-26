@@ -19,19 +19,14 @@ __all__ = ['RenameHandler', 'RenameMode']
 class RenameMode(Enum):
     """
     Enumeration of available rename operations.
-
-    Attributes
-    ----------
-    COPY :
-        Copy the file from its current place to the new location.
-    SYMLINK :
-        Create a symlink in the new location, pointing to its current
-        location.
-    MOVE :
-        Move the file from its current place to the new location.
     """
+    #: Copy the file from its current place to the new location.
     COPY = auto()
+
+    #: Create a symlink in the new location, pointing to its current location.
     SYMLINK = auto()
+
+    #: Move the file from its current place to the new location.
     MOVE = auto()
 
 

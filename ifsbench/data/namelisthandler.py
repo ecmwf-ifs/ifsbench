@@ -67,7 +67,7 @@ class NamelistOverride(PydanticConfigMixin):
 
         Parameters
         ----------
-        namelist: :any:`f90nml.Namelist`
+        namelist: :any:`f90nml.namelist.Namelist`
             The namelist to which the changes are applied.
         """
 
