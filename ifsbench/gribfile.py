@@ -245,17 +245,25 @@ def modify_grib_file(
     parameter_config: Optional[Dict[str, GribModification]] = None,
     overwrite_existing: bool = False,
 ) -> None:
-    """Modifies grib data and writes modified GRIB file.
+    """
+    Modifies grib data and writes modified GRIB file.
 
-    The noise scale specified in the config is a multiplier of the 'packingError' field for that
+    The noise scale specified in the config is a multiplier of the ``packingError`` field for that
     parameter.
-    Args:
-        input_path: Path to input GRIB file.
-        output_path: This is where the modified data will be written.
-        base_modification: Modification type to apply to all supported parameters
-          unless otherwise specified in parameter_config.
-        parameter_config: shortNames of parameters that are to be modified and the class instance to apply.
-        overwrite_existing: if output_path file exists, delete it. If False and file exists, exit.
+
+    Parameters
+    ----------
+    input_path:
+        Path to input GRIB file.
+    output_path:
+        This is where the modified data will be written.
+    base_modification:
+        Modification type to apply to all supported parameters
+        unless otherwise specified in :data:`parameter_config`.
+    parameter_config:
+        shortNames of parameters that are to be modified and the class instance to apply.
+    overwrite_existing:
+        if output_path file exists, delete it. If False and file exists, exit.
     """
     if not PYGRIB_AVAILABLE:
         raise RuntimeError(

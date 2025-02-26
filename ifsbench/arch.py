@@ -86,7 +86,7 @@ class Arch(ABC):
             The number of GPUs that are used per MPI task
         kwargs :
             Other arguments that may be used in the architecture implementation
-            or may be passed on to :any:`execute`
+            or may be passed on to :func:`execute`
         """
 
     @classmethod
@@ -121,7 +121,7 @@ class Arch(ABC):
             Custom environment to use
         kwargs :
             Other arguments that may be used in the architecture implementation
-            or may be passed on to :any:`execute`
+            or may be passed on to :func:`execute`
         """
         assert isinstance(job, Job)
         assert job.cpu_config == cls.cpu_config
@@ -203,7 +203,7 @@ class XC40(Arch):
 
 class XC40Cray(XC40):
     """
-    Cray compiler-toolchain setup for :any:`XC40`
+    Cray compiler-toolchain setup for :class:`XC40`
     """
 
     @classmethod
@@ -241,7 +241,7 @@ class XC40Cray(XC40):
 
 class XC40Intel(XC40):
     """
-    Intel compiler-toolchain setup for :any:`XC40`
+    Intel compiler-toolchain setup for :class:`XC40`
     """
 
     @classmethod
@@ -329,7 +329,7 @@ class Atos(Arch):
 
 class AtosAaIntel(Atos):
     """
-    Intel compiler-toolchain setup for :any:`AtosAa`
+    Intel compiler-toolchain setup for :class:`Atos`
     """
 
     class AtosAaCpuConfig(CpuConfiguration):

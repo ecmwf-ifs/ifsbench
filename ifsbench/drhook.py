@@ -104,7 +104,7 @@ class DrHookRecord:
     @classmethod
     def from_dict(cls, data, metadata, orient='index'):
         """
-        Load DrHook output from dumped dictionaries into `pd.DataFrame`s
+        Load DrHook output from dumped dictionaries into :any:`pandas.DataFrame`
         """
         return DrHookRecord(data=pd.DataFrame.from_dict(data, orient=orient),
                             metadata=pd.DataFrame.from_dict(metadata, orient=orient))
@@ -131,7 +131,7 @@ class DrHookRecord:
     @classmethod
     def parse_profiles(cls, filepath):
         """
-        Parse the raw DrHook (per-process) profile files into a ``pandas.DataFrame``.
+        Parse the raw DrHook (per-process) profile files into a :any:`pandas.DataFrame`.
         """
         debug(f'Parsing DrHook profile: {filepath}')
 

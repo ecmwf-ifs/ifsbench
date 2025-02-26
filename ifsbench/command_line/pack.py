@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 import click
 
-from ifsbench.cli import cli
+from ifsbench.command_line.cli import cli
 from ifsbench.darshanreport import (
     DarshanReport, read_files_from_darshan, write_files_from_darshan
 )
