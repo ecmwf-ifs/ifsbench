@@ -11,10 +11,10 @@ from typing import Dict, List
 import pytest
 from pydantic import ValidationError
 
-from ifsbench import ConfigMixin
+from ifsbench import PydanticConfigMixin
 
 
-class TestImpl(ConfigMixin):
+class TestImpl(PydanticConfigMixin):
     field_str: str
     field_int: int
     field_list: List[Dict[str, str]]
@@ -101,7 +101,7 @@ def test_dumb_config_with_class_succeeds():
 
 def test_from_config_invalid_class_member_fails():
 
-    class TestInvalidImpl(ConfigMixin):
+    class TestInvalidImpl(PydanticConfigMixin):
         classname: str
         field_int: int
         field_list: List[Dict[str, str]]

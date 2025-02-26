@@ -14,7 +14,7 @@ from typing_extensions import Self
 
 import f90nml
 
-from ifsbench.config_mixin import ConfigMixin
+from ifsbench.config_mixin import PydanticConfigMixin
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug, info
 
@@ -28,7 +28,7 @@ class NamelistOperation(Enum):
     DELETE = 'delete'
 
 
-class NamelistOverride(ConfigMixin):
+class NamelistOverride(PydanticConfigMixin):
     """
     Specify changes that will be applied to a namelist.
 
@@ -118,7 +118,7 @@ class NamelistOverride(ConfigMixin):
                 del namelist[key]
 
 
-class NamelistHandler(DataHandler, ConfigMixin):
+class NamelistHandler(DataHandler, PydanticConfigMixin):
     """
     DataHandler specialisation that can modify Fortran namelists.
 
