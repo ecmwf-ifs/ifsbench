@@ -47,8 +47,8 @@ docs = [
 ]
 
 [project.scripts]
-  "ifs-bench.py" = "ifsbench.cli.pack:cli"
-  "nml-diff.py" = "ifsbench.cli.nml_diff:cli"
+  "ifs-bench.py" = "ifsbench.command_line.cli:cli"
+  "nml-diff.py" = "ifsbench.command_line.nml_diff:nml_diff"
 
 [tool.setuptools]
 license-files = ["LICENSE", "CONTRIBUTORS.md"]

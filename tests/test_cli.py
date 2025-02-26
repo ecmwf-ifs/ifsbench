@@ -14,7 +14,7 @@ import re
 from click.testing import CliRunner
 import pytest
 
-from ifsbench.cli.cli import cli, reference_options, run_options
+from ifsbench.command_line.cli import cli, reference_options, run_options
 
 
 @pytest.fixture(scope='module', name='runner')
