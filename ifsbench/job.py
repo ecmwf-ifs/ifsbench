@@ -24,47 +24,36 @@ class CpuConfiguration(ABC):
 
     :any:`Arch` should provide an implementation of this class to describe the
     CPU configuration of the available nodes.
-
-    Attributes
-    ----------
-    sockets_per_node : int
-        The number of sockets (sometimes this is also used to describe NUMA domains)
-        available on each node. This must be specified in a derived class.
-    cores_per_socket : int
-        The number of physical cores per socket. This must be specified in a derived class.
-    threads_per_core : int
-        The number of logical cores per physical core (i.e. the number of SMT threads
-        each core can execute). Typically, this is 1 (no hyperthreading), 2 or 4.
-        This must be specified in a derived class.
-    cores_per_node : int
-        The number of physical cores per node. This value is automatically derived
-        from the above properties.
-    threads_per_node : int
-        The number of logical cores per node (threads). This value is automatically derived
-        from the above properties.
-    gpus_per_node : int
-        The number of available GPUs per node.
     """
 
+    #: The number of sockets (sometimes this is also used to describe NUMA domains)
+    #: available on each node. This must be specified in a derived class.
     sockets_per_node: int
 
+    #: The number of physical cores per socket. This must be specified in a derived class.
     cores_per_socket: int
 
+    #: The number of logical cores per physical core (i.e. the number of SMT threads
+    #: each core can execute). Typically, this is 1 (no hyperthreading), 2 or 4.
+    #: This must be specified in a derived class.
     threads_per_core: int
 
+    #: The number of available GPUs per node.
     gpus_per_node = 0
 
     @classproperty
     def cores_per_node(self):
         """
-        The number of physical cores per node
+        The number of physical cores per node. This value is automatically derived
+        from the above properties.
         """
         return self.sockets_per_node * self.cores_per_socket
 
     @classproperty
     def threads_per_node(self):
         """
-        The number of logical cores (threads) per node
+        The number of logical cores per node (threads). This value is automatically derived
+        from the above properties.
         """
         return self.cores_per_node * self.threads_per_core
 
@@ -106,6 +95,7 @@ class CpuDistribution(Enum):
 
     DISTRIBUTE_USER = auto()
     """Indicate that a different user-specified strategy should be used"""
+
 
 class Job:
     """

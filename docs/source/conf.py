@@ -57,6 +57,8 @@ add_module_names = False # Remove namespaces from class/method signatures
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/dev', None),
+    'f90nml': ('https://f90nml.readthedocs.io/en/latest/', None),
 }
 
 # The file extensions of source files. Sphinx considers the files with
@@ -92,7 +94,6 @@ html_static_path = []
 
 html_theme_options = {
     'logo_only': False,
-    'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
     'vcs_pageview_mode': 'view',
