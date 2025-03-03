@@ -8,7 +8,7 @@
 from ifsbench.env import DefaultEnvPipeline, EnvOperation, EnvHandler
 from ifsbench.job import CpuBinding, CpuDistribution
 from ifsbench.logging import warning
-from ifsbench.launcher.launcher import Launcher, LaunchData
+from ifsbench.launch.launcher import Launcher, LaunchData
 
 class MpirunLauncher(Launcher):
     """

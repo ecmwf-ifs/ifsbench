@@ -13,7 +13,7 @@ import sys
 
 import pytest
 
-from ifsbench.launcher import LaunchData
+from ifsbench.launch import LaunchData
 
 @pytest.fixture(name='python_exec')
 def fixture_python():

@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from ifsbench.env import EnvHandler
-from ifsbench.launcher.launcher import Launcher
+from ifsbench.launch.launcher import Launcher
 
 __all__ = ['Arch', 'DefaultArch']
 
