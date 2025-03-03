@@ -36,7 +36,7 @@ jobs:
           make html
 
       - name: Deploy to sites
-        if: github.repository == 'ecmwf-ifs/ifsbench' && github.event_name != 'pull_request'
+        if: github.repository == 'ecmwf-ifs/ifsbench' && github.ref_name == 'main' && github.event_name != 'pull_request'
         env:
           SITES_TOKEN: ${{ secrets.SITES_TOKEN }}
         run: |
