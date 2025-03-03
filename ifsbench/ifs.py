@@ -198,7 +198,7 @@ class IFS(ABC):
         Set-up environment and configuration file and launch an IFS execution
 
         This calls :meth:`IFS.setup_env` and :meth:`IFS.setup_nml` before
-        invoking the architecture's :any:`Arch.run` method.
+        invoking the architecture's :meth:`Arch.run` method.
 
         Parameters
         ----------

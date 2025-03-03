@@ -141,18 +141,22 @@ class Job:
 
     def calculate_missing(self, cpu_configuration):
         """
+        Calculate missing attributes in :class:`Job`
+
         If at least one of
 
         * the total number of MPI tasks (:data:`tasks`)
         * the number of nodes (:data:`nodes`) and the number of tasks per node
-        (:data:`tasks_per_node`)
+          (:data:`tasks_per_node`)
         * the number of nodes (:data:`nodes`) and the number of tasks per socket
-        (:data:`tasks_per_socket`)
+          (:data:`tasks_per_socket`)
 
         is specified, this function calculates missing values for
+
             * tasks
             * nodes
             * tasks_per_node
+
         given hardware configuration. The resulting values are stored in this
         object.
 

@@ -70,12 +70,13 @@ class Arch(ABC):
     @abstractmethod
     def process_job(self, job, **kwargs):
         """
-        Process a given job and add architecture-dependent tweaks. This will
-        return a :class:`ArchResult` object that
+        Process a given job and add architecture-dependent tweaks.
+
+        This will return a :class:`ArchResult` object that
+
         * holds an updated Job object.
         * may specify additional EnvHandler objects needed on this architecture.
-        * may specify additional flags that should be passed to the default
-          launcher.
+        * may specify additional flags that should be passed to the default launcher.
 
         Parameters
         ----------
