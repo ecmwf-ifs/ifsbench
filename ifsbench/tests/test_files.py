@@ -9,9 +9,7 @@
 Tests for all classes that represent benchmark files
 """
 
-from contextlib import contextmanager
 from pathlib import Path
-import shutil
 import tempfile
 
 import pytest
@@ -28,48 +26,40 @@ def fixture_here():
     return Path(__file__).parent.resolve()
 
 
-@contextmanager
-def temporary_tarballdir(basedir):
-    """
-    Create a temporary tarball directory
-    """
-    tarballdir = basedir/'tarballdir'
-    if tarballdir.exists():
-        shutil.rmtree(tarballdir)
-    tarballdir.mkdir(parents=True, exist_ok=True)
-    yield tarballdir
-
-    # Clean up after us
-    if tarballdir.exists():
-        shutil.rmtree(tarballdir)
+@pytest.fixture(name='experiment_files')
+def fixture_experiment_files(here):
+    """Return the full path to the directory with dummy experiment files"""
+    return here/'experiment_files'
 
 
-experiment_files_dict = {
-    'my-exp-id': {
-        '/some/path/to/some/source/dir': {
-            'sub/directory/inputA': {
-                'fullpath': '/some/path/to/some/source/dir/sub/directory/inputA',
-                'sha256sum': 'b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c'
+@pytest.fixture(name='experiment_files_dict')
+def fixture_experiment_files_dict():
+    return {
+        'my-exp-id': {
+            '/some/path/to/some/source/dir': {
+                'sub/directory/inputA': {
+                    'fullpath': '/some/path/to/some/source/dir/sub/directory/inputA',
+                    'sha256sum': 'b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c'
+                },
+                'sub/directory/inputC': {
+                    'fullpath': '/some/path/to/some/source/dir/sub/directory/inputC',
+                    'sha256sum': 'bf07a7fbb825fc0aae7bf4a1177b2b31fcf8a3feeaf7092761e18c859ee52a9c'
+                },
             },
-            'sub/directory/inputC': {
-                'fullpath': '/some/path/to/some/source/dir/sub/directory/inputC',
-                'sha256sum': 'bf07a7fbb825fc0aae7bf4a1177b2b31fcf8a3feeaf7092761e18c859ee52a9c'
+            '/some/other/path/to/some/input/dir': {
+                'subsub/dir/inputB': {
+                    'fullpath': '/some/other/path/to/some/input/dir/subsub/dir/inputB',
+                    'sha256sum': '7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730'
+                },
+            },
+            '/the/path/to/ifsdata': {
+                'some/inputD': {
+                    'fullpath': '/the/path/to/ifsdata/some/inputD',
+                    'sha256sum': 'aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f'
+                },
             },
         },
-        '/some/other/path/to/some/input/dir': {
-            'subsub/dir/inputB': {
-                'fullpath': '/some/other/path/to/some/input/dir/subsub/dir/inputB',
-                'sha256sum': '7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730'
-            },
-        },
-        '/the/path/to/ifsdata': {
-            'some/inputD': {
-                'fullpath': '/the/path/to/ifsdata/some/inputD',
-                'sha256sum': 'aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f'
-            },
-        },
-    },
-}
+    }
 
 
 def test_input_file(here):
@@ -119,7 +109,7 @@ def test_input_file(here):
         _ = InputFile('/i_dont_exist', compute_metadata=True)
 
 
-def test_experiment_files(here):
+def test_experiment_files(tmp_path, experiment_files, experiment_files_dict):
     """
     Test discovery of files in src_dir
     """
@@ -138,21 +128,21 @@ def test_experiment_files(here):
 
     # Update the srcdir which automatically verifies the checksum
     with pytest.raises(ValueError):
-        exp_files.update_srcdir(here, with_ifsdata=True)
+        exp_files.update_srcdir(experiment_files, with_ifsdata=True)
 
     # Do the same but now with correct checksum
     exp_setup['my-exp-id']['/the/path/to/ifsdata']['some/inputD']['sha256sum'] += 'f'
     exp_files = ExperimentFiles.from_dict(exp_setup, verify_checksum=False)
 
     # Update the srcdir for exp_files but not ifsdata
-    exp_files.update_srcdir(here)
-    assert all(str(f.fullpath.parent) == str(here/'inidata') for f in exp_files.exp_files)
+    exp_files.update_srcdir(experiment_files)
+    assert all(str(f.fullpath.parent) == str(experiment_files/'inidata') for f in exp_files.exp_files)
     assert all(str(f.fullpath.parent).startswith('/the/path/to') for f in exp_files.ifsdata_files)
 
     # Update srcdir for all
-    exp_files.update_srcdir(here, with_ifsdata=True)
-    assert all(str(f.fullpath.parent) == str(here/'inidata') for f in exp_files.exp_files)
-    assert all(str(f.fullpath.parent) == str(here/'ifsdata') for f in exp_files.ifsdata_files)
+    exp_files.update_srcdir(experiment_files, with_ifsdata=True)
+    assert all(str(f.fullpath.parent) == str(experiment_files/'inidata') for f in exp_files.exp_files)
+    assert all(str(f.fullpath.parent) == str(experiment_files/'ifsdata') for f in exp_files.ifsdata_files)
 
     # Reload experiment from dict with checksum verification
     reloaded_exp_files = ExperimentFiles.from_dict(exp_files.to_dict(), verify_checksum=True)
@@ -161,21 +151,20 @@ def test_experiment_files(here):
     assert len(reloaded_exp_files.ifsdata_files) == 1
 
     # Pack experiment files to tarballs
-    with temporary_tarballdir(here) as tarballdir:
-        exp_files.to_tarball(tarballdir, with_ifsdata=True)
-        assert Path(tarballdir/here.name).with_suffix('.tar.gz').exists()
-        assert Path(tarballdir/'ifsdata.tar.gz').exists()
-        yaml_file = tarballdir/(exp_files.exp_id+'.yml')
-        exp_files.to_yaml(yaml_file)
+    exp_files.to_tarball(tmp_path, with_ifsdata=True)
+    assert Path(tmp_path/experiment_files.name).with_suffix('.tar.gz').exists()
+    assert Path(tmp_path/'ifsdata.tar.gz').exists()
+    yaml_file = tmp_path/(exp_files.exp_id+'.yml')
+    exp_files.to_yaml(yaml_file)
 
-        # Unpack experiments
-        reloaded_exp_files = ExperimentFiles.from_tarball(
-            yaml_file, input_dir=tarballdir, output_dir=tarballdir, with_ifsdata=True)
-        assert len(reloaded_exp_files.files) == 4
-        assert len(reloaded_exp_files.exp_files) == 3
-        assert len(reloaded_exp_files.ifsdata_files) == 1
-        assert all(str(f.fullpath.parent).startswith(str(tarballdir))
-                   for f in reloaded_exp_files.files)
+    # Unpack experiments
+    reloaded_exp_files = ExperimentFiles.from_tarball(
+        yaml_file, input_dir=tmp_path, output_dir=tmp_path, with_ifsdata=True)
+    assert len(reloaded_exp_files.files) == 4
+    assert len(reloaded_exp_files.exp_files) == 3
+    assert len(reloaded_exp_files.ifsdata_files) == 1
+    assert all(str(f.fullpath.parent).startswith(str(tmp_path))
+                for f in reloaded_exp_files.files)
 
 
 def test_experiment_files_from_darshan(here):

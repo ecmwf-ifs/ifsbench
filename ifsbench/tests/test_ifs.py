@@ -19,6 +19,12 @@ def fixture_here():
     return Path(__file__).parent.resolve()
 
 
+@pytest.fixture(name='namelists')
+def fixture_namelists(here):
+    """Return the full path of the namelists directory"""
+    return here/'namelists'
+
+
 @pytest.mark.parametrize('cycle,expected_type', [
     ('CY46R1', ifs.IFS_CY46R1),
     ('cy46r1', ifs.IFS_CY46R1),
@@ -95,7 +101,7 @@ def test_ifs_setup_env(cycle, prec):
 
 
 @pytest.mark.parametrize('cycle', list(ifs.cycle_registry.keys()))
-def test_ifs_setup_nml(here, cycle):
+def test_ifs_setup_nml(namelists, cycle):
     """
     Verify that a given number of default parameters is set correctly
     in the namelist
@@ -106,13 +112,13 @@ def test_ifs_setup_nml(here, cycle):
     )
 
     obj = ifs.IFS.create_cycle(cycle, builddir='build')
-    nml, kwargs = obj.setup_nml(namelist=(here/'t21_fc.nml'), rundir='.', nproc=12, nproc_io=5,
+    nml, kwargs = obj.setup_nml(namelist=(namelists/'t21_fc.nml'), rundir='.', nproc=12, nproc_io=5,
                                 nthread=1, hyperthread=1, arch=None, foobar='baz')
     assert kwargs == {'foobar': 'baz'}
     groups = tuple(nml.nml.groups())
     assert all(param in groups for param in default_params)
 
-    nml, kwargs = obj.setup_nml(namelist=(here/'t21_fc.nml'), rundir='.', nproc=12, nproc_io=5,
+    nml, kwargs = obj.setup_nml(namelist=(namelists/'t21_fc.nml'), rundir='.', nproc=12, nproc_io=5,
                                 fclen='d10', nthread=1, hyperthread=1, arch=None)
     assert kwargs == {}
     groups = tuple(nml.nml.groups())
