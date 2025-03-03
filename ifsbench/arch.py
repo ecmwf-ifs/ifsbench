@@ -21,21 +21,18 @@ __all__ = ['Arch', 'DefaultArch']
 class ArchResult:
     """
     Holds results of an :meth:`Arch.process` run.
-
-    Attributes:
-    job: Job
-        The updated job after the architecture processing.
-    env_handlers: list[EnvHandler]
-        Additional EnvHandler objects that set architecture-specific environment
-        flags.
-    default_launcher: Launcher
-        The default launcher that is used on this system.
-    default_launcher_flags : list[str]
-        Additional launcher flags that should be added to launcher invocations.
     """
+
+    #: The updated job after the architecture processing.
     job = None
+
+    #: Additional EnvHandler objects that set architecture-specific environment flags.
     env_handlers : List[EnvHandler] = field(default_factory=list)
+
+    #: The default launcher that is used on this system.
     default_launcher : Launcher = None
+
+    #: Additional launcher flags that should be added to launcher invocations.
     default_launcher_flags : List[str] = field(default_factory=list)
 
 

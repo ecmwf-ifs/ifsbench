@@ -18,25 +18,21 @@ __all__ = ['CpuBinding', 'CpuDistribution', 'CpuConfiguration', 'Job']
 class CpuConfiguration:
     """
     This class describes the hardware configuration of compute nodes.
-
-    Attributes
-    ----------
-    sockets_per_node : int
-        The number of sockets (sometimes this is also used to describe NUMA domains)
-        available on each node. This must be specified in a derived class.
-    cores_per_socket : int
-        The number of physical cores per socket. This must be specified in a derived class.
-    threads_per_core : int
-        The number of logical cores per physical core (i.e. the number of SMT threads
-        each core can execute). Typically, this is 1 (no hyperthreading), 2 or 4.
-        This must be specified in a derived class.
-    gpus_per_node : int
-        The number of available GPUs per node.
     """
 
+    #: The number of sockets (sometimes this is also used to describe NUMA domains)
+    #: available on each node. This must be specified in a derived class.
     sockets_per_node : int = 1
+
+    #: The number of physical cores per socket. This must be specified in a derived class.
     cores_per_socket : int = 1
+
+    #: The number of logical cores per physical core (i.e. the number of SMT threads
+    #: each core can execute). Typically, this is 1 (no hyperthreading), 2 or 4.
+    #: This must be specified in a derived class.
     threads_per_core : int = 1
+
+    #: The number of available GPUs per node.
     gpus_per_node : int = 0
 
     def cores_per_node(self):
@@ -93,47 +89,43 @@ class CpuDistribution(Enum):
 class Job:
     """
     Description of a parallel job setup.
-
-    Parameters
-    ----------
-    tasks : int
-        The number of tasks/processes.
-    nodes : int
-        The number of nodes.
-    tasks_per_node : int
-        The number of tasks per node.
-    tasks_per_socket : int
-        The number of tasks per socket.
-    cpus_per_task : int
-        The number of cpus assigned to each task.
-    threads_per_core : int
-        The number of threads that each CPU core should run.
-    gpus_per_task : int
-        The number of GPUs that are required by each task.
-    account : str, optional
-        The account that is passed to the scheduler.
-    partition: str, optional
-        The partition that is passed to the scheduler.
-    bind : :any:`CpuBinding`, optional
-        Specify the binding strategy to use for pinning.
-    distribute_remote : :any:`CpuDistribution`, optional
-        Specify the distribution strategy to use for task distribution across nodes.
-    distribute_local : :any:`CpuDistribution`, optional
-        Specify the distribution strategy to use for task distribution across
-        sockets within a node.
     """
 
+    #: The number of tasks/processes.
     tasks : int = None
+
+    #: The number of nodes.
     nodes : int = None
+
+    #: The number of tasks per node.
     tasks_per_node : int = None
+
+    #: The number of tasks per socket.
     tasks_per_socket : int = None
+
+    #: The number of cpus assigned to each task.
     cpus_per_task : int = None
+
+    #: The number of threads that each CPU core should run.
     threads_per_core : int = None
+
+    #: The number of GPUs that are required by each task.
     gpus_per_task : int = None
+
+    #: The account that is passed to the scheduler.
     account : str = None
+
+    #: The partition that is passed to the scheduler.
     partition : str = None
+
+    #: Specify the binding strategy to use for pinning.
     bind : CpuBinding = None
+
+    #: Specify the distribution strategy to use for task distribution across nodes.
     distribute_remote : CpuDistribution = None
+
+    #: Specify the distribution strategy to use for task distribution across
+    #: sockets within a node.
     distribute_local : CpuDistribution = None
 
     def copy(self):

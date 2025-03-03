@@ -20,25 +20,21 @@ class EnvOperation(Enum):
     Enum of environment operations.
 
     Specifies operations on environment variables.
-
-    Attributes
-    ----------
-
-    SET
-        Set a given environment variable.
-    APPEND
-        Append to a given environment variable.
-    PREPEND
-        Prepend to a given environment variable.
-    DELETE
-        Delete/unset a given environment variable.
-    CLEAR
-        Clear the whole environment
     """
+
+    #: Set a given environment variable.
     SET = auto()
+
+    #: Append to a given environment variable.
     APPEND = auto()
+
+    #: Prepend to a given environment variable.
     PREPEND = auto()
+
+    #: Delete/unset a given environment variable.
     DELETE = auto()
+
+    #: Clear the whole environment.
     CLEAR = auto()
 
 class EnvHandler:
