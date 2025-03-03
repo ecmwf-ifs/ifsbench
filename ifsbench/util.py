@@ -8,22 +8,16 @@
 """
 Collection of utility routines
 """
-import contextlib
 from os import environ, getcwd
 from pathlib import Path
 from pprint import pformat
-import shutil
 from subprocess import Popen, STDOUT, PIPE, CalledProcessError
 import sys
-import timeit
 
-from ifsbench.logging import debug, info, warning, error
+from ifsbench.logging import debug, info, error
 
 
-__all__ = [
-    'execute', 'symlink_data', 'copy_data', 'Timer', 'classproperty',
-    'auto_post_mortem_debugger'
-]
+__all__ = ['execute', 'auto_post_mortem_debugger']
 
 
 def execute(command, **kwargs):
@@ -129,73 +123,6 @@ def execute(command, **kwargs):
         if _log_file:
             _log_file.close()
 
-
-def symlink_data(source, dest, force=True):
-    """
-    Utility to symlink input data if it doesn't exist.
-
-    :param source: Path of the original file to link to
-    :param dest: Path of the new symlink
-    :param force: Force delete and re-link for existing symlinks
-    """
-    if not source.exists():
-        warning(f'Trying to link non-existent file: {source}')
-
-    if not dest.parent.exists():
-        dest.parent.mkdir(parents=True)
-
-    if dest.exists():
-        if not dest.resolve() == source and force:
-            # Delete and re-link of path points somewhere else
-            dest.unlink()
-            debug(f'Symlinking {source} -> {dest}')
-            dest.symlink_to(source)
-    else:
-        debug(f'Symlinking {source} -> {dest}')
-        dest.symlink_to(source)
-
-
-def copy_data(source, dest, force=False):
-    """
-    Utility to copy input data if it doesn't exist.
-
-    Note, if the target file exists, the "last modified" time will be
-    used to decide if the file should be copoed iver again, unless the
-    copy is explicitly forced.
-
-    :param source: Path of the input file to copy
-    :param dest: Path of the target to copy :param source: to
-    :param force: Force delete and copy for existing symlinks
-    """
-    if not source.exists():
-        raise RuntimeError(f'Trying to copy non-existent file: {source}')
-
-    if not dest.parent.exists():
-        dest.parent.mkdir(parents=True)
-
-    if dest.exists():
-        if force or source.stat().st_mtime > dest.stat().st_mtime:
-            # Delete and re-link if `dest` points somewhere else
-            dest.unlink()
-            debug(f'Copying {source} -> {dest}')
-            shutil.copyfile(source, dest)
-    else:
-        debug(f'Copying {source} -> {dest}')
-        shutil.copyfile(source, dest)
-
-
-@contextlib.contextmanager
-def Timer(name=None):
-    """
-    Utility to do inline timing of code blocks
-    """
-    start_time = timeit.default_timer()
-    yield
-    end_time = timeit.default_timer()
-    time = end_time - start_time
-    print(f'Timer::{name}: {time:.3f} s')
-
-
 def as_tuple(item, dtype=None, length=None):
     """
     Force item to a tuple, even if `None` is provided.
@@ -220,48 +147,6 @@ def as_tuple(item, dtype=None, length=None):
     if dtype and not all(isinstance(i, dtype) for i in t):
         raise TypeError(f'Items need to be of type {dtype}')
     return t
-
-
-def is_iterable(o):
-    """
-    Checks if an item is truly iterable using duck typing.
-
-    This was added because :class:`pymbolic.primitives.Expression` provide an ``__iter__`` method
-    that throws an exception to avoid being iterable. However, with that method defined it is
-    identified as a :class:`collections.Iterable` and thus this is a much more reliable test.
-    """
-    try:
-        iter(o)
-    except TypeError:
-        return False
-    return True
-
-
-def flatten(l):
-    """
-    Flatten a hierarchy of nested lists into a plain list.
-    """
-    newlist = []
-    for el in l:
-        if is_iterable(el) and not isinstance(el, (str, bytes)):
-            for sub in flatten(el):
-                newlist.append(sub)
-        else:
-            newlist.append(el)
-    return newlist
-
-
-class classproperty:
-    """
-    Decorator to make classmethods available as class properties
-    """
-
-    def __init__(self, method):
-        self._method = method
-
-    def __get__(self, instance, owner):  # pylint:disable=unused-argument
-        return self._method(owner)
-
 
 def auto_post_mortem_debugger(type, value, tb):  # pylint: disable=redefined-builtin
     """
