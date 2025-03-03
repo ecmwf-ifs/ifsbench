@@ -26,7 +26,7 @@ from importlib import metadata
 
 project = 'ifsbench'
 copyright = '2020- European Centre for Medium-Range Weather Forecasts (ECMWF)'
-author = 'Michael Lange, Balthasar Reuter, Johannes Bulin'
+author = 'Michael Lange, Balthasar Reuter, Johannes Bulin, Ulrike Hager'
 
 # The full version, including alpha/beta/rc tags.
 release = metadata.version('ifsbench')
