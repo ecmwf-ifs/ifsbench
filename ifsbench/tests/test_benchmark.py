@@ -59,8 +59,8 @@ def fixture_test_setup_2():
         data_handlers = data_handlers
     )
 
-@pytest.mark.parametrize('name1', ['test_setup_empty', 'test_setup_1', 'test_setup_1'])
-@pytest.mark.parametrize('name2', ['test_setup_empty', 'test_setup_1', 'test_setup_1'])
+@pytest.mark.parametrize('name1', ['test_setup_empty', 'test_setup_1', 'test_setup_2'])
+@pytest.mark.parametrize('name2', ['test_setup_empty', 'test_setup_1', 'test_setup_2'])
 def test_defaultbenchmark_setup_merge(request, name1, name2):
     """
     Test the DefaultBenchmarkSetup.merge function.
