@@ -24,7 +24,6 @@ from ifsbench.drhook import * # noqa
 from ifsbench.env import * # noqa
 from ifsbench.files import * # noqa
 from ifsbench.gribfile import * # noqa
-from ifsbench.ifs import * # noqa
 from ifsbench.job import * # noqa
 from ifsbench.launch import * # noqa
 from ifsbench.logging import * # noqa
