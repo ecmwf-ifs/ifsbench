@@ -9,14 +9,14 @@
 Hardware and job resource description classes.
 """
 
-from dataclasses import dataclass, replace
-from enum import Enum, auto
+from enum import Enum
+
+from ifsbench.config_mixin import PydanticConfigMixin
 
 __all__ = ['CpuBinding', 'CpuDistribution', 'CpuConfiguration', 'Job']
 
 
-@dataclass
-class CpuConfiguration:
+class CpuConfiguration(PydanticConfigMixin):
     """
     This class describes the hardware configuration of compute nodes.
     """
@@ -48,52 +48,51 @@ class CpuConfiguration:
         The number of logical cores per node (threads). This value is automatically derived
         from the above properties.
         """
-        return self.cores_per_node * self.threads_per_core
+        return self.cores_per_node() * self.threads_per_core
 
 
-class CpuBinding(Enum):
+class CpuBinding(str, Enum):
     """
     Description of CPU binding strategy to use, for which the launch
     command should provide the appropriate options
     """
 
-    BIND_NONE = auto()
+    BIND_NONE = 'none'
     """Disable all binding specification"""
 
-    BIND_SOCKETS = auto()
+    BIND_SOCKETS = 'sockets'
     """Bind tasks to sockets"""
 
-    BIND_CORES = auto()
+    BIND_CORES = 'cores'
     """Bind tasks to cores"""
 
-    BIND_THREADS = auto()
+    BIND_THREADS = 'threads'
     """Bind tasks to hardware threads"""
 
-    BIND_USER = auto()
+    BIND_USER = 'user'
     """Indicate that a different user-specified strategy should be used"""
 
 
-class CpuDistribution(Enum):
+class CpuDistribution(str, Enum):
     """
     Description of CPU distribution strategy to use, for which the launch
     command should provide the appropriate options
     """
 
-    DISTRIBUTE_DEFAULT = auto()
+    DISTRIBUTE_DEFAULT = 'default'
     """Use the default distribution strategy"""
 
-    DISTRIBUTE_BLOCK = auto()
+    DISTRIBUTE_BLOCK = 'block'
     """Allocate ranks/threads consecutively"""
 
-    DISTRIBUTE_CYCLIC = auto()
+    DISTRIBUTE_CYCLIC = 'cyclic'
     """Allocate ranks/threads in a round-robin fashion"""
 
-    DISTRIBUTE_USER = auto()
+    DISTRIBUTE_USER = 'user'
     """Indicate that a different user-specified strategy should be used"""
 
 
-@dataclass
-class Job:
+class Job(PydanticConfigMixin):
     """
     Description of a parallel job setup.
     """
@@ -135,12 +134,12 @@ class Job:
     #: sockets within a node.
     distribute_local: CpuDistribution = None
 
-    def copy(self):
+    def clone(self):
         """
         Return a deep copy of this object.
         """
 
-        return replace(self)
+        return self.model_copy(deep=True)
 
     def calculate_missing(self, cpu_configuration: CpuConfiguration) -> None:
         """

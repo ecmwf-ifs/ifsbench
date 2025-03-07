@@ -140,7 +140,7 @@ class DefaultArch(Arch):
         account = self._account
         partition = self._partition
 
-        result.job = job.copy()
+        result.job = job.clone()
 
         if partition:
             result.job.set('partition', partition)
