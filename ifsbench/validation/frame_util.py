@@ -7,7 +7,9 @@
 
 __all__ = ['get_float_columns', 'get_int_columns']
 
-def get_float_columns(frame):
+from pandas import DataFrame
+
+def get_float_columns(frame: DataFrame) -> DataFrame:
     """
     Extract a sub-dataframe which only holds columns that correspond to
     float values.
@@ -31,7 +33,7 @@ def get_float_columns(frame):
 
     return frame[column_keys]
 
-def get_int_columns(frame):
+def get_int_columns(frame: DataFrame) -> DataFrame:
     """
     Extract a sub-dataframe which only holds columns that correspond to
     int values.
