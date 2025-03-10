@@ -18,54 +18,50 @@ from ifsbench.job import Job
 from ifsbench.launch import Launcher
 
 
-__all__ = ['DefaultBenchmarkSetup', 'DefaultBenchmark']
+__all__ = ['DefaultScienceSetup', 'DefaultTechSetup', 'DefaultBenchmark']
 
 @dataclass
-class DefaultBenchmarkSetup:
+class DefaultScienceSetup:
+    """
+    Generic benchmark setup.
+
+    This dataclass holds generic information that is needed by benchmarks.
+    """
+    #: The application that gets benchmarked.
+    application: Application
+
+    #: Data handlers that are executed only once, during the initial setup
+    #: of the run directory.
+    data_handlers_init:  List[DataHandler] = field(default_factory=list)
+
+    #: Data handlers that are executed every time the benchmark is run.
+    data_handlers_runtime:  List[DataHandler] = field(default_factory=list)
+
+    #: Environment handlers that are used when the benchmark is run.
+    env_handlers:  List[EnvHandler] = field(default_factory=list)
+
+@dataclass
+class DefaultTechSetup:
     """
     Generic benchmark setup.
 
     This dataclass holds generic information that is needed by benchmarks.
     """
 
-    #: The data pipeline for the initial data setup.
-    data_handlers:  List[DataHandler] = field(default_factory=list)
+    #: The application that gets benchmarked.
+    application: Optional[Application] = None
+
+    #: Data handlers that are executed only once, during the initial setup
+    #: of the run directory.
+    data_handlers_init:  List[DataHandler] = field(default_factory=list)
+
+    #: Data handlers that are executed every time the benchmark is run.
+    data_handlers_runtime:  List[DataHandler] = field(default_factory=list)
 
     #: Environment handlers that are used for the initial data setup.
     env_handlers:  List[EnvHandler] = field(default_factory=list)
 
-    #: The application that gets benchmarked.
-    application: Optional[Application] = None
-
-    def merge(self, other):
-        """
-        Create a copy of this object and merge it with another given setup
-        object by
-        * appending the data_handlers
-        * appending the env_handlers
-        * replacing the application with ``other.application`` (if specified).
-
-        Parameters
-        ----------
-        other: DefaultBenchmarkSetup
-            The other setup object that is merged into this one.
-
-        Returns
-        -------
-        The merged object.
-        """
-        data_handlers = self.data_handlers + other.data_handlers
-        env_handlers = self.env_handlers + other.env_handlers
-        application = self.application
-        if other.application:
-            application = other.application
-
-        return DefaultBenchmarkSetup(
-            data_handlers = data_handlers,
-            env_handlers = env_handlers,
-            application = application
-        )
-
+@dataclass
 class DefaultBenchmark:
     """
     Generic benchmark implementation.
@@ -77,21 +73,15 @@ class DefaultBenchmark:
 
     Parameters
     ----------
-    setup: DefaultBenchmarkSetup
+    setup: DefaultScienceSetup
         The generic benchmark setup.
-    tech_setup: DefaultBenchmarkSetup or None
+    tech_setup: DefaultTechSetup or None
         If given, an additional DefaultBenchmarkSetup object that can provide
         additional, technical information (additional debug environment flags).
     """
-    def __init__(self,
-        setup: DefaultBenchmarkSetup,
-        tech_setup: Optional[DefaultBenchmarkSetup] = None
-    ):
-        self._setup = setup
 
-        if tech_setup:
-            self._setup = self._setup.merge(tech_setup)
-
+    science: DefaultScienceSetup
+    tech: Optional[DefaultTechSetup] = None
 
     def setup_rundir(self,
         run_dir: Path,
@@ -119,7 +109,11 @@ class DefaultBenchmark:
         if exists and not force:
             return
 
-        for handler in self._setup.data_handlers:
+        handlers = self.science.data_handlers_init
+        if self.tech:
+            handlers += self.tech.data_handlers_init
+
+        for handler in handlers:
             handler.execute(run_dir)
 
 
@@ -147,7 +141,9 @@ class DefaultBenchmark:
             Additional flags to be added to the launcher invocation.
         """
 
-        env_pipeline = DefaultEnvPipeline(handlers=self._setup.env_handlers, env_initial=os.environ)
+        env_pipeline = DefaultEnvPipeline(handlers=self.science.env_handlers, env_initial=os.environ)
+        if self.tech:
+            env_pipeline.add(self.tech.env_handlers)
 
         if arch:
             arch_result = arch.process_job(job)
@@ -164,14 +160,23 @@ class DefaultBenchmark:
         if launcher is None:
             raise ValueError("No launcher was specified!")
 
-        cmd = self._setup.application.get_command(run_dir, job)
-        library_paths = self._setup.application.get_library_paths(run_dir, job)
+        application = self.science.application
+        if self.tech is not None and self.tech.application is not None:
+            application = self.tech.application
 
-        for handler in self._setup.application.get_data_handlers(run_dir, job):
+        cmd = application.get_command(run_dir, job)
+
+        library_paths = application.get_library_paths(run_dir, job)
+
+        data_handlers = list(self.science.data_handlers_runtime)
+        if self.tech:
+            data_handlers += self.tech.data_handlers_runtime
+        data_handlers += application.get_data_handlers(run_dir, job)
+
+        for handler in data_handlers:
             handler.execute(run_dir)
 
-        for handler in self._setup.application.get_env_handlers(run_dir, job):
-            env_pipeline.add(handler)
+        env_pipeline.add(application.get_env_handlers(run_dir, job))
 
         launch = launcher.prepare(run_dir, job, cmd, library_paths, env_pipeline, launcher_flags)
         launch.launch()
