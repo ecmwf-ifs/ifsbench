@@ -147,7 +147,7 @@ class DefaultBenchmark:
             Additional flags to be added to the launcher invocation.
         """
 
-        env_pipeline = DefaultEnvPipeline(self._setup.env_handlers, os.environ)
+        env_pipeline = DefaultEnvPipeline(handlers=self._setup.env_handlers, env_initial=os.environ)
 
         if arch:
             arch_result = arch.process_job(job)
