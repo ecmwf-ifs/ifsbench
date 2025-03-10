@@ -15,68 +15,12 @@ import sys
 
 import pytest
 
-from ifsbench import (DefaultBenchmark, DefaultBenchmarkSetup, DefaultApplication,
-                      EnvOperation, EnvHandler, CpuConfiguration, Job, DefaultArch)
-from ifsbench.data import ExtractHandler, DataHandler
+from ifsbench import (DefaultBenchmark, DefaultScienceSetup, DefaultTechSetup,
+                      DefaultApplication, EnvOperation, EnvHandler,
+                      CpuConfiguration, Job, DefaultArch)
+from ifsbench.data import DataHandler
 from ifsbench.launch import Launcher, LaunchData
 
-
-@pytest.fixture(name='test_setup_empty')
-def fixture_test_setup_empty():
-    return DefaultBenchmarkSetup()
-
-@pytest.fixture(name='test_setup_1')
-def fixture_test_setup_1():
-    env_handlers = [
-        EnvHandler(mode=EnvOperation.SET, key='SOMEVALUE', value='2'),
-        EnvHandler(mode=EnvOperation.APPEND, key='SOMELIST', value='1'),
-    ]
-
-    data_handlers = [
-        ExtractHandler(archive_path='some_path.tar.gz')
-    ]
-
-    return DefaultBenchmarkSetup(
-        application = DefaultApplication(command=['ls', '-l']),
-        env_handlers = env_handlers,
-        data_handlers = data_handlers
-    )
-
-@pytest.fixture(name='test_setup_2')
-def fixture_test_setup_2():
-    env_handlers = [
-        EnvHandler(mode=EnvOperation.CLEAR),
-    ]
-
-    data_handlers = [
-        ExtractHandler(archive_path='some_path.tar.gz'),
-        ExtractHandler(archive_path='some_other_path.tar.gz'),
-    ]
-
-    return DefaultBenchmarkSetup(
-        application = DefaultApplication(command=['pwd']),
-        env_handlers = env_handlers,
-        data_handlers = data_handlers
-    )
-
-@pytest.mark.parametrize('name1', ['test_setup_empty', 'test_setup_1', 'test_setup_2'])
-@pytest.mark.parametrize('name2', ['test_setup_empty', 'test_setup_1', 'test_setup_2'])
-def test_defaultbenchmark_setup_merge(request, name1, name2):
-    """
-    Test the DefaultBenchmarkSetup.merge function.
-    """
-    setup1 = request.getfixturevalue(name1)
-    setup2 = request.getfixturevalue(name2)
-
-    setup_merge = setup1.merge(setup2)
-
-    assert len(setup_merge.data_handlers) == len(setup1.data_handlers + setup2.data_handlers)
-    assert len(setup_merge.env_handlers) == len(setup1.env_handlers + setup2.env_handlers)
-
-    if setup2.application is None:
-        assert setup_merge.application == setup1.application
-    else:
-        assert setup_merge.application == setup2.application
 
 @pytest.fixture(name='test_setup_files')
 def fixture_test_setup_files():
@@ -96,28 +40,46 @@ def fixture_test_setup_files():
         TouchHandler(path='file2'),
     ]
 
-    file_list = [Path('file1'), Path('file2')]
+    science_files = [Path('file1'), Path('file2')]
 
-    return DefaultBenchmarkSetup(
-        application = DefaultApplication(command=['pwd']),
-        env_handlers = env_handlers,
-        data_handlers = data_handlers
-    ), file_list
+    science = DefaultScienceSetup(
+        application=DefaultApplication(command=['pwd']),
+        env_handlers=env_handlers,
+        data_handlers_init=data_handlers
+    )
+
+    tech = DefaultTechSetup(
+        data_handlers_init = [TouchHandler(path='file3')]
+    )
+
+    tech_files = [Path('file3')]
+
+    # Return example tech and science setup as well as the list of files that should
+    # be created by the science/tech data handles.
+    return science, tech, science_files, tech_files
+
 
 @pytest.mark.parametrize('force', [True, False])
-def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force):
+@pytest.mark.parametrize('use_tech', [True, False])
+def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force, use_tech):
     """
     Test the DefaultBenchmark.setup_rundir function.
     """
 
-    setup = test_setup_files[0]
-    file_list = test_setup_files[1]
+    science, tech, science_list, tech_list = test_setup_files
 
-    benchmark = DefaultBenchmark(setup=setup)
+    if use_tech:
+        benchmark = DefaultBenchmark(science=science, tech=tech)
+    else:
+        benchmark = DefaultBenchmark(science=science)
 
     # Create the run directory and check that all files in file list
     # actually exist.
     benchmark.setup_rundir(tmp_path, force)
+
+    file_list = science_list
+    if use_tech:
+        file_list += tech_list
 
     for file in file_list:
         assert (tmp_path/file).exists()
@@ -126,7 +88,7 @@ def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force):
     # "access time" attributes for all the files and sleep.
     stats = {file: (tmp_path/file).stat() for file in file_list}
 
-    sleep(1e-2)
+    sleep(1e-1)
 
     # Now we rerun the setup and check afterwards, if the access times have
     # changed. This gives us information on whether or not the files have been
@@ -152,10 +114,16 @@ def fixture_test_run_setup():
         command = [sys.executable, '-c', 'from pathlib import Path; Path(\'test.txt\').touch()']
     )
 
-    return DefaultBenchmarkSetup(
+    science = DefaultScienceSetup(
         application = application,
         env_handlers = env_handlers,
     )
+
+    tech = DefaultTechSetup(
+        env_handlers = [EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')]
+    )
+
+    return science, tech
 
 class _DummyLauncher(Launcher):
     """
@@ -172,12 +140,19 @@ class _DummyLauncher(Launcher):
     (_DummyLauncher(), None),
     (_DummyLauncher(), ['something'])
 ])
-def test_defaultbenchmark_run(tmp_path, test_run_setup, job, arch, launcher, launcher_flags):
+@pytest.mark.parametrize('use_tech', [True, False])
+def test_defaultbenchmark_run(tmp_path, test_run_setup, job, arch, launcher, launcher_flags, use_tech):
     """
     Test the DefaultBenchmark.run function.
     """
 
-    benchmark = DefaultBenchmark(setup=test_run_setup)
+    science, tech = test_run_setup
+
+    if use_tech:
+        benchmark = DefaultBenchmark(science=science, tech=tech)
+
+    else:
+        benchmark = DefaultBenchmark(science=science)
 
     # Create the run directory and check that all files in file list
     # actually exist.
