@@ -9,14 +9,16 @@ import pathlib
 import shutil
 from typing import Dict, Optional, Union
 
-from ifsbench.config_mixin import PydanticConfigMixin
+from pydantic import Field
+from typing_extensions import Literal
+
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug
 
 __all__ = ['ExtractHandler']
 
 
-class ExtractHandler(DataHandler, PydanticConfigMixin):
+class ExtractHandler(DataHandler):
     """
     DataHandler that extracts a given archive to a specific directory.
 
@@ -33,6 +35,9 @@ class ExtractHandler(DataHandler, PydanticConfigMixin):
         :meth:`execute`.
     """
 
+    handler_type: Literal['ExtractHandler'] = Field(
+        default='ExtractHandler', exclude=True
+    )
     archive_path: str
     target_dir: Optional[str] = None
 
