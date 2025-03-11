@@ -5,6 +5,10 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
+"""
+Generic benchmark implementation.
+"""
+
 from dataclasses import dataclass, field
 import os
 from pathlib import Path
@@ -23,9 +27,18 @@ __all__ = ['DefaultScienceSetup', 'DefaultTechSetup', 'DefaultBenchmark']
 @dataclass
 class DefaultScienceSetup:
     """
-    Generic benchmark setup.
+    Generic (scientific) benchmark setup.
 
-    This dataclass holds generic information that is needed by benchmarks.
+    This dataclass encapsulates the information that is needed to describe a 
+    benchmark:
+      * The application that is benchmarked.
+      * The data pipeline.
+      * The environment variables that are needed.
+
+    This kind of information is called the ``scientific`` setup as it describes
+    _what_ gets benchmarked and _how_.
+    Additional technical details that don't alter results (debug flags, additional
+    environment variables, etc.) should be specified in :class:`DefaultTechSetup`, instead.
     """
     #: The application that gets benchmarked.
     application: Application
@@ -43,12 +56,15 @@ class DefaultScienceSetup:
 @dataclass
 class DefaultTechSetup:
     """
-    Generic benchmark setup.
+    Additional technical details for benchmarks.
 
-    This dataclass holds generic information that is needed by benchmarks.
+    This dataclass can be used in combination with a :class:`DefaultScienceSetup` 
+    to setup a `DefaultBenchmark`. It encapsulates additional technical details 
+    like debug flags, debug executables or performance-altering environment variables
+    that do not change the results of the benchmark.
     """
 
-    #: The application that gets benchmarked.
+    #: If set, this overrides the application that gets benchmarked.
     application: Optional[Application] = None
 
     #: Data handlers that are executed only once, during the initial setup
@@ -70,17 +86,13 @@ class DefaultBenchmark:
       1. Setup a run directory.
       2. Launch a given appliation in the run directory.
       3. Create a result object, using the data in the run directory.
-
-    Parameters
-    ----------
-    setup: DefaultScienceSetup
-        The generic benchmark setup.
-    tech_setup: DefaultTechSetup or None
-        If given, an additional DefaultBenchmarkSetup object that can provide
-        additional, technical information (additional debug environment flags).
     """
 
+    #: The main (scientific) benchmark setup that describes _what_ gets benchmarked
+    # and _which data_ is used.
     science: DefaultScienceSetup
+
+    #: Additional technical details that don't alter the results.
     tech: Optional[DefaultTechSetup] = None
 
     def setup_rundir(self,
