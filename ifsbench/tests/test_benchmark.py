@@ -6,7 +6,7 @@
 # nor does it submit to any jurisdiction.
 
 """
-Some sanity tests the DefaultBenchmark implementation.
+Some sanity tests the Benchmark implementation.
 """
 
 from pathlib import Path
@@ -15,7 +15,7 @@ import sys
 
 import pytest
 
-from ifsbench import (DefaultBenchmark, DefaultScienceSetup, DefaultTechSetup,
+from ifsbench import (Benchmark, ScienceSetup, TechSetup,
                       DefaultApplication, EnvOperation, EnvHandler,
                       CpuConfiguration, Job, DefaultArch)
 from ifsbench.data import DataHandler
@@ -42,13 +42,13 @@ def fixture_test_setup_files():
 
     science_files = [Path('file1'), Path('file2')]
 
-    science = DefaultScienceSetup(
+    science = ScienceSetup(
         application=DefaultApplication(command=['pwd']),
         env_handlers=env_handlers,
         data_handlers_init=data_handlers
     )
 
-    tech = DefaultTechSetup(
+    tech = TechSetup(
         data_handlers_init = [TouchHandler(path='file3')]
     )
 
@@ -63,15 +63,15 @@ def fixture_test_setup_files():
 @pytest.mark.parametrize('use_tech', [True, False])
 def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force, use_tech):
     """
-    Test the DefaultBenchmark.setup_rundir function.
+    Test the Benchmark.setup_rundir function.
     """
 
     science, tech, science_list, tech_list = test_setup_files
 
     if use_tech:
-        benchmark = DefaultBenchmark(science=science, tech=tech)
+        benchmark = Benchmark(science=science, tech=tech)
     else:
-        benchmark = DefaultBenchmark(science=science)
+        benchmark = Benchmark(science=science)
 
     # Create the run directory and check that all files in file list
     # actually exist.
@@ -114,12 +114,12 @@ def fixture_test_run_setup():
         command = [sys.executable, '-c', 'from pathlib import Path; Path(\'test.txt\').touch()']
     )
 
-    science = DefaultScienceSetup(
+    science = ScienceSetup(
         application = application,
         env_handlers = env_handlers,
     )
 
-    tech = DefaultTechSetup(
+    tech = TechSetup(
         env_handlers = [EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')]
     )
 
@@ -143,16 +143,16 @@ class _DummyLauncher(Launcher):
 @pytest.mark.parametrize('use_tech', [True, False])
 def test_defaultbenchmark_run(tmp_path, test_run_setup, job, arch, launcher, launcher_flags, use_tech):
     """
-    Test the DefaultBenchmark.run function.
+    Test the Benchmark.run function.
     """
 
     science, tech = test_run_setup
 
     if use_tech:
-        benchmark = DefaultBenchmark(science=science, tech=tech)
+        benchmark = Benchmark(science=science, tech=tech)
 
     else:
-        benchmark = DefaultBenchmark(science=science)
+        benchmark = Benchmark(science=science)
 
     # Create the run directory and check that all files in file list
     # actually exist.

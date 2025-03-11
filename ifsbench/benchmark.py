@@ -22,10 +22,10 @@ from ifsbench.job import Job
 from ifsbench.launch import Launcher
 
 
-__all__ = ['DefaultScienceSetup', 'DefaultTechSetup', 'DefaultBenchmark']
+__all__ = ['ScienceSetup', 'TechSetup', 'Benchmark']
 
 @dataclass
-class DefaultScienceSetup:
+class ScienceSetup:
     """
     Generic (scientific) benchmark setup.
 
@@ -38,7 +38,7 @@ class DefaultScienceSetup:
     This kind of information is called the ``scientific`` setup as it describes
     _what_ gets benchmarked and _how_.
     Additional technical details that don't alter results (debug flags, additional
-    environment variables, etc.) should be specified in :class:`DefaultTechSetup`, instead.
+    environment variables, etc.) should be specified in :class:`TechSetup`, instead.
     """
     #: The application that gets benchmarked.
     application: Application
@@ -54,12 +54,12 @@ class DefaultScienceSetup:
     env_handlers:  List[EnvHandler] = field(default_factory=list)
 
 @dataclass
-class DefaultTechSetup:
+class TechSetup:
     """
     Additional technical details for benchmarks.
 
-    This dataclass can be used in combination with a :class:`DefaultScienceSetup` 
-    to setup a `DefaultBenchmark`. It encapsulates additional technical details 
+    This dataclass can be used in combination with a :class:`ScienceSetup` 
+    to setup a `Benchmark`. It encapsulates additional technical details 
     like debug flags, debug executables or performance-altering environment variables
     that do not change the results of the benchmark.
     """
@@ -78,7 +78,7 @@ class DefaultTechSetup:
     env_handlers:  List[EnvHandler] = field(default_factory=list)
 
 @dataclass
-class DefaultBenchmark:
+class Benchmark:
     """
     Generic benchmark implementation.
 
@@ -90,10 +90,10 @@ class DefaultBenchmark:
 
     #: The main (scientific) benchmark setup that describes _what_ gets benchmarked
     # and _which data_ is used.
-    science: DefaultScienceSetup
+    science: ScienceSetup
 
     #: Additional technical details that don't alter the results.
-    tech: Optional[DefaultTechSetup] = None
+    tech: Optional[TechSetup] = None
 
     def setup_rundir(self,
         run_dir: Path,
