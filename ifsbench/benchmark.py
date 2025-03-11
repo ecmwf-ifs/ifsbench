@@ -31,7 +31,7 @@ class ScienceSetup:
 
     This dataclass encapsulates the information that is needed to describe a 
     benchmark:
-      * The application that is benchmarked.
+      * The application that is benchmarked (unless overriden by :class:`TechSetup`).
       * The data pipeline.
       * The environment variables that are needed.
 
@@ -40,7 +40,7 @@ class ScienceSetup:
     Additional technical details that don't alter results (debug flags, additional
     environment variables, etc.) should be specified in :class:`TechSetup`, instead.
     """
-    #: The application that gets benchmarked.
+    #: The application that gets benchmarked (unless overriden by :class:`TechSetup`).
     application: Application
 
     #: Data handlers that are executed only once, during the initial setup
