@@ -8,17 +8,32 @@
 """
 Collection of utility routines
 """
+from dataclasses import dataclass
 from os import environ, getcwd
 from pathlib import Path
 from pprint import pformat
-from subprocess import Popen, STDOUT, PIPE, CalledProcessError
+from subprocess import Popen, PIPE
 import sys
 
-from ifsbench.logging import debug, info, error
+from ifsbench.logging import debug, info
 
 
-__all__ = ['execute', 'auto_post_mortem_debugger']
+__all__ = ['ExecuteResult', 'execute', 'auto_post_mortem_debugger']
 
+@dataclass
+class ExecuteResult:
+    """
+    Results of an :func:`execute` invocation.
+    """
+
+    #: The captured standard output.
+    stdout: str
+
+    #: The captured standard error.
+    stderr: str
+
+    #: The return code of the execution.
+    exit_code: int
 
 def execute(command, **kwargs):
     """
@@ -34,11 +49,11 @@ def execute(command, **kwargs):
         Do not actually run the command but log it (default: `False`).
     logfile : str, optional
         Write stdout to this file (default: `None`).
-    stdout : optional
-        Overwrite `stdout` attribute of :any:`subprocess.run`. Ignored if
-        :attr:`logfile` is given (default: `None`).
-    stderr : optional
-        Overwrite `stderr` attribute of :any:`subprocess.run` (default: `None`).
+
+    Returns
+    -------
+    ExecuteResult:
+        The results of the execution (stdout, stderr, exit code)
     """
     cwd = kwargs.pop('cwd', None)
     env = kwargs.pop('env', None)
@@ -57,8 +72,6 @@ def execute(command, **kwargs):
     else:
         run_env = None
 
-    stdout = kwargs.pop('stdout', None)
-    stderr = kwargs.pop('stderr', STDOUT)
 
     # Log the command we're about to execute
     cwd = getcwd() if cwd is None else str(cwd)
@@ -68,60 +81,78 @@ def execute(command, **kwargs):
     if dryrun:
         # Only print the environment when in dryrun mode.
         info('[ifsbench] Environment: ' + str(run_env))
-        return
+        return ExecuteResult(
+            stdout="",
+            stderr="",
+            exit_code=0
+        )
 
     cmd_args = {
-        'cwd': cwd, 'env': run_env, 'text': True, 'stderr': stderr
+        'cwd': cwd, 'env': run_env, 'text': True, 'stdout': PIPE, 'stderr': PIPE
     }
 
     if logfile:
         # If we're file-logging, intercept via pipe
         _log_file = Path(logfile).open('w', encoding='utf-8') # pylint: disable=consider-using-with
-        cmd_args['stdout'] = PIPE
     else:
         _log_file = None
-        cmd_args['stdout'] = stdout
 
+    stdout = ""
+    stderr = ""
 
-    def _read_and_multiplex(p):
+    def _read_and_multiplex(p, stdout, stderr):
         """
         Read from ``p.stdout.read()`` and write to log and sys.stdout.
         """
         line = p.stdout.read()
         if line:
+            stdout += line
+
             # Forward to user output
             sys.stdout.write(line)
 
-            # Also flush to logfile
-            _log_file.write(line)
-            _log_file.flush()
+            if logfile:
+                # Also flush to logfile
+                _log_file.write(line)
+                _log_file.flush()
 
+        line = p.stderr.read()
+        if line:
+            stderr += line
+
+            # Forward to user output
+            sys.stderr.write(line)
+
+            if logfile:
+                # Also flush to logfile
+                _log_file.write(line)
+                _log_file.flush()
+
+        return stdout, stderr
+
+    ret = 1
     try:
         # Execute with our args and outside args
         with Popen(command, **cmd_args, **kwargs) as p:
 
-            if logfile:
-                # Intercept p.stdout and multiplex to file and sys.stdout
-                while p.poll() is None:
-                    _read_and_multiplex(p)
+            # Intercept p.stdout and multiplex to file and sys.stdout
+            while p.poll() is None:
+                stdout, stderr = _read_and_multiplex(p, stdout, stderr)
 
             # Check for successful completion
             ret = p.wait()
 
-            if logfile:
-                # Read one last time to catch racy process output
-                _read_and_multiplex(p)
-
-        if ret:
-            raise CalledProcessError(ret, command)
-
-    except CalledProcessError as excinfo:
-        error(f'Execution failed with return code: {excinfo.returncode}')
-        raise excinfo
-
+            # Read one last time to catch racy process output
+            stdout, stderr = _read_and_multiplex(p, stdout, stderr)
     finally:
         if _log_file:
             _log_file.close()
+
+    return ExecuteResult(
+        stdout=stdout,
+        stderr=stderr,
+        exit_code=ret
+    )
 
 def as_tuple(item, dtype=None, length=None):
     """

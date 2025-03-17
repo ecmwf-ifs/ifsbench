@@ -9,9 +9,8 @@
 Tests for utility routines
 """
 from pathlib import Path
-from subprocess import CalledProcessError
+import sys
 import tempfile
-import pytest
 
 from ifsbench.util import execute
 
@@ -21,15 +20,15 @@ def test_execute():
     Test some aspects of the execute() utility.
     """
     # Very trivial executables with success/error exit codes
-    execute('true')
-    with pytest.raises(CalledProcessError):
-        execute('false')
+    assert execute('true').exit_code == 0
+    assert execute('false').exit_code == 1
 
     with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
         # basic logfile capture validation
         logfile = Path(tmp_dir)/'test_execute.log'
-        execute(['echo', 'foo', 'bar'], logfile=logfile)
+        result = execute(['echo', 'foo', 'bar'], logfile=logfile)
         assert logfile.read_text() == 'foo bar\n'
+        assert result.stdout == 'foo bar\n'
 
         # verify env
         execute(['env'], logfile=logfile, env={'FOO': 'bar', 'BAR': 'foo'})
@@ -46,3 +45,9 @@ def test_execute():
         text = 'abc\n' * 100
         execute(['echo', text], logfile=logfile)
         assert logfile.read_text() == text + '\n'
+
+        # Write to stderr
+        result = execute([sys.executable, '-c', 'import sys; print(\'foo bar\', file=sys.stderr)'], logfile=logfile)
+        assert logfile.read_text() == 'foo bar\n'
+        assert result.stdout == ''
+        assert result.stderr == 'foo bar\n'

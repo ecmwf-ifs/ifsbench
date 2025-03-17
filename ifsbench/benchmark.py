@@ -12,10 +12,12 @@ Generic benchmark implementation.
 from dataclasses import dataclass, field
 import os
 from pathlib import Path
+from time import time
 from typing import List, Optional
 
 from ifsbench.application import Application
 from ifsbench.arch import Arch
+from ifsbench.config_mixin import PydanticConfigMixin
 from ifsbench.data import DataHandler
 from ifsbench.env import EnvHandler, DefaultEnvPipeline
 from ifsbench.job import Job
@@ -29,7 +31,7 @@ class ScienceSetup:
     """
     Generic (scientific) benchmark setup.
 
-    This dataclass encapsulates the information that is needed to describe a 
+    This dataclass encapsulates the information that is needed to describe a
     benchmark:
       * The application that is benchmarked (unless overriden by :class:`TechSetup`).
       * The data pipeline.
@@ -58,8 +60,8 @@ class TechSetup:
     """
     Additional technical details for benchmarks.
 
-    This dataclass can be used in combination with a :class:`ScienceSetup` 
-    to setup a `Benchmark`. It encapsulates additional technical details 
+    This dataclass can be used in combination with a :class:`ScienceSetup`
+    to setup a `Benchmark`. It encapsulates additional technical details
     like debug flags, debug executables or performance-altering environment variables
     that do not change the results of the benchmark.
     """
@@ -76,6 +78,20 @@ class TechSetup:
 
     #: Environment handlers that are used for the initial data setup.
     env_handlers:  List[EnvHandler] = field(default_factory=list)
+
+class BenchmarkSummary(PydanticConfigMixin):
+    """
+    Summary of a benchmark run.
+    """
+
+    #: The standard output of the actual execution.
+    stdout: str
+
+    #: The standard error of the actual execution.
+    stderr: str
+
+    #: The walltime of the actual execution in seconds.
+    walltime: float
 
 @dataclass
 class Benchmark:
@@ -151,6 +167,11 @@ class Benchmark:
             A custom launcher to use. If None, the arch launcher is used.
         launcher_flags: list[str]
             Additional flags to be added to the launcher invocation.
+
+        Returns
+        -------
+        BenchmarkSummary:
+
         """
 
         env_pipeline = DefaultEnvPipeline(handlers=self.science.env_handlers, env_initial=os.environ)
@@ -191,4 +212,16 @@ class Benchmark:
         env_pipeline.add(application.get_env_handlers(run_dir, job))
 
         launch = launcher.prepare(run_dir, job, cmd, library_paths, env_pipeline, launcher_flags)
-        launch.launch()
+
+        start = time()
+        result = launch.launch()
+        elapsed = time() - start
+
+        if result.exit_code != 0:
+            raise RuntimeError("Launching the executable failed!")
+
+        return BenchmarkSummary(
+            stdout=result.stdout,
+            stderr=result.stderr,
+            walltime=elapsed
+        )

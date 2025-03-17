@@ -44,6 +44,11 @@ class LaunchData:
     def launch(self):
         """
         Launch the actual executable.
+
+        Returns
+        -------
+        ifsbench.ExecuteResult:
+            The results of the execution.
         """
 
         info(f"Launch command {self.cmd} in {self.run_dir}.")
@@ -52,7 +57,11 @@ class LaunchData:
         for key, value in self.env.items():
             debug(f"\t{key}={value}")
 
-        execute(command=self.cmd, cwd=self.run_dir, env=self.env)
+        return execute(
+            command=self.cmd,
+            cwd=self.run_dir,
+            env=self.env,
+        )
 
 
 class Launcher(ABC):
