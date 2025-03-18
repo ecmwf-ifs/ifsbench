@@ -6,6 +6,7 @@
 # nor does it submit to any jurisdiction.
 
 from ifsbench.data.datahandler import * # noqa
+from ifsbench.data.datahandler_utils import * # noqa
 from ifsbench.data.extracthandler import * # noqa
 from ifsbench.data.namelisthandler import * # noqa
 from ifsbench.data.renamehandler import * # noqa

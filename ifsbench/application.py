@@ -6,10 +6,15 @@
 # nor does it submit to any jurisdiction.
 
 from abc import ABC, abstractmethod
+from functools import cached_property
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List
 
-from ifsbench.data import DataHandler
+from pydantic import BeforeValidator, Field
+from typing_extensions import Annotated
+
+from ifsbench.config_mixin import PydanticConfigMixin, CLASSNAME
+from ifsbench.data import DataHandler, DataHandlerLookup
 from ifsbench.env import EnvHandler
 from ifsbench.job import Job
 
@@ -106,7 +111,10 @@ class Application(ABC):
         return NotImplemented
 
 
-class DefaultApplication(Application):
+ListValidator = BeforeValidator(lambda in_value: in_value or [])
+
+
+class DefaultApplication(Application, PydanticConfigMixin):
     """
     Default application implementation.
 
@@ -125,29 +133,22 @@ class DefaultApplication(Application):
         The library path list that is returned by get_library_paths.
     """
 
-    def __init__(
-        self,
-        command: List[str],
-        data_handlers: Optional[List[DataHandler]] = None,
-        env_handlers: Optional[List[EnvHandler]] = None,
-        library_paths: Optional[List[Path]] = None,
-    ):
-        self._command = list(command)
+    command: List[str]
+    data_handler_configs: Annotated[List[Dict[str, str]], ListValidator] = Field(
+        default_factory=list
+    )
+    env_handlers: Annotated[List[EnvHandler], ListValidator] = Field(
+        default_factory=list
+    )
+    library_paths: Annotated[List[Path], ListValidator] = Field(default_factory=list)
 
-        if data_handlers:
-            self._data_handlers = list(data_handlers)
-        else:
-            self._data_handlers = []
-
-        if env_handlers:
-            self._env_handlers = list(env_handlers)
-        else:
-            self._env_handlers = []
-
-        if library_paths:
-            self._library_paths = list(library_paths)
-        else:
-            self._library_paths = []
+    @cached_property
+    def _data_handlers(self) -> List[DataHandler]:
+        handlers = []
+        for conf in self.data_handler_configs:
+            clsname = conf.pop(CLASSNAME)
+            handlers.append(DataHandlerLookup[clsname].from_config(conf))
+        return handlers
 
     def get_data_handlers(self, run_dir: Path, job: Job) -> List[DataHandler]:
         del run_dir, job  # Unused
@@ -155,12 +156,12 @@ class DefaultApplication(Application):
 
     def get_env_handlers(self, run_dir: Path, job: Job) -> List[EnvHandler]:
         del run_dir, job  # Unused
-        return list(self._env_handlers)
+        return list(self.env_handlers)
 
     def get_library_paths(self, run_dir: Path, job: Job) -> List[Path]:
         del run_dir, job  # Unused
-        return list(self._library_paths)
+        return list(self.library_paths)
 
     def get_command(self, run_dir: Path, job: Job) -> List[str]:
         del run_dir, job  # Unused
-        return list(self._command)
+        return list(self.command)
