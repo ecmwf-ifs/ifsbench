@@ -12,9 +12,9 @@ import re
 import shutil
 from typing import Union
 
-from pydantic import computed_field
+from pydantic import computed_field, Field
+from typing_extensions import Literal
 
-from ifsbench.config_mixin import PydanticConfigMixin
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug
 
@@ -36,7 +36,7 @@ class RenameMode(str, Enum):
     MOVE = 'move'
 
 
-class RenameHandler(DataHandler, PydanticConfigMixin):
+class RenameHandler(DataHandler):
     """
     DataHandler specialisation that can move/rename files by using regular
     expressions (as in :any:`re.sub`).
@@ -54,6 +54,7 @@ class RenameHandler(DataHandler, PydanticConfigMixin):
         Specifies how the renaming is done (copy, move, symlink).
     """
 
+    handler_type: Literal['RenameHandler'] = Field(default='RenameHandler')
     pattern: str
     repl: str
     mode: RenameMode = RenameMode.SYMLINK

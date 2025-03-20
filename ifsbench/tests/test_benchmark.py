@@ -13,11 +13,21 @@ from pathlib import Path
 from time import sleep
 import sys
 
+from pydantic import Field
 import pytest
+from typing_extensions import Literal
 
-from ifsbench import (Benchmark, ScienceSetup, TechSetup,
-                      DefaultApplication, EnvOperation, EnvHandler,
-                      CpuConfiguration, Job, DefaultArch)
+from ifsbench import (
+    Benchmark,
+    ScienceSetup,
+    TechSetup,
+    DefaultApplication,
+    EnvOperation,
+    EnvHandler,
+    CpuConfiguration,
+    Job,
+    DefaultArch,
+)
 from ifsbench.data import DataHandler
 from ifsbench.launch import Launcher, LaunchData
 
@@ -29,11 +39,11 @@ def fixture_test_setup_files():
     ]
 
     class TouchHandler(DataHandler):
-        def __init__(self, path):
-            self.path = path
+        handler_type: Literal['TouchHandler'] = Field(default='TouchHandler')
+        path: str
 
         def execute(self, wdir, **kwargs):
-            (wdir/self.path).touch()
+            (wdir / self.path).touch()
 
     data_handlers = [
         TouchHandler(path='file1'),
@@ -45,12 +55,10 @@ def fixture_test_setup_files():
     science = ScienceSetup(
         application=DefaultApplication(command=['pwd']),
         env_handlers=env_handlers,
-        data_handlers_init=data_handlers
+        data_handlers_init=data_handlers,
     )
 
-    tech = TechSetup(
-        data_handlers_init = [TouchHandler(path='file3')]
-    )
+    tech = TechSetup(data_handlers_init=[TouchHandler(path='file3')])
 
     tech_files = [Path('file3')]
 
@@ -82,11 +90,11 @@ def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force, use_te
         file_list += tech_list
 
     for file in file_list:
-        assert (tmp_path/file).exists()
+        assert (tmp_path / file).exists()
 
     # We test the "force" flag now. First, we store the current
     # "access time" attributes for all the files and sleep.
-    stats = {file: (tmp_path/file).stat() for file in file_list}
+    stats = {file: (tmp_path / file).stat() for file in file_list}
 
     sleep(1e-1)
 
@@ -95,7 +103,7 @@ def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force, use_te
     # updated.
     benchmark.setup_rundir(tmp_path, force)
     for file in file_list:
-        stat = (tmp_path/file).stat()
+        stat = (tmp_path / file).stat()
 
         # If force was used, the files should have been updated.
         if force:
@@ -111,37 +119,54 @@ def fixture_test_run_setup():
     ]
 
     application = DefaultApplication(
-        command = [sys.executable, '-c', 'from pathlib import Path; Path(\'test.txt\').touch()']
+        command=[
+            sys.executable,
+            '-c',
+            'from pathlib import Path; Path(\'test.txt\').touch()',
+        ]
     )
 
     science = ScienceSetup(
-        application = application,
-        env_handlers = env_handlers,
+        application=application,
+        env_handlers=env_handlers,
     )
 
     tech = TechSetup(
-        env_handlers = [EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')]
+        env_handlers=[EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')]
     )
 
     return science, tech
+
 
 class _DummyLauncher(Launcher):
     """
     Dummy launcher that just calls the given executable.
     """
-    def prepare(self, run_dir, job, cmd, library_paths=None, env_pipeline=None, custom_flags=None):
+
+    def prepare(
+        self,
+        run_dir,
+        job,
+        cmd,
+        library_paths=None,
+        env_pipeline=None,
+        custom_flags=None,
+    ):
         return LaunchData(run_dir=run_dir, cmd=cmd)
 
 
 @pytest.mark.parametrize('job', [Job(tasks=2)])
-@pytest.mark.parametrize('arch', [None, DefaultArch(_DummyLauncher(), CpuConfiguration())])
-@pytest.mark.parametrize('launcher, launcher_flags', [
-    (None, None),
-    (_DummyLauncher(), None),
-    (_DummyLauncher(), ['something'])
-])
+@pytest.mark.parametrize(
+    'arch', [None, DefaultArch(_DummyLauncher(), CpuConfiguration())]
+)
+@pytest.mark.parametrize(
+    'launcher, launcher_flags',
+    [(None, None), (_DummyLauncher(), None), (_DummyLauncher(), ['something'])],
+)
 @pytest.mark.parametrize('use_tech', [True, False])
-def test_defaultbenchmark_run(tmp_path, test_run_setup, job, arch, launcher, launcher_flags, use_tech):
+def test_defaultbenchmark_run(
+    tmp_path, test_run_setup, job, arch, launcher, launcher_flags, use_tech
+):
     """
     Test the Benchmark.run function.
     """
@@ -165,4 +190,4 @@ def test_defaultbenchmark_run(tmp_path, test_run_setup, job, arch, launcher, lau
 
     benchmark.run(tmp_path, job, arch, launcher, launcher_flags)
 
-    assert (tmp_path/'test.txt').exists()
+    assert (tmp_path / 'test.txt').exists()

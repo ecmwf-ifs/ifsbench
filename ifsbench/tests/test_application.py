@@ -9,43 +9,65 @@
 Some sanity tests for :any:`Application` implementations.
 """
 
+from pathlib import Path
+
 import pytest
 
 from ifsbench import DefaultApplication, Job, EnvHandler, EnvOperation
-from ifsbench.data import ExtractHandler
 
-@pytest.mark.parametrize('job, command, data_handlers, env_handlers, library_paths', [
-    (Job(tasks=5), ['ls', '-l'], None, None, None),
-    (Job(nodes=12), ['ls', '-l'], [], [], []),
-    (Job(nodes=12), ['ls', '-l'], [ExtractHandler(archive_path='in', target_dir='out')], [], ['/some/path']),
-    (Job(nodes=12), ['ls', '-l'], [], [EnvHandler(mode=EnvOperation.CLEAR)], []),
-])
-def test_default_application(tmp_path, job, command, data_handlers, env_handlers, library_paths):
-    application = DefaultApplication(command, data_handlers, env_handlers, library_paths)
+
+@pytest.mark.parametrize(
+    'job, command, data_handlers, env_handlers, library_paths',
+    [
+        (Job(tasks=5), ['ls', '-l'], None, None, None),
+        (Job(nodes=12), ['ls', '-l'], [], [], []),
+        (
+            Job(nodes=12),
+            ['ls', '-l'],
+            [
+                {
+                    'handler_type': 'ExtractHandler',
+                    'archive_path': 'in',
+                    'target_dir': 'out',
+                }
+            ],
+            [],
+            [Path('/some/path')],
+        ),
+        (Job(nodes=12), ['ls', '-l'], [], [EnvHandler(mode=EnvOperation.CLEAR)], []),
+    ],
+)
+def test_default_application(
+    tmp_path, job, command, data_handlers, env_handlers, library_paths
+):
+    config = {'command': command}
+    if data_handlers is not None:
+        config['data_handlers'] = data_handlers
+    if env_handlers is not None:
+        config['env_handlers'] = env_handlers
+    if library_paths is not None:
+        config['library_paths'] = library_paths
+    application = DefaultApplication.from_config(config=config)
 
     assert application.get_command(tmp_path, job) == command
-
-    # Pylint doesn't like checks of the kind something == []. We still want to
-    # do this here to check that the application methods return empty lists.
-    # pylint: disable=C1803
 
     if library_paths:
         assert application.get_library_paths(tmp_path, job) == library_paths
     else:
-        assert application.get_library_paths(tmp_path, job) == []
-
+        assert len(application.get_library_paths(tmp_path, job)) == 0
 
     if env_handlers:
         env_out = application.get_env_handlers(tmp_path, job)
         assert len(env_out) == len(env_handlers)
         assert [type(x) for x in env_out] == [type(x) for x in env_handlers]
     else:
-        assert application.get_env_handlers(tmp_path, job) == []
-
+        assert len(application.get_env_handlers(tmp_path, job)) == 0
 
     if data_handlers:
         data_out = application.get_data_handlers(tmp_path, job)
         assert len(data_out) == len(data_handlers)
-        assert [type(x) for x in data_out] == [type(x) for x in data_handlers]
+        assert [type(x).__name__ for x in data_out] == [
+            dh['handler_type'] for dh in data_handlers
+        ]
     else:
-        assert application.get_data_handlers(tmp_path, job) == []
+        assert len(application.get_data_handlers(tmp_path, job)) == 0

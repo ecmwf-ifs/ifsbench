@@ -5,15 +5,18 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from typing import Union
 
 from pathlib import Path
-from typing import Union
+from pydantic import Field
+
+from ifsbench.config_mixin import PydanticConfigMixin
 
 __all__ = ['DataHandler']
 
 
-class DataHandler(ABC):
+class DataHandler(PydanticConfigMixin):
     """
     Base class for data pipeline steps.
 
@@ -21,6 +24,8 @@ class DataHandler(ABC):
     DataHandler objects can be executed sequentially to perform specific data
     setup tasks.
     """
+
+    handler_type: str = Field(exclude=True)
 
     @abstractmethod
     def execute(self, wdir: Union[str, Path], **kwargs):

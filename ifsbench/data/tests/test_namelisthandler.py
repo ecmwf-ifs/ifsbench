@@ -283,6 +283,7 @@ def test_namelisthandler_dump_config(overrides):
     nh = NamelistHandler.from_config(config)
 
     expected = {
+        'handler_type': NamelistHandler.__name__,
         'input_path': input_path,
         'output_path': output_path,
         'overrides': overrides,
@@ -327,6 +328,7 @@ def test_namelisthandler_dump_config_with_classname(overrides):
     nh = NamelistHandler.from_config(config)
 
     expected = {
+        'handler_type': NamelistHandler.__name__,
         'input_path': input_path,
         'output_path': output_path,
         'overrides': overrides,

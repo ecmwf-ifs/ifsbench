@@ -9,8 +9,8 @@ from enum import Enum
 import pathlib
 from typing import Any, Dict, List, Union
 
-from pydantic import model_validator
-from typing_extensions import Self
+from pydantic import Field, model_validator
+from typing_extensions import Literal, Self
 
 import f90nml
 
@@ -118,7 +118,7 @@ class NamelistOverride(PydanticConfigMixin):
                 del namelist[key]
 
 
-class NamelistHandler(DataHandler, PydanticConfigMixin):
+class NamelistHandler(DataHandler):
     """
     DataHandler specialisation that can modify Fortran namelists.
 
@@ -138,6 +138,7 @@ class NamelistHandler(DataHandler, PydanticConfigMixin):
         The NamelistOverrides that will be applied.
     """
 
+    handler_type: Literal['NamelistHandler'] = Field(default='NamelistHandler')
     input_path: pathlib.Path
     output_path: pathlib.Path
     overrides: List[Dict[str, Union[str, int]]]

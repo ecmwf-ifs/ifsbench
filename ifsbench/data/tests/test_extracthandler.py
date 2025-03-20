@@ -59,7 +59,9 @@ def test_extracthandler_model_dump(target_dir):
     eh = ExtractHandler.from_config(config)
     config_dump = eh.dump_config()
 
-    assert config_dump == config
+    expected = dict(config)
+    expected['handler_type'] = ExtractHandler.__name__
+    assert config_dump == expected
 
 
 @pytest.fixture(name='archive')
