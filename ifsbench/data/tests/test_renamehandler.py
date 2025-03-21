@@ -6,7 +6,7 @@
 # nor does it submit to any jurisdiction.
 
 """
-Tests for all classes that represent benchmark files
+Tests for the RenameHandler class.
 """
 
 import pytest
