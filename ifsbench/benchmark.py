@@ -151,7 +151,7 @@ class Benchmark:
         arch: Optional[Arch] = None,
         launcher: Optional[Launcher] = None,
         launcher_flags: Optional[List[str]] = None
-    ):
+    ) -> BenchmarkSummary:
         """
         Run the benchmark.
 
@@ -171,7 +171,8 @@ class Benchmark:
         Returns
         -------
         BenchmarkSummary:
-
+            BenchmarkSummary object that holds the output and the walltime
+            of the benchmark.
         """
 
         env_pipeline = DefaultEnvPipeline(handlers=self.science.env_handlers, env_initial=os.environ)

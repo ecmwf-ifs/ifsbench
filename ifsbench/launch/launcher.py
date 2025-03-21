@@ -16,7 +16,7 @@ from typing import List, Optional
 from ifsbench.job import Job
 from ifsbench.env import EnvPipeline
 from ifsbench.logging import debug, info
-from ifsbench.util import execute
+from ifsbench.util import execute, ExecuteResult
 
 __all__ = ['LaunchData', 'Launcher']
 
@@ -41,7 +41,7 @@ class LaunchData:
     cmd: List[str]
     env: dict = field(default_factory=dict)
 
-    def launch(self):
+    def launch(self) -> ExecuteResult:
         """
         Launch the actual executable.
 

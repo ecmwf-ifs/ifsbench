@@ -14,6 +14,7 @@ from pathlib import Path
 from pprint import pformat
 from subprocess import Popen, PIPE
 import sys
+from typing import List
 
 from ifsbench.logging import debug, info
 
@@ -35,7 +36,7 @@ class ExecuteResult:
     #: The return code of the execution.
     exit_code: int
 
-def execute(command, **kwargs):
+def execute(command: List[str], **kwargs) -> ExecuteResult:
     """
     Execute a single command with a given directory or environment.
 
