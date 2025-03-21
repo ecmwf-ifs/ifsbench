@@ -14,7 +14,7 @@ from pathlib import Path
 from pprint import pformat
 from subprocess import Popen, PIPE
 import sys
-from typing import List
+from typing import List, Tuple
 
 from ifsbench.logging import debug, info
 
@@ -101,9 +101,12 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     stdout = ""
     stderr = ""
 
-    def _read_and_multiplex(p, stdout, stderr):
+    def _read_and_multiplex(p: Popen, stdout: str, stderr: str) -> Tuple[str, str]:
         """
-        Read from ``p.stdout.read()`` and write to log and sys.stdout.
+        Read from ``p.stdout.read()`` and ``p.stderr.read()`` and
+          * forward it to sys.stdout/sys.stderr.
+          * add it to the stdout/stderr strings and return the updated values.
+          * (Optional) write it to the logfile.
         """
         line = p.stdout.read()
         if line:
