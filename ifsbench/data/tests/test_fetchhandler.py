@@ -119,7 +119,7 @@ def test_fetchhandler_path_handling(run_dir, force, ignore_errors):
 
     assert (run_dir/'subdir/new_file.txt').exists()
 
-    handler.target_path=run_dir/'subdir/another_new_file.txt'
+    handler.target_path=Path('subdir/another_new_file.txt')
 
     handler.execute(run_dir)
 
