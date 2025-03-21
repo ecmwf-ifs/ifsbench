@@ -7,5 +7,6 @@
 
 from ifsbench.data.datahandler import * # noqa
 from ifsbench.data.extracthandler import * # noqa
+from ifsbench.data.fetchhandler import * # noqa
 from ifsbench.data.namelisthandler import * # noqa
 from ifsbench.data.renamehandler import * # noqa
