@@ -6,20 +6,24 @@
 # nor does it submit to any jurisdiction.
 
 import pathlib
-from typing import Union
+from typing import Union, Literal
 import urllib.error
 import urllib.request
 
-from ifsbench.config_mixin import PydanticConfigMixin
+from pydantic import Field
+
 from ifsbench.data.datahandler import DataHandler
-from ifsbench.logging import debug
+from ifsbench.logging import debug, warning
 
 __all__ = ['FetchHandler']
 
-class FetchHandler(DataHandler, PydanticConfigMixin):
+class FetchHandler(DataHandler):
     """
     Fetch a file from a given URL.
     """
+
+    #: Identifier for the DataHandler type.
+    handler_type: Literal['FetchHandler'] = Field(default='FetchHandler')
 
     #: The source URL from where the file gets fetched.
     source_url: str
@@ -49,6 +53,7 @@ class FetchHandler(DataHandler, PydanticConfigMixin):
         if target_path.exists() and (not self.force):
             debug(f"File {target_path} exists already and won't be fetched.")
             return
+        
         if target_path.exists():
             target_path.unlink()
 
@@ -57,6 +62,6 @@ class FetchHandler(DataHandler, PydanticConfigMixin):
         try:
             urllib.request.urlretrieve(self.source_url, filename=target_path)
         except urllib.error.URLError as ue:
-            debug("Fetching file failed: {ue}")
+            warning("Fetching file failed: {ue}")
             if not self.ignore_errors:
                 raise RuntimeError(str(ue)) from ue
