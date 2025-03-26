@@ -20,19 +20,45 @@ from ifsbench.data import FetchHandler
 @pytest.mark.parametrize('target_path', [Path('subdir/target.tar.gz')])
 @pytest.mark.parametrize('force', [True, False])
 @pytest.mark.parametrize('ignore_errors', [True, False])
-def test_fetchhandler_serialise(source_url, target_path, force, ignore_errors):
+def test_fetchhandler_dump_config(source_url, target_path, force, ignore_errors):
+    """
+    Serialise a FetchHandler and make sure the the resulting dictionary is
+    what we expect.
+    """
+    reference_config = {
+        'source_url': source_url, 
+        'target_path': str(target_path),
+        'force': force,
+        'ignore_errors': ignore_errors,
+        'handler_type': 'FetchHandler'
+    }
+
+    handler = FetchHandler(
+        source_url=source_url,
+        target_path=target_path,
+        force=force,
+        ignore_errors=ignore_errors
+    )
+
+    dumped_config = handler.dump_config()
+
+    assert reference_config == dumped_config
+
+@pytest.mark.parametrize('source_url', ['file://home/some_file.tar.gz'])
+@pytest.mark.parametrize('target_path', [Path('subdir/target.tar.gz')])
+@pytest.mark.parametrize('force', [True, False])
+@pytest.mark.parametrize('ignore_errors', [True, False])
+def test_fetchhandler_from_config(source_url, target_path, force, ignore_errors):
     """
     Serialise and deserialise a FetchHandler and make sure the the resulting
     object is correct.
     """
-    config = {
-        'source_url': source_url, 
-        'target_path': target_path,
-        'force': force,
-        'ignore_errors': ignore_errors
-    }
-
-    handler = FetchHandler(**config)
+    handler = FetchHandler(
+        source_url=source_url,
+        target_path=target_path,
+        force=force,
+        ignore_errors=ignore_errors
+    )
 
     config_dump = handler.dump_config()
     new_handler = FetchHandler.from_config(config_dump)
@@ -41,6 +67,7 @@ def test_fetchhandler_serialise(source_url, target_path, force, ignore_errors):
     assert new_handler.target_path == target_path
     assert new_handler.force == force
     assert new_handler.ignore_errors == ignore_errors
+
 
 @pytest.fixture(name='run_dir')
 def fixture_rundir(tmp_path):
@@ -54,21 +81,20 @@ def fixture_rundir(tmp_path):
 
     return tmp_path
 
-@pytest.mark.parametrize('force', [True, False])
 @pytest.mark.parametrize('ignore_errors', [True, False])
-def test_fetchhandler_force(run_dir, force, ignore_errors):
+def test_fetchhandler_force(run_dir, ignore_errors):
     """
-    Check that the force flag is working as intended.    
+    Check that files get overwritten if the force flag is True. 
     """
 
-    # Essentially replace goodbye.txt with hello.txt. If force is False,
-    # the original goodbye.txt file should remain, otherwise it should
-    # have the same content as hello.txt.
+    # Essentially replace goodbye.txt with hello.txt. As force is True,
+    # the new goodbye.txt should have the same content as hello.txt after
+    # the call.
 
     handler = FetchHandler(
         source_url=f"file://{run_dir}/hello.txt",
         target_path=run_dir/'goodbye.txt',
-        force=force,
+        force=True,
         ignore_errors=ignore_errors
     )
 
@@ -77,29 +103,60 @@ def test_fetchhandler_force(run_dir, force, ignore_errors):
     with (run_dir/'goodbye.txt').open('r') as f:
         result = f.read()
 
-    if force:
-        assert result == 'Hello!'
-    else:
-        assert result == 'Goodbye!'
+    assert result == 'Hello!'
 
 @pytest.mark.parametrize('ignore_errors', [True, False])
-def test_fetchhandler_ignore_errors(run_dir, ignore_errors):
+def test_fetchhandler_no_force(run_dir, ignore_errors):
     """
-    Check that the ignore_errors flag works as intended by trying to fetch
-    a non-existent file.
+    Check that files do not get overwritten if the force flag is False. 
+    """
+
+    # Essentially replace goodbye.txt with hello.txt. As force is False,
+    # the old goodbye.txt file should not be replaced.
+
+    handler = FetchHandler(
+        source_url=f"file://{run_dir}/hello.txt",
+        target_path=run_dir/'goodbye.txt',
+        force=False,
+        ignore_errors=ignore_errors
+    )
+
+    handler.execute(run_dir)
+
+    with (run_dir/'goodbye.txt').open('r') as f:
+        result = f.read()
+
+    assert result == 'Goodbye!'
+
+def test_fetchhandler_ignore_errors(run_dir):
+    """
+    Check that setting the ignore_errors flag to True suppresses any errors
+    when trying to fetch a non-existent file.
     """
     handler = FetchHandler(
         source_url=f"file://{run_dir}/non_existent.txt",
         target_path=run_dir/'goodbye.txt',
         force=True,
-        ignore_errors=ignore_errors
+        ignore_errors=True
     )
 
-    if ignore_errors:
+    # Make sure that no exception gets raised here.
+    handler.execute(run_dir)
+
+def test_fetchhandler_no_ignore_errors(run_dir):
+    """
+    Check that the setting the ignore_errors flag to False makes the handler
+    raise a RuntimeError when trying to fetch a non-existent file.
+    """
+    handler = FetchHandler(
+        source_url=f"file://{run_dir}/non_existent.txt",
+        target_path=run_dir/'goodbye.txt',
+        force=True,
+        ignore_errors=False
+    )
+
+    with pytest.raises(RuntimeError):
         handler.execute(run_dir)
-    else:
-        with pytest.raises(RuntimeError):
-            handler.execute(run_dir)
 
 @pytest.mark.parametrize('force', [True, False])
 @pytest.mark.parametrize('ignore_errors', [True, False])

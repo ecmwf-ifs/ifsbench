@@ -53,7 +53,7 @@ class FetchHandler(DataHandler):
         if target_path.exists() and (not self.force):
             debug(f"File {target_path} exists already and won't be fetched.")
             return
-        
+
         if target_path.exists():
             target_path.unlink()
 
