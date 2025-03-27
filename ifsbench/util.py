@@ -9,6 +9,7 @@
 Collection of utility routines
 """
 from dataclasses import dataclass
+from io import StringIO
 from os import environ, getcwd
 from pathlib import Path
 from pprint import pformat
@@ -98,19 +99,19 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     else:
         _log_file = None
 
-    stdout = ""
-    stderr = ""
+    stdout = StringIO()
+    stderr = StringIO()
 
-    def _read_and_multiplex(p: Popen, stdout: str, stderr: str) -> Tuple[str, str]:
+    def _read_and_multiplex(p: Popen, stdout: StringIO, stderr: StringIO):
         """
         Read from ``p.stdout.read()`` and ``p.stderr.read()`` and
           * forward it to sys.stdout/sys.stderr.
-          * add it to the stdout/stderr strings and return the updated values.
+          * add it to the stdout/stderr streams.
           * (Optional) write it to the logfile.
         """
         line = p.stdout.read()
         if line:
-            stdout += line
+            stdout.write(line)
 
             # Forward to user output
             sys.stdout.write(line)
@@ -122,7 +123,7 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
 
         line = p.stderr.read()
         if line:
-            stderr += line
+            stderr.write(line)
 
             # Forward to user output
             sys.stderr.write(line)
@@ -132,8 +133,6 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
                 _log_file.write(line)
                 _log_file.flush()
 
-        return stdout, stderr
-
     ret = 1
     try:
         # Execute with our args and outside args
@@ -141,20 +140,20 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
 
             # Intercept p.stdout and multiplex to file and sys.stdout
             while p.poll() is None:
-                stdout, stderr = _read_and_multiplex(p, stdout, stderr)
+                _read_and_multiplex(p, stdout, stderr)
 
             # Check for successful completion
             ret = p.wait()
 
             # Read one last time to catch racy process output
-            stdout, stderr = _read_and_multiplex(p, stdout, stderr)
+            _read_and_multiplex(p, stdout, stderr)
     finally:
         if _log_file:
             _log_file.close()
 
     return ExecuteResult(
-        stdout=stdout,
-        stderr=stderr,
+        stdout=stdout.getvalue(),
+        stderr=stderr.getvalue(),
         exit_code=ret
     )
 

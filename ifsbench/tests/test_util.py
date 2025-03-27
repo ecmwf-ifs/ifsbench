@@ -51,3 +51,18 @@ def test_execute():
         assert logfile.read_text() == 'foo bar\n'
         assert result.stdout == ''
         assert result.stderr == 'foo bar\n'
+
+def test_execute_dryrun():
+    """
+    Test the execute function in dryrun mode..
+    """
+    # Very trivial executables with success/error exit codes
+    assert execute('true', dryrun=True).exit_code == 0
+    assert execute('false', dryrun=True).exit_code == 0
+
+    with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
+        # basic logfile capture validation
+        logfile = Path(tmp_dir)/'test_execute.log'
+        result = execute(['echo', 'foo', 'bar'], dryrun=True, logfile=logfile)
+        assert not logfile.exists()
+        assert result.stdout == ''
