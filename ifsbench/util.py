@@ -15,7 +15,7 @@ from pathlib import Path
 from pprint import pformat
 from subprocess import Popen, PIPE
 import sys
-from typing import List, Tuple
+from typing import List
 
 from ifsbench.logging import debug, info
 
