@@ -13,7 +13,7 @@ import urllib.request
 from pydantic import Field
 
 from ifsbench.data.datahandler import DataHandler
-from ifsbench.logging import debug, warning
+from ifsbench.logging import debug, info, warning
 
 __all__ = ['FetchHandler']
 
@@ -51,7 +51,7 @@ class FetchHandler(DataHandler):
         target_path.parent.mkdir(parents=True, exist_ok=True)
 
         if target_path.exists() and (not self.force):
-            debug(f"File {target_path} exists already and won't be fetched.")
+            info(f"File {target_path} exists already and won't be fetched.")
             return
 
         if target_path.exists():
