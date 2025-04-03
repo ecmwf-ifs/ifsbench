@@ -12,7 +12,7 @@ import re
 import shutil
 from typing import Union
 
-from pydantic import computed_field, Field
+from pydantic import computed_field
 from typing_extensions import Literal
 
 from ifsbench.data.datahandler import DataHandler
@@ -54,7 +54,7 @@ class RenameHandler(DataHandler):
         Specifies how the renaming is done (copy, move, symlink).
     """
 
-    handler_type: Literal['RenameHandler'] = Field(default='RenameHandler')
+    handler_type: Literal['RenameHandler'] = 'RenameHandler'
     pattern: str
     repl: str
     mode: RenameMode = RenameMode.SYMLINK

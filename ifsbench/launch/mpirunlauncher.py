@@ -8,7 +8,6 @@
 from pathlib import Path
 from typing import List, Optional
 
-from pydantic import Field
 from typing_extensions import Literal
 
 from ifsbench.env import DefaultEnvPipeline, EnvOperation, EnvPipeline, EnvHandler
@@ -22,7 +21,7 @@ class MpirunLauncher(Launcher):
     :any:`Launcher` implementation for a standard mpirun
     """
 
-    launcher_type: Literal['MpirunLauncher'] = Field(default='MpirunLauncher')
+    launcher_type: Literal['MpirunLauncher'] = 'MpirunLauncher'
 
     _job_options_map = {
         'tasks': '--n={}',

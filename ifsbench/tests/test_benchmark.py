@@ -13,7 +13,6 @@ from pathlib import Path
 from time import sleep
 import sys
 
-from pydantic import Field
 import pytest
 from typing_extensions import Literal
 
@@ -39,7 +38,7 @@ def fixture_test_setup_files():
     ]
 
     class TouchHandler(DataHandler):
-        handler_type: Literal['TouchHandler'] = Field(default='TouchHandler')
+        handler_type: Literal['TouchHandler'] = 'TouchHandler'
         path: str
 
         def execute(self, wdir, **kwargs):
@@ -143,7 +142,7 @@ class _DummyLauncher(Launcher):
     Dummy launcher that just calls the given executable.
     """
 
-    launcher_type: Literal['Dummy'] = Field(default='Dummy')
+    launcher_type: Literal['Dummy'] = 'Dummy'
 
     _prepare_called = False
 
@@ -178,7 +177,7 @@ def test_defaultbenchmark_run(
     arch = (
         DefaultArch.from_config(
             {
-                'launcher': _DummyLauncher.from_config({'launcher_type': 'Dummy'}),
+                'launcher': {'launcher_type': 'Dummy'},
                 'cpu_config': CpuConfiguration(),
             }
         )

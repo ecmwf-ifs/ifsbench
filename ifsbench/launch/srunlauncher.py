@@ -8,7 +8,6 @@
 from pathlib import Path
 from typing import List, Optional
 
-from pydantic import Field
 from typing_extensions import Literal
 
 from ifsbench.env import DefaultEnvPipeline, EnvOperation, EnvPipeline, EnvHandler
@@ -22,7 +21,7 @@ class SrunLauncher(Launcher):
     :any:`Launcher` implementation for Slurm's srun.
     """
 
-    launcher_type: Literal['SrunLauncher'] = Field(default='SrunLauncher')
+    launcher_type: Literal['SrunLauncher'] = 'SrunLauncher'
 
     _job_options_map = {
         'nodes': '--nodes={}',

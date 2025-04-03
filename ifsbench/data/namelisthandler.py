@@ -9,7 +9,7 @@ from enum import Enum
 import pathlib
 from typing import Any, Dict, List, Union
 
-from pydantic import Field, model_validator
+from pydantic import model_validator
 from typing_extensions import Literal, Self
 
 import f90nml
@@ -138,7 +138,7 @@ class NamelistHandler(DataHandler):
         The NamelistOverrides that will be applied.
     """
 
-    handler_type: Literal['NamelistHandler'] = Field(default='NamelistHandler')
+    handler_type: Literal['NamelistHandler'] = 'NamelistHandler'
     input_path: pathlib.Path
     output_path: pathlib.Path
     overrides: List[Dict[str, Union[str, int]]]

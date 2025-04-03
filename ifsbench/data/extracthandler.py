@@ -9,7 +9,6 @@ import pathlib
 import shutil
 from typing import Dict, Optional, Union
 
-from pydantic import Field
 from typing_extensions import Literal
 
 from ifsbench.data.datahandler import DataHandler
@@ -35,7 +34,7 @@ class ExtractHandler(DataHandler):
         :meth:`execute`.
     """
 
-    handler_type: Literal['ExtractHandler'] = Field(default='ExtractHandler')
+    handler_type: Literal['ExtractHandler'] = 'ExtractHandler'
     archive_path: str
     target_dir: Optional[str] = None
 

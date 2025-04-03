@@ -11,8 +11,6 @@ import shutil
 import urllib.error
 import urllib.request
 
-from pydantic import Field
-
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug, info, warning
 
@@ -24,7 +22,7 @@ class FetchHandler(DataHandler):
     """
 
     #: Identifier for the DataHandler type.
-    handler_type: Literal['FetchHandler'] = Field(default='FetchHandler')
+    handler_type: Literal['FetchHandler'] = 'FetchHandler'
 
     #: The source URL from where the file gets fetched.
     source_url: str
