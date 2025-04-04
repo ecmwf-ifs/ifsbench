@@ -20,6 +20,8 @@ from ifsbench.command_line import * # noqa
 from ifsbench.config_mixin import * # noqa
 from ifsbench.config_utils import * # noqa
 from ifsbench.darshanreport import * # noqa
+from ifsbench.data_file_reader import * # noqa
+from ifsbench.data_file_stats import * # noqa
 from ifsbench.drhook import * # noqa
 from ifsbench.env import * # noqa
 from ifsbench.files import * # noqa
@@ -29,6 +31,7 @@ from ifsbench.job import * # noqa
 from ifsbench.launch import * # noqa
 from ifsbench.logging import * # noqa
 from ifsbench.namelist import * # noqa
+from ifsbench.netcdf_file_reader import * # noqa
 from ifsbench.nodefile import * # noqa
 from ifsbench.paths import * # noqa
 from ifsbench.runrecord import * # noqa

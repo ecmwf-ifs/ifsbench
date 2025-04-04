@@ -22,6 +22,7 @@ dependencies = [
   "pydantic", # essential for typing and configs
   "click",    # essential for CLI scripts
   "f90nml",   # essential for namelist handling
+  "netcdf4",  # essential for reading netcdf files
   "xarray",   # essential for data handling
 ]
 
