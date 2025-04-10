@@ -31,7 +31,7 @@ from ifsbench.logging import * # noqa
 from ifsbench.namelist import * # noqa
 from ifsbench.nodefile import * # noqa
 from ifsbench.paths import * # noqa
-from ifsbench.pydantic import * # noqa
+from ifsbench.pydantic_utils import * # noqa
 from ifsbench.runrecord import * # noqa
 from ifsbench.util import * # noqa
 
