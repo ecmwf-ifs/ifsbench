@@ -43,7 +43,7 @@ class _DataFrameAnnotation:
             a dictionary. The dictionary must have the same form as in the
             pandas.DataFrame.to_dict(orient='split') function.
             """
-            result = DataFrame(**value)
+            result = DataFrame.from_dict(value, orient='tight')
             return result
 
         from_dict_schema = core_schema.chain_schema(
@@ -66,7 +66,7 @@ class _DataFrameAnnotation:
             serialization=core_schema.plain_serializer_function_ser_schema(
                 # Serialise a frame. We have to use `orient=split` here, as
                 # other orient-values may lead to a reordering of columns.
-                lambda frame: frame.to_dict(orient='split')
+                lambda frame: frame.to_dict(orient='tight')
             ),
         )
 
