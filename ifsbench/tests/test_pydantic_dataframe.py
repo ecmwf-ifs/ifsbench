@@ -12,7 +12,7 @@ Check the PydandictDataFrame type.
 import json
 from typing import Dict, List
 
-from pandas import DataFrame
+from pandas import DataFrame, MultiIndex
 import pytest
 import yaml
 
@@ -70,6 +70,41 @@ def test_pydantic_data_to_config():
             'columns': ['mean', 'max', 'min'], 
             'data': [[2.0, 3.0, 1.0]], 
             'index_names': [None], 
+            'column_names': [None]
+        }
+    }
+
+    assert config == ref
+
+def test_pydantic_data_to_config_multiindex():
+    """
+    Serialise PydanticFrame objects and check the serialisation output.
+    """
+
+    class _DummyClass(PydanticConfigMixin):
+        frame: PydanticDataFrame
+
+    index = MultiIndex.from_tuples([
+            ('min', 'soil stuff'),
+            ('mean', 'soil stuff'),
+            ('min', 'water stuff'),
+            ('mean', 'water stuff')
+        ],
+        names=['stat', 'type']
+    )
+
+    frame=DataFrame([[2.0, 3.0, 1.0], [4.0, -2.0, 1.0], [0.0, 0.0, 5.0], [2.0, 3.0, 4.0]],
+                    index=index, columns=['mean', 'max', 'min'])
+
+    obj = _DummyClass(frame=frame)
+
+    config = obj.dump_config()
+    ref = {'frame': {
+            'index': [['min', 'soil stuff'], ['mean', 'soil stuff'], 
+                      ['min', 'water stuff'], ['mean', 'water stuff']],
+            'columns': ['mean', 'max', 'min'], 
+            'data': [[2.0, 3.0, 1.0], [4.0, -2.0, 1.0], [0.0, 0.0, 5.0], [2.0, 3.0, 4.0]], 
+            'index_names': ['stat', 'type'],
             'column_names': [None]
         }
     }

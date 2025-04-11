@@ -9,7 +9,7 @@
 Additional tools to support pydantic usage in ifsbench.
 """
 
-from typing import Any
+from typing import Any, Dict
 try:
     # Annotated is only available in typing for Python >=3.9.
     from typing import Annotated
@@ -46,6 +46,29 @@ class _DataFrameAnnotation:
             result = DataFrame.from_dict(value, orient='tight')
             return result
 
+        def serialise_frame(value: DataFrame) -> Dict[str, Any]:
+            """
+            Serialise a DataFrame.
+            """
+
+            # Serialise a frame. We use `orient=tight` here, as this keeps the
+            # column order intact when serialising.
+            frame_dict = value.to_dict(orient='tight')
+
+            # Some entries in columns/index may be tuples, instead of lists. At
+            # least YAML doesn't understand tuples properly so we convert
+            # everything that's a tuple to list.
+            if 'columns' in frame_dict:
+                for i, entry in enumerate(frame_dict['columns']):
+                    if isinstance(entry, tuple):
+                        frame_dict['columns'][i] = list(entry)
+
+            if 'index' in frame_dict:
+                for i, entry in enumerate(frame_dict['index']):
+                    if isinstance(entry, tuple):
+                        frame_dict['index'][i] = list(entry)
+            return frame_dict
+
         from_dict_schema = core_schema.chain_schema(
             [
                 core_schema.dict_schema(),
@@ -64,9 +87,7 @@ class _DataFrameAnnotation:
                 ]
             ),
             serialization=core_schema.plain_serializer_function_ser_schema(
-                # Serialise a frame. We have to use `orient=split` here, as
-                # other orient-values may lead to a reordering of columns.
-                lambda frame: frame.to_dict(orient='tight')
+                serialise_frame
             ),
         )
 
