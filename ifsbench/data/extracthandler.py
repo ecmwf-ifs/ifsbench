@@ -7,7 +7,7 @@
 
 import pathlib
 import shutil
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 from typing_extensions import Literal
 
@@ -35,28 +35,18 @@ class ExtractHandler(DataHandler):
     """
 
     handler_type: Literal['ExtractHandler'] = 'ExtractHandler'
-    archive_path: str
-    target_dir: Optional[str] = None
-
-    @classmethod
-    def from_config(cls, config: Dict[str, Optional[str]]) -> 'ExtractHandler':
-        eh = cls(**config)
-        eh._archive_path = pathlib.Path(eh.archive_path)
-        if eh.target_dir is None:
-            eh._target_dir = None
-        else:
-            eh._target_dir = pathlib.Path(eh.target_dir)
-        return eh
+    archive_path: pathlib.Path
+    target_dir: Optional[pathlib.Path] = None
 
     def execute(self, wdir: Union[str, pathlib.Path], **kwargs) -> None:
         wdir = pathlib.Path(wdir)
 
         target_dir = wdir
-        if self._target_dir is not None:
-            if self._target_dir.is_absolute():
-                target_dir = self._target_dir
+        if self.target_dir is not None:
+            if self.target_dir.is_absolute():
+                target_dir = self.target_dir
             else:
-                target_dir = wdir / self._target_dir
+                target_dir = wdir / self.target_dir
 
-        debug(f"Unpack archive {self._archive_path} to {target_dir}.")
-        shutil.unpack_archive(self._archive_path, target_dir)
+        debug(f"Unpack archive {str(self.archive_path)} to {str(target_dir)}.")
+        shutil.unpack_archive(self.archive_path, target_dir)

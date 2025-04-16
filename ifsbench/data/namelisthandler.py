@@ -7,7 +7,7 @@
 
 from enum import Enum
 import pathlib
-from typing import Any, Dict, List, Union
+from typing import List, Union
 
 from pydantic import model_validator
 from typing_extensions import Literal, Self
@@ -141,41 +141,30 @@ class NamelistHandler(DataHandler):
     handler_type: Literal['NamelistHandler'] = 'NamelistHandler'
     input_path: pathlib.Path
     output_path: pathlib.Path
-    overrides: List[Dict[str, Union[str, int]]]
-
-    @classmethod
-    def from_config(cls, config: Dict[str, Any]) -> 'NamelistHandler':
-
-        nh = cls(**config)
-        nh._input_path = pathlib.Path(nh.input_path)
-        nh._output_path = pathlib.Path(nh.output_path)
-        nh._overrides = [
-            NamelistOverride.from_config(noc) for noc in config['overrides']
-        ]
-        return nh
+    overrides: List[NamelistOverride]
 
     def execute(self, wdir, **kwargs):
         wdir = pathlib.Path(wdir)
 
-        if self._input_path.is_absolute():
-            input_path = self._input_path
+        if self.input_path.is_absolute():
+            input_path = self.input_path
         else:
-            input_path = wdir / self._input_path
+            input_path = wdir / self.input_path
 
         # Do nothing if the input namelist doesn't exist.
         if not input_path.exists():
             info(f"Namelist {input_path} doesn't exist.")
             return
 
-        if self._output_path.is_absolute():
-            output_path = self._output_path
+        if self.output_path.is_absolute():
+            output_path = self.output_path
         else:
-            output_path = wdir / self._output_path
+            output_path = wdir / self.output_path
 
         debug(f"Modify namelist {input_path}.")
         namelist = f90nml.read(input_path)
 
-        for override in self._overrides:
+        for override in self.overrides:
             override.apply(namelist)
 
         namelist.write(output_path, force=True)

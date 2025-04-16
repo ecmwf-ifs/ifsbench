@@ -64,16 +64,16 @@ def test_read_yaml_config(tmp_path: pathlib.Path):
     # Check some sample objects for correctness.
     ext_handler = run_conf['ext_handler']
     assert isinstance(ext_handler, ExtractHandler)
-    assert ext_handler.archive_path == 'big_tarball.tar.gz'
+    assert ext_handler.archive_path == pathlib.Path('big_tarball.tar.gz')
 
     nml_handler = run_conf['nml_handler']
     assert isinstance(nml_handler, NamelistHandler)
     assert len(nml_handler.overrides) == 3
-    assert isinstance(nml_handler._overrides[0], NamelistOverride)
-    no = nml_handler._overrides[0]
+    assert isinstance(nml_handler.overrides[0], NamelistOverride)
+    no = nml_handler.overrides[0]
     assert no.mode == NamelistOperation.SET
     assert no.value == 16
-    no = nml_handler._overrides[2]
+    no = nml_handler.overrides[2]
     assert no.mode == NamelistOperation.DELETE
     assert no.value is None
 
