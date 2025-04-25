@@ -11,7 +11,7 @@ Some sanity tests for the :class:`FrameCloseValidation` implementation.
 
 import itertools
 
-from pandas import DataFrame
+from pandas import DataFrame, MultiIndex
 import pytest
 
 from ifsbench.validation.frame_close_validation import FrameCloseValidation
@@ -75,6 +75,33 @@ def test_frameclose_explicit():
 
     assert not equal
     assert mismatch == [('Step 0', 1)]
+
+    frame2 = DataFrame([[2.0, 3.001, 4.0], [5.0, 1.0, 3]], index=['Step 0', 'Step 1'])
+
+    equal, mismatch = validation.compare(frame1, frame2)
+
+    assert not equal
+    assert len(mismatch) == 0
+
+
+def test_frame_mismatch_multiindex():
+    """
+    Some handcoded checks for multi-index frames and corresponding mismatch
+    return values.
+    """
+    validation = FrameCloseValidation(atol=0, rtol=0)
+
+    index = MultiIndex.from_tuples([('Step 0', 'type a'), ('Step 0', 'type b')])
+
+    frame1 = DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=index)
+    frame2 = DataFrame([[2.0, 3.001, 4], [5.0, 1.0, 3]], index=index)
+
+    equal, mismatch = validation.compare(frame1, frame2)
+
+    assert not equal
+    assert mismatch == [(('Step 0', 'type a'), 1)]
+    assert frame1.loc[mismatch[0][0], mismatch[0][1]] == 3.0
+    assert frame2.loc[mismatch[0][0], mismatch[0][1]] == 3.001
 
     frame2 = DataFrame([[2.0, 3.001, 4.0], [5.0, 1.0, 3]], index=['Step 0', 'Step 1'])
 

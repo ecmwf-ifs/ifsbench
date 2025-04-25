@@ -68,10 +68,8 @@ class FrameCloseValidation:
 
         close = numpy.isclose(frame1.values, frame2.values, rtol=self.rtol, atol=self.atol, equal_nan=True)
 
-        # Do some dataframe black magic to convert close (bool array which is True
-        # wherever the two frames are close) into a list of (index, column) tuples.
-        close_frame = DataFrame(data=~close, index=frame1.index, columns=frame1.columns)
-        mismatch = close_frame.where(close_frame).stack().index.to_list()
+        mismatch = numpy.argwhere(~close)
+        mismatch = [(frame1.index[i], frame1.columns[j]) for i,j in mismatch]
 
         return numpy.all(close), mismatch
         
