@@ -9,16 +9,24 @@
 Additional tools to support pydantic usage in ifsbench.
 """
 
-from typing import Any, Dict
+# Pylint complains about List and Union not used. They are in fact
+# used and needed but the use is hidden in a string. See the
+# serialise_frame function for more information.
+# pylint: disable=W0611
+
+from typing import Any, Dict, List, Union
+from typing_extensions import TypeAliasType
+
 try:
     # Annotated is only available in typing for Python >=3.9.
     from typing import Annotated
 except ImportError:
     from typing_extensions import Annotated
 
-from pandas import DataFrame
+
+from pandas import DataFrame, Timestamp
 from pydantic_core import core_schema
-from pydantic import GetCoreSchemaHandler
+from pydantic import GetCoreSchemaHandler, BeforeValidator, TypeAdapter
 
 __all__ = ['PydanticDataFrame']
 
@@ -55,18 +63,35 @@ class _DataFrameAnnotation:
             # column order intact when serialising.
             frame_dict = value.to_dict(orient='tight')
 
-            # Some entries in columns/index may be tuples, instead of lists. At
-            # least YAML doesn't understand tuples properly so we convert
-            # everything that's a tuple to list.
-            if 'columns' in frame_dict:
-                for i, entry in enumerate(frame_dict['columns']):
-                    if isinstance(entry, tuple):
-                        frame_dict['columns'][i] = list(entry)
+            # frame_dict is now a dictionary but may still contain data types
+            # that can't easily be serialised (tuples, pandas.Timestamp and
+            # probably some more).
+            # We use some pydantic magic to autoconvert this to a dictionary of
+            # dict, list, float, int, str, bool, None objects.
 
-            if 'index' in frame_dict:
-                for i, entry in enumerate(frame_dict['index']):
-                    if isinstance(entry, tuple):
-                        frame_dict['index'][i] = list(entry)
+            # Disable pylint "unused variable" warning here. TimestampType is
+            # used, but that is hidden in a string. See the pydantic bug below.
+            # pylint: disable=W0612
+
+            # Custom type annotation that we will use to auto-convert
+            # pandas.Timestamp object to a string.
+            TimestampType = Annotated[str, BeforeValidator(lambda x: str(x) if isinstance(x, Timestamp) else x)]
+
+            # There is currently (pydantic 2.9.2) a bug which prevents us from just doing
+            # the following (https://github.com/pydantic/pydantic/issues/11320):
+            # Allowed = Union[Dict[str,'Allowed'], List['Allowed'], TimestampType, str, int, float, bool, None]
+            #
+            # Therefore, we use a TypeAlias workaround.
+
+            Allowed = TypeAliasType(
+                'Allowed',
+                'Union[Dict[str, Allowed], List[Allowed], TimestampType, str, int, float, bool, None]',  
+            )
+
+            allowed_type = TypeAdapter(Dict[str, Allowed])
+
+            frame_dict = allowed_type.validate_python(frame_dict)
+
             return frame_dict
 
         from_dict_schema = core_schema.chain_schema(

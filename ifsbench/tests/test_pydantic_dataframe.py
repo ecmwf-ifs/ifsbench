@@ -12,7 +12,7 @@ Check the PydandictDataFrame type.
 import json
 from typing import Dict, List
 
-from pandas import DataFrame, MultiIndex
+from pandas import DataFrame, MultiIndex, Timestamp
 import pytest
 import yaml
 
@@ -51,14 +51,13 @@ def test_pydantic_data_frame_init(default_frames):
     assert obj.frame_dict['name'].equals(default_frames[1])
     assert obj.frame_list[0].equals(default_frames[2])
 
+class _DummyClass(PydanticConfigMixin):
+    frame: PydanticDataFrame
 
 def test_pydantic_data_to_config():
     """
     Serialise PydanticFrame objects and check the serialisation output.
     """
-
-    class _DummyClass(PydanticConfigMixin):
-        frame: PydanticDataFrame
 
     frame=DataFrame([[2.0, 3.0, 1.0]], index=['First index'], columns=['mean', 'max', 'min'])
 
@@ -80,9 +79,6 @@ def test_pydantic_data_to_config_multiindex():
     """
     Serialise PydanticFrame objects and check the serialisation output.
     """
-
-    class _DummyClass(PydanticConfigMixin):
-        frame: PydanticDataFrame
 
     index = MultiIndex.from_tuples([
             ('min', 'soil stuff'),
@@ -206,3 +202,27 @@ def test_pydantic_data_from_config_yaml(tmp_path, default_frames):
 
     assert obj.frame_dict['name'].equals(copy.frame_dict['name'])
     assert obj.frame_list[0].equals(copy.frame_list[0])
+
+def test_pydantic_data_frame_serialise_timestamp():
+    """
+    Check the serialisation of a data frame if it contains pandas.Timestamp objects.
+    """
+
+    timestamp = Timestamp(year=2024, day=24, month=6)
+    frame = DataFrame([[5.0, 2.0, 4.0, timestamp], [6.0, 1.0, 2.0, timestamp]], columns=['b', 'a', 'c', 'time'],
+                       index=MultiIndex.from_product([(timestamp,), ('Step 0', 'Step 1')]))
+
+    obj = _DummyClass(frame=frame)
+
+    config = obj.dump_config()
+
+    ref = {'frame': {
+           'index': [['2024-06-24 00:00:00', 'Step 0'], ['2024-06-24 00:00:00', 'Step 1']], 
+           'columns': ['b', 'a', 'c', 'time'], 
+           'data': [[5.0, 2.0, 4.0, '2024-06-24 00:00:00'], [6.0, 1.0, 2.0, '2024-06-24 00:00:00']], 
+           'index_names': [None, None], 
+           'column_names': [None]
+        }
+    }
+
+    assert config == ref
