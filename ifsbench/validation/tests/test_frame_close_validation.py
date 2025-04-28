@@ -45,7 +45,7 @@ def test_frameclose_equal_self(atol, rtol, test_frames):
 ])
 def test_frameclose_unequal_self_noise(atol, rtol, add_noise, test_frames):
     """
-    Verify that a frame is not equal to a perturbed copy of itself if the 
+    Verify that a frame is not equal to a perturbed copy of itself if the
     applied noise is larger than the tolerances.
     """
     validation = FrameCloseValidation(atol=atol, rtol=rtol)
@@ -61,12 +61,13 @@ def test_frameclose_unequal_self_noise(atol, rtol, add_noise, test_frames):
 
         assert mismatch == mismatch_ref
 
-
-def test_frameclose_explicit():
+@pytest.mark.parametrize('atol', [0, 1e-8, 1e-4])
+@pytest.mark.parametrize('rtol', [0, 1e-8, 1e-4])
+def test_frameclose_explicit_mismatch(atol, rtol):
     """
     Some handcoded result checking for FrameCloseValidation.
     """
-    validation = FrameCloseValidation(atol=0, rtol=0)
+    validation = FrameCloseValidation(atol=atol, rtol=rtol)
 
     frame1 = DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=['Step 0', 'Step 1'])
     frame2 = DataFrame([[2.0, 3.001, 4], [5.0, 1.0, 3]], index=['Step 0', 'Step 1'])
@@ -76,20 +77,36 @@ def test_frameclose_explicit():
     assert not equal
     assert mismatch == [('Step 0', 1)]
 
+@pytest.mark.parametrize('atol', [0, 1e-8, 1e-4])
+@pytest.mark.parametrize('rtol', [0, 1e-8, 1e-4])
+def test_frameclose_explicit_mismatch_dtype(atol, rtol):
+    """
+    Some handcoded result checking for FrameCloseValidation.
+    """
+    validation = FrameCloseValidation(atol=atol, rtol=rtol)
+
+    frame1 = DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=['Step 0', 'Step 1'])
+
+    # Last column is treated as int. This shouldn't match frame1 due to this.
     frame2 = DataFrame([[2.0, 3.001, 4.0], [5.0, 1.0, 3]], index=['Step 0', 'Step 1'])
 
     equal, mismatch = validation.compare(frame1, frame2)
 
     assert not equal
+
+    # No mismatch should be given as the general structure of the two frames
+    # (datatypes!) is not equal.
     assert len(mismatch) == 0
 
 
-def test_frame_mismatch_multiindex():
+@pytest.mark.parametrize('atol', [0, 1e-8, 1e-4])
+@pytest.mark.parametrize('rtol', [0, 1e-8, 1e-4])
+def test_frame_mismatch_multiindex(atol, rtol):
     """
     Some handcoded checks for multi-index frames and corresponding mismatch
     return values.
     """
-    validation = FrameCloseValidation(atol=0, rtol=0)
+    validation = FrameCloseValidation(atol=atol, rtol=rtol)
 
     index = MultiIndex.from_tuples([('Step 0', 'type a'), ('Step 0', 'type b')])
 
@@ -102,10 +119,3 @@ def test_frame_mismatch_multiindex():
     assert mismatch == [(('Step 0', 'type a'), 1)]
     assert frame1.loc[mismatch[0][0], mismatch[0][1]] == 3.0
     assert frame2.loc[mismatch[0][0], mismatch[0][1]] == 3.001
-
-    frame2 = DataFrame([[2.0, 3.001, 4.0], [5.0, 1.0, 3]], index=['Step 0', 'Step 1'])
-
-    equal, mismatch = validation.compare(frame1, frame2)
-
-    assert not equal
-    assert len(mismatch) == 0
