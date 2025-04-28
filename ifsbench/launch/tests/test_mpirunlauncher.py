@@ -120,7 +120,7 @@ def test_mpirunLauncher_prepare_run_dir(
             [],
             'test_env_none',
             [],
-            ['mpirun', '--n=64', '--cpus-per-proc=4', 'ls', '-l'],
+            ['mpirun', '-np 64', '-cpus-per-proc 4', 'ls', '-l'],
         ),
         (
             ['something'],

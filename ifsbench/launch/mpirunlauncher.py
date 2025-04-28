@@ -24,10 +24,10 @@ class MpirunLauncher(Launcher):
     launcher_type: Literal['MpirunLauncher'] = 'MpirunLauncher'
 
     _job_options_map = {
-        'tasks': '--n={}',
-        'tasks_per_node': '--npernode={}',
-        'tasks_per_socket': '--npersocket={}',
-        'cpus_per_task': '--cpus-per-proc={}',
+        'tasks': '-np {}',
+        'tasks_per_node': '-npernode {}',
+        'tasks_per_socket': '-npersocket {}',
+        'cpus_per_task': '-cpus-per-proc {}',
     }
 
     _bind_options_map = {
