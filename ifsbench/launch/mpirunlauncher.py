@@ -79,7 +79,10 @@ class MpirunLauncher(Launcher):
             value = getattr(job, attr, None)
 
             if value is not None:
-                flags += [option.format(value)]
+                # Split the resulting split up if it contains spaces. Otherwise
+                # we might end up with a command like ['mpirun', '-n 4', 'program']
+                # which causes errors. We want ['mpirun', '-n', '4', 'program'].
+                flags += option.format(value).split(" ")
 
         if job.bind:
             flags += list(self._bind_options_map[job.bind])
