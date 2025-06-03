@@ -5,11 +5,13 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
+from collections.abc import Iterable
+
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 
-from ifsbench.logging import debug
+from ifsbench.logging import debug, info
 
 
 __all__ = ['GroupedBarPlot', 'StackedBarPlot']
@@ -25,16 +27,20 @@ class GroupedBarPlot:
         Names of the groups by which to cluster bars.
     """
 
-    def __init__(self, groups, figsize=(12,9)):
+    def __init__(self, groups, nruns=2, figsize=(12,9)):
         self.groups = groups
         self.x = np.arange(len(self.groups))
 
         self.fig, self.ax = plt.subplots(figsize=figsize, layout='constrained')
-        self.width = 1. / len(self.groups)
+        self.figsize = figsize
+        self.width = 1. / len(self.groups) * .9 * figsize[0] / nruns
 
         self.idx = 0
 
-    def add_group(self, values, label):
+        info(f'[Perfplot] Creating GroupedBarPlot with {len(self.groups)} groups '
+             f'[figsize={self.figsize}, width={self.width:.2f}]')
+
+    def add_group(self, values, label, hatch=None):
         """
         Add a bar to each group for a given set of values.
 
@@ -45,11 +51,35 @@ class GroupedBarPlot:
         label : str
             Label to appear in the legend for all entries
         """
+        hatch = ['', '//', '\\'] if not hatch else hatch
+
         assert len(values) == len(self.groups)
 
+        # Figure the max set of stacked values and create a filled matrix
+        maxlen = max(len(v) if isinstance(v, Iterable) else 1 for v in values)
+        fill_values = np.asarray([
+            [v[i] if isinstance(v, Iterable) and len(v) > i else 0. for v in values]
+            for i in range(maxlen)
+        ])
+        # Get the cumulative of the filled matrix, so we can get the previous "bottom"
+        cum_values = np.asarray(
+            [[sum(fill_values[:j+1,i]) for j in range(maxlen)] for i in range(len(values))]
+        ).transpose()
+
         offset = self.width * self.idx
-        rects = self.ax.bar(self.x + offset, values, self.width, label=label)
-        self.ax.bar_label(rects, padding=3)
+        color = None
+        for i in range(maxlen):
+            # Determine the previous from the cumulative sums
+            prev = cum_values[i-1,:] if i >= 1 else [0. for _ in values]
+            rects = self.ax.bar(
+                self.x + offset, fill_values[i,:], bottom=prev,
+                width=self.width, label=label, hatch=hatch[i], color=color
+            )
+            # Record most recent color so that we can keep it homogenous
+            color = rects.patches[-1].get_facecolor()
+
+        # Add max cumulative value as bar label
+        self.ax.bar_label(rects, padding=3, labels=[f'{i:.2f}' for i in cum_values[-1,:]])
 
         self.idx += 1
 
