@@ -25,11 +25,11 @@ class GroupedBarPlot:
         Names of the groups by which to cluster bars.
     """
 
-    def __init__(self, groups):
+    def __init__(self, groups, figsize=(12,9)):
         self.groups = groups
         self.x = np.arange(len(self.groups))
 
-        self.fig, self.ax = plt.subplots(layout='constrained')
+        self.fig, self.ax = plt.subplots(figsize=figsize, layout='constrained')
         self.width = 1. / len(self.groups)
 
         self.idx = 0
@@ -89,10 +89,10 @@ class StackedBarPlot:
         Name of the colormap to use, as defined in matplotlib.
     """
 
-    def __init__(self, groups, cmap='viridis'):
+    def __init__(self, groups, cmap='viridis', figsize=(12,9)):
         self.groups = groups
 
-        self.fig, self.ax = plt.subplots(figsize=(12,9))
+        self.fig, self.ax = plt.subplots(figsize=figsize)
 
         # Define and discretise colormap
         self.cmap = mpl.colormaps[cmap]
