@@ -28,7 +28,7 @@ def config_from_yaml(path):
     return config
 
 
-def data_from_preset(drhook, preset, groups):
+def data_from_preset(drhook, preset, groups, do_sums=True):
     """
     Construct an array of timing values, summing any list of grouped keys.
     """
@@ -46,7 +46,7 @@ def data_from_preset(drhook, preset, groups):
                 if v == 0.:
                     warning(f'[Perfplot] Could not find label {l} in DR_HOOK timings')
 
-            data.append( sum(val) )
+            data.append( sum(val) if do_sums else val )
         else:
             warning(f'[Perfplot] Could not find group key {k} in preset')
             data.append( 0.0 )
@@ -90,7 +90,7 @@ def plot_ecphysics_stacked(config, output, cmap, verbose):
     groups = config['groups']
 
     groups += ['Other']
-    plot = StackedBarPlot(groups, cmap=cmap)
+    plot = StackedBarPlot(groups, cmap=cmap, nruns=len(config['runs']))
 
     for run in config['runs']:
         label = run['label']
@@ -135,7 +135,7 @@ def plot_ecphysics_compare(config, output, verbose):
     config = config_from_yaml(config)
     groups = config['groups']
 
-    plot = GroupedBarPlot(groups=groups, figsize=(24,9))
+    plot = GroupedBarPlot(groups=groups, figsize=(12,7))
 
     for run in config['runs']:
         label = run['label']
@@ -145,7 +145,7 @@ def plot_ecphysics_compare(config, output, verbose):
         drhook = DrHookRecord.from_raw(path)
         gstats = GStatsRecord.from_file(path)
 
-        data = data_from_preset(drhook=drhook, preset=preset, groups=groups)
+        data = data_from_preset(drhook=drhook, preset=preset, groups=groups, do_sums=False)
 
         plot.add_group(data, label=label)
 
