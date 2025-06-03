@@ -221,7 +221,7 @@ class DrHookRecord:
         if isinstance(routine, Iterable) and not isinstance(routine, str):
             # Extract a list of entries if an iterable of keys is given
             result = [self.data.loc[self.data['routine'] == r][metric] for r in routine]
-            return [fill if r.empty else r[0] for r in result]
+            return [fill if r.empty else r.iloc[0] for r in result]
 
         result = self.data.loc[self.data['routine'] == routine][metric]
-        return fill if result.empty else result[0]
+        return fill if result.empty else result.iloc[0]
