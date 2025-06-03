@@ -65,7 +65,7 @@ def perfplot():
     help='Paths to plot configuration YAML file'
 )
 @click.option(
-    '--output', default='plot.pdf', type=click.Path(),
+    '--output', '-o', default='plot.pdf', type=click.Path(),
     help='Filename of the output plot'
 )
 @click.option(
@@ -112,12 +112,8 @@ def plot_ecphysics_stacked(config, output, cmap, verbose):
 
 @perfplot.command('ecphys-detail')
 @click.option(
-    '--cpu-data', '-c', multiple=True, type=click.Path(),
-    help='Paths to CPU data sets to add to bar plot'
-)
-@click.option(
-    '--gpu-data', '-g', multiple=True, type=click.Path(),
-    help='Paths to GPU data sets to add to bar plot'
+    '--config', '-c', type=click.Path(),
+    help='Paths to plot configuration YAML file'
 )
 @click.option(
     '--output', '-o', default='plot.pdf', type=click.Path(),
@@ -127,7 +123,7 @@ def plot_ecphysics_stacked(config, output, cmap, verbose):
     '--verbose', '-v', is_flag=True, default=False,
     help='Enable verbose (debugging) output.'
 )
-def plot_ecphysics_compare(cpu_data, gpu_data, output, verbose):
+def plot_ecphysics_compare(config, output, verbose):
     """
     Plot the EC-physics performance breakdown per component.
     """
@@ -136,19 +132,21 @@ def plot_ecphysics_compare(cpu_data, gpu_data, output, verbose):
     if verbose:
         logger.setLevel(DEBUG)
 
-    groups = ['Turbulence', 'Convection', 'Cloud']
-    plot = GroupedBarPlot(groups=groups)
+    config = config_from_yaml(config)
+    groups = config['groups']
 
-    for path in cpu_data:
-        preset = preset_cpu_fused_ecphys
-        drhook = DrHookRecord.from_raw(path)
-        data = drhook.get([preset[k] for k in groups], fill=0.0)
-        plot.add_group(data, label='CPU-Fused')
+    plot = GroupedBarPlot(groups=groups, figsize=(24,9))
 
-    for path in gpu_data:
-        preset = preset_gpu_ecphys
+    for run in config['runs']:
+        label = run['label']
+        path = Path(run['path'])
+        preset = run['preset']
+
         drhook = DrHookRecord.from_raw(path)
-        data = drhook.get([preset[k] for k in groups], fill=0.0)
-        plot.add_group(data, label='GPU-Stack')
+        gstats = GStatsRecord.from_file(path)
+
+        data = data_from_preset(drhook=drhook, preset=preset, groups=groups)
+
+        plot.add_group(data, label=label)
 
     plot.plot(filename=output)
