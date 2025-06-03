@@ -18,13 +18,14 @@ from ifsbench.plot import GroupedBarPlot, StackedBarPlot
 from ifsbench.logging import logger, DEBUG, warning
 
 
-def preset_from_yaml(path):
+def config_from_yaml(path):
     """
-    Read "preset" mapping of group keys to DrHook timing labels
+    Read plot config from YAML file
     """
     with Path(path).open(encoding='utf-8') as f:
-        preset_map = yaml.safe_load(f)
-    return preset_map
+        config = yaml.safe_load(f)
+
+    return config
 
 
 def data_from_preset(drhook, preset, groups):
@@ -60,20 +61,8 @@ def perfplot():
 
 @perfplot.command('ecphys-stacked')
 @click.option(
-    '--cpu-data', '-c', multiple=True, type=click.Path(),
-    help='Paths to CPU data sets to add to bar plot'
-)
-@click.option(
-    '--cpu-preset', '-cp', multiple=True, type=click.Path(),
-    help='Paths to group preset definition YAML file'
-)
-@click.option(
-    '--gpu-data', '-g', multiple=True, type=click.Path(),
-    help='Paths to GPU data sets to add to bar plot'
-)
-@click.option(
-    '--gpu-preset', '-gp', multiple=True, type=click.Path(),
-    help='Paths to group preset definition YAML file'
+    '--config', '-c', type=click.Path(),
+    help='Paths to plot configuration YAML file'
 )
 @click.option(
     '--output', default='plot.pdf', type=click.Path(),
@@ -87,7 +76,7 @@ def perfplot():
     '--verbose', '-v', is_flag=True, default=False,
     help='Enable verbose (debugging) output.'
 )
-def plot_ecphysics_stacked(cpu_data, cpu_preset, gpu_data, gpu_preset, output, cmap, verbose):
+def plot_ecphysics_stacked(config, output, cmap, verbose):
     """
     Plot EC-physics performance as a stacked barplot for comparing difference runs.
     """
@@ -96,41 +85,27 @@ def plot_ecphysics_stacked(cpu_data, cpu_preset, gpu_data, gpu_preset, output, c
     if verbose:
         logger.setLevel(DEBUG)
 
-    groups = [
-        'Init', 'Pre', 'Rad Trans', 'Turbulence', 'Convection', 'Cloud',
-        'WMS', 'Diag', 'Chem', 'Rad Vis', 'Surface', 'Ozone', 'SLPhy', 'Pullback', 'Post',
-    ]
+    config = config_from_yaml(config)
+
+    groups = config['groups']
+
     groups += ['Other']
     plot = StackedBarPlot(groups, cmap=cmap)
 
-    for path, preset_path in zip(cpu_data, cpu_preset):
+    for run in config['runs']:
+        label = run['label']
+        path = Path(run['path'])
+        preset = run['preset']
+
         drhook = DrHookRecord.from_raw(path)
         gstats = GStatsRecord.from_file(path)
-
-        preset = preset_from_yaml(preset_path)
 
         data = data_from_preset(drhook=drhook, preset=preset, groups=groups[:-1])
 
         # Add "other" as the difference to the EC_PHYS gstats label
         data += [gstats.total_ecphys - sum(data)]
 
-        plot.add_stack(data, label='CPU-Fused')
-
-    for path, preset_path in zip(gpu_data, gpu_preset):
-
-        drhook = DrHookRecord.from_raw(path)
-        gstats = GStatsRecord.from_file(path)
-
-        preset = preset_from_yaml(preset_path)
-
-        data = data_from_preset(drhook=drhook, preset=preset, groups=groups[:-1])
-
-        # Add "other" as the difference to the EC_PHYS gstats label
-        data += [gstats.total_ecphys - sum(data)]
-
-        plot.add_stack(data, label='GPU-Stack')
-
-        # from IPython import embed; embed()
+        plot.add_stack(data, label=label)
 
     plot.plot(filename=output)
 
