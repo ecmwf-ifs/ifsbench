@@ -65,11 +65,11 @@ def test_arch_run(watcher, arch, np, nt, hyperthread, expected):
     ]),
     ('atos_ac', 64, 4, 1, 1, [
         'srun', '--ntasks=64', '--ntasks-per-node=4', '--qos=ng',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--gpus-per-task=1'
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:4'
     ]),
     ('atos_ac', 64, 4, 1, 4, [
         'srun', '--ntasks=64', '--ntasks-per-node=1', '--qos=ng',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--gpus-per-task=4'
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:4'
     ]),
     ('lumi_g', 256, 4, 1, None, [
         'srun', '--ntasks=256', '--ntasks-per-node=14', '--partition=standard-g',
@@ -81,11 +81,11 @@ def test_arch_run(watcher, arch, np, nt, hyperthread, expected):
     ]),
     ('lumi_g', 256, 4, 1, 1, [
         'srun', '--ntasks=256', '--ntasks-per-node=8', '--partition=standard-g',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--gpus-per-task=1'
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:8'
     ]),
     ('lumi_g', 256, 4, 1, 4, [
         'srun', '--ntasks=256', '--ntasks-per-node=2', '--partition=standard-g',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--gpus-per-task=4'
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:8'
     ]),
 ])
 def test_arch_gpu_run(watcher, arch, np, nt, gpus_per_task, hyperthread, expected):
@@ -100,6 +100,7 @@ def test_arch_gpu_run(watcher, arch, np, nt, gpus_per_task, hyperthread, expecte
 
     for string in expected:
         assert string in watcher.output
+
 
 @pytest.mark.parametrize('arch,np,nt,hyperthread,gpus_per_task,user_options,order', [
     ('atos_ac', 64, 4, 1, 0, ['--qos=some_partition'], [

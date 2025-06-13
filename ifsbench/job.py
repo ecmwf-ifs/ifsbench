@@ -160,14 +160,14 @@ class Job:
         Specify the distribution strategy to use for task distribution across nodes
     distribute_local : :any:`CpuDistribution`, optional
         Specify the distribution strategy to use for task distribution across sockets within a node
-    gpus_per_task : int, optional
-        The number of GPUs that are used per task.
+    gpus_per_node : int, optional
+        The number of GPUs that are used per node.
     """
 
     def __init__(self, cpu_config, tasks=None, nodes=None, tasks_per_node=None,
                  tasks_per_socket=None, cpus_per_task=None, threads_per_core=None,
                  bind=None, distribute_remote=None, distribute_local=None,
-                 gpus_per_task=None):
+                 gpus_per_node=None):
 
         assert issubclass(cpu_config, CpuConfiguration)
         self.cpu_config = cpu_config
@@ -183,8 +183,8 @@ class Job:
             self.cpus_per_task = cpus_per_task
         if threads_per_core is not None:
             self.threads_per_core = threads_per_core
-        if gpus_per_task is not None:
-            self.gpus_per_task = gpus_per_task
+        if gpus_per_node is not None:
+            self.gpus_per_node = gpus_per_node
         if bind is not None:
             self.bind = bind
         if distribute_remote is not None:
@@ -193,8 +193,7 @@ class Job:
             self.distribute_local = distribute_local
 
 
-        gpus_per_node = self.get_gpus_per_task() * self.get_tasks_per_node()
-        if gpus_per_node > self.cpu_config.gpus_per_node:
+        if self.get_gpus_per_node() > self.cpu_config.gpus_per_node:
             raise ValueError("More GPUs have been requested than are available.")
 
         try:
@@ -267,14 +266,6 @@ class Job:
             else:
                 raise ValueError('The number of tasks per node could not be determined!')
 
-            # If GPUs are used, make sure that tasks_per_node is compatible with
-            # the number of available GPUs.
-            if self.get_gpus_per_task() > 0:
-                tasks_per_node = min(
-                    tasks_per_node,
-                    self.cpu_config.gpus_per_node // self.get_gpus_per_task()
-                )
-
         return tasks_per_node
 
     def get_cpus_per_task(self):
@@ -285,13 +276,13 @@ class Job:
         """
         return getattr(self, 'cpus_per_task', 1)
 
-    def get_gpus_per_task(self):
+    def get_gpus_per_node(self):
         """
-        The number of GPUs assigned to each task
+        The number of GPUs to use per node
 
         If this has not been specified explicitly, it defaults to 0
         """
-        return getattr(self, 'gpus_per_task', 0)
+        return getattr(self, 'gpus_per_node', 0)
 
     def get_threads_per_core(self):
         """

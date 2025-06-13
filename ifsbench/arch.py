@@ -282,7 +282,7 @@ class Atos(Arch):
     @classmethod
     def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
             launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
+            gpus_per_node=None, **kwargs):
         """Build job description using :attr:`cpu_config`"""
 
         # Setup environment
@@ -298,16 +298,18 @@ class Atos(Arch):
         launch_user_options = list(as_tuple(launch_user_options))
 
         # If GPUs are used, request the GPU partition.
-        if gpus_per_task is not None and gpus_per_task > 0:
-            if cls.cpu_config.gpus_per_node // gpus_per_task <= 0:
-                raise ValueError(f"Not enough GPUs are available on the "
-                    f"architecture {cls.__name__}!")
+        if gpus_per_task:
+            if gpus_per_node is not None:
+                warning(f'Both, gpus_per_task={gpus_per_task} and gpus_per_node={gpus_per_node} specified, ignoring gpus_per_task')
+            else:
+                gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
+                tasks_per_node = min(
+                    tasks_per_node,
+                    cls.cpu_config.gpus_per_node // gpus_per_task
+                )
 
+        if gpus_per_node:
             launch_user_options.insert(0, '--qos=ng')
-            tasks_per_node = min(
-                tasks_per_node,
-                cls.cpu_config.gpus_per_node // gpus_per_task
-            )
         elif tasks * cpus_per_task > 32:
             # By default, stuff on Atos runs on the GPIL nodes which allow only
             # up to 32 cores. If more resources are needed, the compute
@@ -321,7 +323,7 @@ class Atos(Arch):
         # Build job description
         job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
                   cpus_per_task=cpus_per_task, threads_per_core=threads_per_core,
-                  bind=bind, gpus_per_task=gpus_per_task)
+                  bind=bind, gpus_per_node=gpus_per_node)
 
         # Launch via generic run
         cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
@@ -368,7 +370,7 @@ class Lumi(Arch):
     @classmethod
     def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
             launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
+            gpus_per_node=None, **kwargs):
         """Build job description using :attr:`cpu_config`"""
 
         # Setup environment
@@ -387,16 +389,18 @@ class Lumi(Arch):
 
 
         # If GPUs are used, limit the number of tasks per node.
-        if gpus_per_task is not None and gpus_per_task > 0:
-            if cls.cpu_config.gpus_per_node // gpus_per_task <= 0:
-                raise ValueError(f"Not enough GPUs are available on the "
-                    f"architecture {cls.__name__}!")
+        if gpus_per_task:
+            if gpus_per_node is not None:
+                warning(f'Both, gpus_per_task={gpus_per_task} and gpus_per_node={gpus_per_node} specified, ignoring gpus_per_task')
+            else:
 
-            tasks_per_node = min(
-                tasks_per_node,
-                cls.cpu_config.gpus_per_node // gpus_per_task
-            )
+                gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
+                tasks_per_node = min(
+                    tasks_per_node,
+                    cls.cpu_config.gpus_per_node // gpus_per_task
+                )
 
+        if gpus_per_node:
             use_gpu_mpi = kwargs.pop('mpi_gpu_aware', False)
 
             if use_gpu_mpi:
@@ -410,7 +414,7 @@ class Lumi(Arch):
         # Build job description
         job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
                   cpus_per_task=cpus_per_task, threads_per_core=threads_per_core,
-                  bind=bind, gpus_per_task=gpus_per_task)
+                  bind=bind, gpus_per_node=gpus_per_node)
 
         # Launch via generic run
         cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
