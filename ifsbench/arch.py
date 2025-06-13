@@ -13,6 +13,7 @@ import os
 
 from .job import CpuConfiguration, CpuBinding, Job
 from .launcher import Launcher, MpirunLauncher, SrunLauncher, AprunLauncher
+from .logging import warning
 from .util import as_tuple, execute
 
 
@@ -300,7 +301,10 @@ class Atos(Arch):
         # If GPUs are used, request the GPU partition.
         if gpus_per_task:
             if gpus_per_node is not None:
-                warning(f'Both, gpus_per_task={gpus_per_task} and gpus_per_node={gpus_per_node} specified, ignoring gpus_per_task')
+                warning((
+                    f'Both, gpus_per_task={gpus_per_task} and gpus_per_node={gpus_per_node} specified, '
+                    'ignoring gpus_per_task'
+                ))
             else:
                 gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
                 tasks_per_node = min(
@@ -391,7 +395,10 @@ class Lumi(Arch):
         # If GPUs are used, limit the number of tasks per node.
         if gpus_per_task:
             if gpus_per_node is not None:
-                warning(f'Both, gpus_per_task={gpus_per_task} and gpus_per_node={gpus_per_node} specified, ignoring gpus_per_task')
+                warning((
+                    f'Both, gpus_per_task={gpus_per_task} and gpus_per_node={gpus_per_node} specified, '
+                    'ignoring gpus_per_task'
+                ))
             else:
 
                 gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
