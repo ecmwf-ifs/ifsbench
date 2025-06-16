@@ -338,11 +338,11 @@ export CUDA_VISIBLE_DEVICES={gpu_mapping_str}
 exec $*
             """.strip()
 
-            rundir = kwargs.get('rundir')
+            rundir = kwargs.get('cwd')
             if not rundir:
                 raise RuntimeError('No rundir given to Atos.run')
             wrapper = Path(rundir/'select_gpu.sh')
-            wrapper.write_text(wrapper_str)
+            wrapper.write_text(wrapper_str, encoding='utf_8')
             wrapper.chmod(0o750)
 
             cmd = [str(wrapper), *cmd]

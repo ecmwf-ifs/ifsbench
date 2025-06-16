@@ -98,14 +98,14 @@ def test_arch_gpu_run(tmp_path, watcher, arch, np, nt, gpus_per_task, hyperthrea
     obj = arch_registry[arch]
 
     with watcher:
-        obj.run('cmd', np, nt, hyperthread, gpus_per_task=gpus_per_task, dryrun=True, rundir=tmp_path)
+        obj.run('cmd', np, nt, hyperthread, gpus_per_task=gpus_per_task, dryrun=True, cwd=tmp_path)
 
     for string in expected:
         assert string in watcher.output
 
     if launch_script_expected:
         assert (tmp_path/'select_gpu.sh').exists()
-        assert (tmp_path.stat().st_mode & 0o750)
+        assert tmp_path.stat().st_mode & 0o750
         launch_script = (tmp_path/'select_gpu.sh').read_text()
         for string in launch_script_expected:
             assert string in launch_script
@@ -138,13 +138,13 @@ def test_arch_gpu_run_atos_ac(tmp_path, watcher, np, nt, gpus_per_node, expected
     obj = arch_registry['atos_ac']
 
     with watcher:
-        obj.run('cmd', np, nt, 1, gpus_per_node=gpus_per_node, dryrun=True, rundir=tmp_path)
+        obj.run('cmd', np, nt, 1, gpus_per_node=gpus_per_node, dryrun=True, cwd=tmp_path)
 
     for string in expected:
         assert string in watcher.output
 
     assert (tmp_path/'select_gpu.sh').exists()
-    assert (tmp_path.stat().st_mode & 0o750)
+    assert tmp_path.stat().st_mode & 0o750
     launch_script = (tmp_path/'select_gpu.sh').read_text()
     for string in launch_script_expected:
         assert string in launch_script
@@ -171,7 +171,7 @@ def test_arch_user_override(tmp_path, watcher, arch, np, nt, gpus_per_task, hype
 
     with watcher:
         obj.run('cmd', np, nt, hyperthread, gpus_per_task=gpus_per_task,
-            launch_user_options=user_options, dryrun=True, rundir=tmp_path)
+            launch_user_options=user_options, dryrun=True, cwd=tmp_path)
 
     # The order-list contains some launcher flags that must appear in this order
     # in the launch command. Check that all the values exist and that they are
@@ -206,7 +206,7 @@ def test_arch_gpu_mpi_aware(tmp_path, watcher, arch, np, gpus_per_task, mpi_gpu_
     with watcher:
         obj.run(
             'cmd', np, 1, 1, gpus_per_task=gpus_per_task,
-            mpi_gpu_aware=mpi_gpu_aware, dryrun=True, rundir=tmp_path
+            mpi_gpu_aware=mpi_gpu_aware, dryrun=True, cwd=tmp_path
         )
 
     for key, value in env_expected.items():
