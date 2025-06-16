@@ -54,41 +54,43 @@ def test_arch_run(watcher, arch, np, nt, hyperthread, expected):
     for string in expected:
         assert string in watcher.output
 
-@pytest.mark.parametrize('arch,np,nt,hyperthread,gpus_per_task,expected', [
+@pytest.mark.parametrize('arch,np,nt,hyperthread,gpus_per_task,expected,launch_script_expected', [
     ('atos_ac', 64, 4, 1, None, [
         'srun', '--ntasks=64', '--ntasks-per-node=32',
         '--cpus-per-task=4', '--ntasks-per-core=1', '--qos=np',
-    ]),
+    ], None),
     ('atos_ac', 64, 4, 1, 0, [
         'srun', '--ntasks=64', '--ntasks-per-node=32',
         '--cpus-per-task=4', '--ntasks-per-core=1', '--qos=np',
-    ]),
+    ], None),
     ('atos_ac', 64, 4, 1, 1, [
         'srun', '--ntasks=64', '--ntasks-per-node=4', '--qos=ng',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:4'
-    ]),
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:4',
+        'select_gpu.sh'
+    ], ['CUDA_VISIBLE_DEVICES=${SLURM_LOCALID}']),
     ('atos_ac', 64, 4, 1, 4, [
         'srun', '--ntasks=64', '--ntasks-per-node=1', '--qos=ng',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:4'
-    ]),
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:4',
+        'select_gpu.sh'
+    ], ['CUDA_VISIBLE_DEVICES=${SLURM_LOCALID}']),
     ('lumi_g', 256, 4, 1, None, [
         'srun', '--ntasks=256', '--ntasks-per-node=14', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1'
-    ]),
+    ], None),
     ('lumi_g', 256, 4, 1, 0, [
         'srun', '--ntasks=256', '--ntasks-per-node=14', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1'
-    ]),
+    ], None),
     ('lumi_g', 256, 4, 1, 1, [
         'srun', '--ntasks=256', '--ntasks-per-node=8', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:8'
-    ]),
+    ], None),
     ('lumi_g', 256, 4, 1, 4, [
         'srun', '--ntasks=256', '--ntasks-per-node=2', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:8'
-    ]),
+    ], None),
 ])
-def test_arch_gpu_run(watcher, arch, np, nt, gpus_per_task, hyperthread, expected):
+def test_arch_gpu_run(tmp_path, watcher, arch, np, nt, gpus_per_task, hyperthread, expected, launch_script_expected):
     """
     Verify the launch command for certain architecture configurations
     looks as expected
@@ -96,10 +98,56 @@ def test_arch_gpu_run(watcher, arch, np, nt, gpus_per_task, hyperthread, expecte
     obj = arch_registry[arch]
 
     with watcher:
-        obj.run('cmd', np, nt, hyperthread, gpus_per_task=gpus_per_task, dryrun=True)
+        obj.run('cmd', np, nt, hyperthread, gpus_per_task=gpus_per_task, dryrun=True, rundir=tmp_path)
 
     for string in expected:
         assert string in watcher.output
+
+    if launch_script_expected:
+        assert (tmp_path/'select_gpu.sh').exists()
+        assert (tmp_path.stat().st_mode & 0o750)
+        launch_script = (tmp_path/'select_gpu.sh').read_text()
+        for string in launch_script_expected:
+            assert string in launch_script
+    else:
+        assert not (tmp_path/'select_gpu.sh').exists()
+
+
+@pytest.mark.parametrize('np,nt,gpus_per_node,expected,launch_script_expected',[
+    (
+        64, 32, 4,
+        ['--ntasks=64', '--ntasks-per-node=4', '--gres=gpu:4', '/select_gpu.sh'],
+        ['CUDA_VISIBLE_DEVICES=${SLURM_LOCALID}']
+    ),
+    (
+        64, 8, 4,
+        ['--ntasks=64', '--ntasks-per-node=16', '--gres=gpu:4', '/select_gpu.sh'],
+        ['CUDA_VISIBLE_DEVICES=$((SLURM_LOCALID / 4))']
+    ),
+    (
+        64, 17, 4,
+        ['--ntasks=64', '--ntasks-per-node=7', '--gres=gpu:4', '/select_gpu.sh'],
+        ['CUDA_VISIBLE_DEVICES=$((SLURM_LOCALID / 2))']
+    )
+])
+def test_arch_gpu_run_atos_ac(tmp_path, watcher, np, nt, gpus_per_node, expected, launch_script_expected):
+    """
+    Custom test for Atos_ac to validate the GPU mapping when
+    using gpus_per_node
+    """
+    obj = arch_registry['atos_ac']
+
+    with watcher:
+        obj.run('cmd', np, nt, 1, gpus_per_node=gpus_per_node, dryrun=True, rundir=tmp_path)
+
+    for string in expected:
+        assert string in watcher.output
+
+    assert (tmp_path/'select_gpu.sh').exists()
+    assert (tmp_path.stat().st_mode & 0o750)
+    launch_script = (tmp_path/'select_gpu.sh').read_text()
+    for string in launch_script_expected:
+        assert string in launch_script
 
 
 @pytest.mark.parametrize('arch,np,nt,hyperthread,gpus_per_task,user_options,order', [
@@ -113,7 +161,7 @@ def test_arch_gpu_run(watcher, arch, np, nt, gpus_per_task, hyperthread, expecte
         '--partition=standard-g', '--partition=lumi-c', '--gpus-per-task=0'
     ]),
 ])
-def test_arch_user_override(watcher, arch, np, nt, gpus_per_task, hyperthread,
+def test_arch_user_override(tmp_path, watcher, arch, np, nt, gpus_per_task, hyperthread,
     user_options, order):
     """
     Verify that the launch user options are added to the end of the launcher
@@ -123,7 +171,7 @@ def test_arch_user_override(watcher, arch, np, nt, gpus_per_task, hyperthread,
 
     with watcher:
         obj.run('cmd', np, nt, hyperthread, gpus_per_task=gpus_per_task,
-            launch_user_options=user_options, dryrun=True)
+            launch_user_options=user_options, dryrun=True, rundir=tmp_path)
 
     # The order-list contains some launcher flags that must appear in this order
     # in the launch command. Check that all the values exist and that they are
@@ -147,7 +195,7 @@ def test_arch_user_override(watcher, arch, np, nt, gpus_per_task, hyperthread,
     }),
     ('lumi_g', 64, 8, True, {}),
 ])
-def test_arch_gpu_mpi_aware(watcher, arch, np, gpus_per_task, mpi_gpu_aware,
+def test_arch_gpu_mpi_aware(tmp_path, watcher, arch, np, gpus_per_task, mpi_gpu_aware,
     env_expected):
     """
     Verify that setting mpi_gpu_aware sets the right environment flags (and
@@ -156,8 +204,10 @@ def test_arch_gpu_mpi_aware(watcher, arch, np, gpus_per_task, mpi_gpu_aware,
     obj = arch_registry[arch]
 
     with watcher:
-        obj.run('cmd', np, 1, 1, gpus_per_task=gpus_per_task,
-            mpi_gpu_aware=mpi_gpu_aware, dryrun=True)
+        obj.run(
+            'cmd', np, 1, 1, gpus_per_task=gpus_per_task,
+            mpi_gpu_aware=mpi_gpu_aware, dryrun=True, rundir=tmp_path
+        )
 
     for key, value in env_expected.items():
         # Match anything of the form key: value in the watcher output. Keep in

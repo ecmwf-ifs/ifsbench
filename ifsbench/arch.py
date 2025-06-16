@@ -10,6 +10,7 @@ Architecture specifications
 """
 from abc import ABC, abstractmethod
 import os
+from pathlib import Path
 
 from .job import CpuConfiguration, CpuBinding, Job
 from .launcher import Launcher, MpirunLauncher, SrunLauncher, AprunLauncher
@@ -306,14 +307,45 @@ class Atos(Arch):
                     'ignoring gpus_per_task'
                 ))
             else:
-                gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
                 tasks_per_node = min(
                     tasks_per_node,
                     cls.cpu_config.gpus_per_node // gpus_per_task
                 )
+                gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
 
         if gpus_per_node:
             launch_user_options.insert(0, '--qos=ng')
+
+            # To ensure we correctly bind GPUs to CPUs we write a little
+            # wrapper script that maps the correct CUDA_VISIBLE_DEVICES
+            # id to each rank locally per node
+
+            if tasks_per_node <= gpus_per_node:
+                # With less or equal tasks per node than GPUs available,
+                # we can map one GPU to each task, in ascending order
+                # of local rank number per node
+                gpu_mapping_str = '${SLURM_LOCALID}'
+            else:
+                # With more ranks than GPUs available per node,
+                # we map subsequent rank ids on a node to the same
+                # GPU - effectively a compact allocation strategy
+                ranks_per_gpu = (tasks_per_node - 1) // gpus_per_node + 1
+                gpu_mapping_str = f'$((SLURM_LOCALID / {ranks_per_gpu}))'
+
+            wrapper_str = f"""
+#!/bin/bash
+export CUDA_VISIBLE_DEVICES={gpu_mapping_str}
+exec $*
+            """.strip()
+
+            rundir = kwargs.get('rundir')
+            if not rundir:
+                raise RuntimeError('No rundir given to Atos.run')
+            wrapper = Path(rundir/'select_gpu.sh')
+            wrapper.write_text(wrapper_str)
+            wrapper.chmod(0o750)
+
+            cmd = [str(wrapper), *cmd]
         elif tasks * cpus_per_task > 32:
             # By default, stuff on Atos runs on the GPIL nodes which allow only
             # up to 32 cores. If more resources are needed, the compute
@@ -391,7 +423,6 @@ class Lumi(Arch):
         launch_user_options = list(as_tuple(launch_user_options))
         launch_user_options.insert(0, f"--partition={cls.partition}")
 
-
         # If GPUs are used, limit the number of tasks per node.
         if gpus_per_task:
             if gpus_per_node is not None:
@@ -400,12 +431,11 @@ class Lumi(Arch):
                     'ignoring gpus_per_task'
                 ))
             else:
-
-                gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
                 tasks_per_node = min(
                     tasks_per_node,
                     cls.cpu_config.gpus_per_node // gpus_per_task
                 )
+                gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
 
         if gpus_per_node:
             use_gpu_mpi = kwargs.pop('mpi_gpu_aware', False)
