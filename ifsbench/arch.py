@@ -323,8 +323,10 @@ class Atos(Arch):
             # [1->0, 0->1, 3->2, 2->3], we need to apply some reordering here
 
             # The GPU that is closest to each core
-            core_to_gpu_mapping = {core: 1 for core in range(32)} | {core: 0 for core in range(32, 64)}
-            core_to_gpu_mapping |= {core: 3 for core in range(64, 96)} | {core: 2 for core in range(96, 128)}
+            core_to_gpu_mapping = {core: 1 for core in range(32)}
+            core_to_gpu_mapping.update({core: 0 for core in range(32, 64)})
+            core_to_gpu_mapping.update({core: 3 for core in range(64, 96)})
+            core_to_gpu_mapping.update({core: 2 for core in range(96, 128)})
 
             # Determine the cores that each task is using on a node
             physical_cpus_per_task = (cpus_per_task - 1) // threads_per_core + 1
