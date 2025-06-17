@@ -10,9 +10,11 @@ Architecture specifications
 """
 from abc import ABC, abstractmethod
 import os
+from pathlib import Path
 
 from .job import CpuConfiguration, CpuBinding, Job
 from .launcher import Launcher, MpirunLauncher, SrunLauncher, AprunLauncher
+from .logging import warning
 from .util import as_tuple, execute
 
 
@@ -282,7 +284,7 @@ class Atos(Arch):
     @classmethod
     def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
             launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
+            gpus_per_node=None, **kwargs):
         """Build job description using :attr:`cpu_config`"""
 
         # Setup environment
@@ -298,16 +300,52 @@ class Atos(Arch):
         launch_user_options = list(as_tuple(launch_user_options))
 
         # If GPUs are used, request the GPU partition.
-        if gpus_per_task is not None and gpus_per_task > 0:
-            if cls.cpu_config.gpus_per_node // gpus_per_task <= 0:
-                raise ValueError(f"Not enough GPUs are available on the "
-                    f"architecture {cls.__name__}!")
+        if gpus_per_task:
+            if gpus_per_node is not None:
+                warning((
+                    f'Both, gpus_per_task={gpus_per_task} and gpus_per_node={gpus_per_node} specified, '
+                    'ignoring gpus_per_task'
+                ))
+            else:
+                tasks_per_node = min(
+                    tasks_per_node,
+                    cls.cpu_config.gpus_per_node // gpus_per_task
+                )
+                gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
 
+        if gpus_per_node:
             launch_user_options.insert(0, '--qos=ng')
-            tasks_per_node = min(
-                tasks_per_node,
-                cls.cpu_config.gpus_per_node // gpus_per_task
-            )
+
+            # To ensure we correctly bind GPUs to CPUs we write a little
+            # wrapper script that maps the correct CUDA_VISIBLE_DEVICES
+            # id to each rank locally per node
+
+            if tasks_per_node <= gpus_per_node:
+                # With less or equal tasks per node than GPUs available,
+                # we can map one GPU to each task, in ascending order
+                # of local rank number per node
+                gpu_mapping_str = '${SLURM_LOCALID}'
+            else:
+                # With more ranks than GPUs available per node,
+                # we map subsequent rank ids on a node to the same
+                # GPU - effectively a compact allocation strategy
+                ranks_per_gpu = (tasks_per_node - 1) // gpus_per_node + 1
+                gpu_mapping_str = f'$((SLURM_LOCALID / {ranks_per_gpu}))'
+
+            wrapper_str = f"""
+#!/bin/bash
+export CUDA_VISIBLE_DEVICES={gpu_mapping_str}
+exec $*
+            """.strip()
+
+            rundir = kwargs.get('cwd')
+            if not rundir:
+                raise RuntimeError('No rundir given to Atos.run')
+            wrapper = Path(rundir/'select_gpu.sh')
+            wrapper.write_text(wrapper_str, encoding='utf_8')
+            wrapper.chmod(0o750)
+
+            cmd = [str(wrapper), *cmd]
         elif tasks * cpus_per_task > 32:
             # By default, stuff on Atos runs on the GPIL nodes which allow only
             # up to 32 cores. If more resources are needed, the compute
@@ -321,7 +359,7 @@ class Atos(Arch):
         # Build job description
         job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
                   cpus_per_task=cpus_per_task, threads_per_core=threads_per_core,
-                  bind=bind, gpus_per_task=gpus_per_task)
+                  bind=bind, gpus_per_node=gpus_per_node)
 
         # Launch via generic run
         cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
@@ -368,7 +406,7 @@ class Lumi(Arch):
     @classmethod
     def run(cls, cmd, tasks, cpus_per_task, threads_per_core, launch_cmd=None,
             launch_user_options=None, logfile=None, env=None, gpus_per_task=None,
-            **kwargs):
+            gpus_per_node=None, **kwargs):
         """Build job description using :attr:`cpu_config`"""
 
         # Setup environment
@@ -385,18 +423,21 @@ class Lumi(Arch):
         launch_user_options = list(as_tuple(launch_user_options))
         launch_user_options.insert(0, f"--partition={cls.partition}")
 
-
         # If GPUs are used, limit the number of tasks per node.
-        if gpus_per_task is not None and gpus_per_task > 0:
-            if cls.cpu_config.gpus_per_node // gpus_per_task <= 0:
-                raise ValueError(f"Not enough GPUs are available on the "
-                    f"architecture {cls.__name__}!")
+        if gpus_per_task:
+            if gpus_per_node is not None:
+                warning((
+                    f'Both, gpus_per_task={gpus_per_task} and gpus_per_node={gpus_per_node} specified, '
+                    'ignoring gpus_per_task'
+                ))
+            else:
+                tasks_per_node = min(
+                    tasks_per_node,
+                    cls.cpu_config.gpus_per_node // gpus_per_task
+                )
+                gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
 
-            tasks_per_node = min(
-                tasks_per_node,
-                cls.cpu_config.gpus_per_node // gpus_per_task
-            )
-
+        if gpus_per_node:
             use_gpu_mpi = kwargs.pop('mpi_gpu_aware', False)
 
             if use_gpu_mpi:
@@ -410,7 +451,7 @@ class Lumi(Arch):
         # Build job description
         job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
                   cpus_per_task=cpus_per_task, threads_per_core=threads_per_core,
-                  bind=bind, gpus_per_task=gpus_per_task)
+                  bind=bind, gpus_per_node=gpus_per_node)
 
         # Launch via generic run
         cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
