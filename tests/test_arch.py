@@ -26,19 +26,19 @@ def fixture_watcher():
 @pytest.mark.parametrize('arch,np,nt,hyperthread,expected', [
     ('atos_aa', 64, 4, 1, [
         'srun', '--ntasks=64', '--ntasks-per-node=32',
-        '--cpus-per-task=4', '--ntasks-per-core=1'
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--hint=nomultithread'
     ]),
     ('atos_aa', 256, 4, 1, [
         'srun', '--ntasks=256', '--ntasks-per-node=32',
-        '--cpus-per-task=4', '--ntasks-per-core=1'
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--hint=nomultithread'
     ]),
     ('atos_aa', 256, 16, 1, [
         'srun', '--ntasks=256', '--ntasks-per-node=8',
-        '--cpus-per-task=16', '--ntasks-per-core=1'
+        '--cpus-per-task=16', '--ntasks-per-core=1', '--hint=nomultithread'
     ]),
     ('atos_aa', 256, 16, 2, [
         'srun', '--ntasks=256', '--ntasks-per-node=16',
-        '--cpus-per-task=16', '--ntasks-per-core=2'
+        '--cpus-per-task=16', '--ntasks-per-core=2', '--hint=multithread'
     ]),
 ])
 def test_arch_run(watcher, arch, np, nt, hyperthread, expected):
@@ -57,22 +57,22 @@ def test_arch_run(watcher, arch, np, nt, hyperthread, expected):
 @pytest.mark.parametrize('arch,np,nt,hyperthread,gpus_per_task,expected,launch_script_expected', [
     ('atos_ac', 64, 4, 1, None, [
         'srun', '--ntasks=64', '--ntasks-per-node=32',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--qos=np',
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--qos=np', '--hint=nomultithread'
     ], None),
     ('atos_ac', 64, 4, 1, 0, [
         'srun', '--ntasks=64', '--ntasks-per-node=32',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--qos=np',
+        '--cpus-per-task=4', '--ntasks-per-core=1', '--qos=np', '--hint=nomultithread'
     ], None),
-    ('atos_ac', 64, 4, 1, 1, [
+    ('atos_ac', 64, 32, 1, 1, [
         'srun', '--ntasks=64', '--ntasks-per-node=4', '--qos=ng',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:4',
+        '--cpus-per-task=32', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
         'select_gpu.sh'
-    ], ['CUDA_VISIBLE_DEVICES=${SLURM_LOCALID}']),
-    ('atos_ac', 64, 4, 1, 4, [
+    ], ['VISIBLE_DEVICES_PER_RANK=(1 0 3 2)', 'CUDA_VISIBLE_DEVICES=${VISIBLE_DEVICES_PER_RANK[${SLURM_LOCALID}]']),
+    ('atos_ac', 64, 32, 1, 4, [
         'srun', '--ntasks=64', '--ntasks-per-node=1', '--qos=ng',
-        '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:4',
+        '--cpus-per-task=32', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
         'select_gpu.sh'
-    ], ['CUDA_VISIBLE_DEVICES=${SLURM_LOCALID}']),
+    ], ['VISIBLE_DEVICES_PER_RANK=(1)', 'CUDA_VISIBLE_DEVICES=${VISIBLE_DEVICES_PER_RANK[${SLURM_LOCALID}]']),
     ('lumi_g', 256, 4, 1, None, [
         'srun', '--ntasks=256', '--ntasks-per-node=14', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1'
@@ -116,18 +116,24 @@ def test_arch_gpu_run(tmp_path, watcher, arch, np, nt, gpus_per_task, hyperthrea
 @pytest.mark.parametrize('np,nt,gpus_per_node,expected,launch_script_expected',[
     (
         64, 32, 4,
-        ['--ntasks=64', '--ntasks-per-node=4', '--gres=gpu:4', '/select_gpu.sh'],
-        ['CUDA_VISIBLE_DEVICES=${SLURM_LOCALID}']
+        ['--ntasks=64', '--ntasks-per-node=4', '--gres=gpu:4', '--hint=nomultithread', '/select_gpu.sh'],
+        ['VISIBLE_DEVICES_PER_RANK=(1 0 3 2)', 'CUDA_VISIBLE_DEVICES=${VISIBLE_DEVICES_PER_RANK[${SLURM_LOCALID}]']
     ),
     (
         64, 8, 4,
-        ['--ntasks=64', '--ntasks-per-node=16', '--gres=gpu:4', '/select_gpu.sh'],
-        ['CUDA_VISIBLE_DEVICES=$((SLURM_LOCALID / 4))']
+        ['--ntasks=64', '--ntasks-per-node=16', '--gres=gpu:4', '--hint=nomultithread', '/select_gpu.sh'],
+        [
+            'VISIBLE_DEVICES_PER_RANK=(1 1 1 1 0 0 0 0 3 3 3 3 2 2 2 2)',
+            'CUDA_VISIBLE_DEVICES=${VISIBLE_DEVICES_PER_RANK[${SLURM_LOCALID}]'
+        ]
     ),
     (
         64, 17, 4,
-        ['--ntasks=64', '--ntasks-per-node=7', '--gres=gpu:4', '/select_gpu.sh'],
-        ['CUDA_VISIBLE_DEVICES=$((SLURM_LOCALID / 2))']
+        ['--ntasks=64', '--ntasks-per-node=7', '--gres=gpu:4', '--hint=nomultithread', '/select_gpu.sh'],
+        [
+            'VISIBLE_DEVICES_PER_RANK=(1 1,0 0 0,3 3 3,2 2)',
+            'CUDA_VISIBLE_DEVICES=${VISIBLE_DEVICES_PER_RANK[${SLURM_LOCALID}]'
+        ]
     )
 ])
 def test_arch_gpu_run_atos_ac(tmp_path, watcher, np, nt, gpus_per_node, expected, launch_script_expected):
