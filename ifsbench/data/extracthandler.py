@@ -41,6 +41,11 @@ class ExtractHandler(DataHandler):
     def execute(self, wdir: Union[str, pathlib.Path], **kwargs) -> None:
         wdir = pathlib.Path(wdir)
 
+        if not self.archive_path.is_absolute():
+            archive_path = wdir/self.archive_path
+        else:
+            archive_path = self.archive_path
+
         target_dir = wdir
         if self.target_dir is not None:
             if self.target_dir.is_absolute():
@@ -48,5 +53,5 @@ class ExtractHandler(DataHandler):
             else:
                 target_dir = wdir / self.target_dir
 
-        debug(f"Unpack archive {str(self.archive_path)} to {str(target_dir)}.")
-        shutil.unpack_archive(self.archive_path, target_dir)
+        debug(f"Unpack archive {str(archive_path)} to {str(target_dir)}.")
+        shutil.unpack_archive(archive_path, target_dir)

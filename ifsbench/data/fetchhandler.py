@@ -62,6 +62,6 @@ class FetchHandler(DataHandler):
             with urllib.request.urlopen(self.source_url) as source, target_path.open('wb') as target:
                 shutil.copyfileobj(source, target)
         except urllib.error.URLError as ue:
-            warning("Fetching file failed: {ue}")
+            warning(f"Fetching file failed: {ue}")
             if not self.ignore_errors:
                 raise RuntimeError(str(ue)) from ue

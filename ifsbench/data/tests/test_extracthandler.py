@@ -110,7 +110,7 @@ def test_extracthandler_execute(
         tmp_path: `pathlib.Path`
             pytest-provided temporary directory which acts as our working directory.
 
-        fixture_archive:
+        archive:
             Directory structure inside the archive.
 
         archive_path:
@@ -162,12 +162,14 @@ def test_extracthandler_execute(
             tmp_path / archive_path, archive_type, pack_path
         )
 
+        archive_path = Path(archive_path).relative_to(tmp_path)
+
     # Actually extract the archive.
     config = {'archive_path': archive_path}
     if target_dir:
         config['target_dir'] = target_dir
 
-    handler = ExtractHandler.from_config(config)
+    handler = ExtractHandler(**config)
     handler.execute(tmp_path)
 
     # Build the path where the data should now be. As target_dir may be
