@@ -318,23 +318,35 @@ class Atos(Arch):
 
             # To ensure we correctly bind GPUs to CPUs we write a little
             # wrapper script that maps the correct CUDA_VISIBLE_DEVICES
-            # id to each rank locally per node
+            # id to each rank locally per node.
+            # Because the mapping from NUMA domain to GPU is
+            # [1->0, 0->1, 3->2, 2->3], we need to apply some reordering here
 
-            if tasks_per_node <= gpus_per_node:
-                # With less or equal tasks per node than GPUs available,
-                # we can map one GPU to each task, in ascending order
-                # of local rank number per node
-                gpu_mapping_str = '${SLURM_LOCALID}'
-            else:
-                # With more ranks than GPUs available per node,
-                # we map subsequent rank ids on a node to the same
-                # GPU - effectively a compact allocation strategy
-                ranks_per_gpu = (tasks_per_node - 1) // gpus_per_node + 1
-                gpu_mapping_str = f'$((SLURM_LOCALID / {ranks_per_gpu}))'
+            # The GPU that is closest to each core
+            core_to_gpu_mapping = {core: 1 for core in range(32)}
+            core_to_gpu_mapping.update({core: 0 for core in range(32, 64)})
+            core_to_gpu_mapping.update({core: 3 for core in range(64, 96)})
+            core_to_gpu_mapping.update({core: 2 for core in range(96, 128)})
 
+            # Determine the cores that each task is using on a node
+            physical_cpus_per_task = (cpus_per_task - 1) // threads_per_core + 1
+            physical_cores_per_task = {
+                local_rank: [physical_cpus_per_task * local_rank + i for i in range(physical_cpus_per_task)]
+                for local_rank in range(tasks_per_node)
+            }
+
+            # The GPUs to be used by each rank
+            task_gpu_strings = [
+                ','.join(dict.fromkeys(
+                    str(core_to_gpu_mapping[core])
+                    for core in physical_cores_per_task[local_rank]
+                ))
+                for local_rank in range(tasks_per_node)
+            ]
             wrapper_str = f"""
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES={gpu_mapping_str}
+VISIBLE_DEVICES_PER_RANK=({' '.join(task_gpu_strings)})
+export CUDA_VISIBLE_DEVICES=${{VISIBLE_DEVICES_PER_RANK[${{SLURM_LOCALID}}]}}
 exec $*
             """.strip()
 
@@ -355,6 +367,11 @@ exec $*
 
         # Bind to cores
         bind = CpuBinding.BIND_CORES
+
+        if threads_per_core > 1:
+            launch_user_options.insert(0, '--hint=multithread')
+        elif threads_per_core == 1:
+            launch_user_options.insert(0, '--hint=nomultithread')
 
         # Build job description
         job = Job(cls.cpu_config, tasks=tasks, tasks_per_node=tasks_per_node,
