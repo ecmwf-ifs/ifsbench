@@ -31,7 +31,7 @@ _cpu_config_2 = CpuConfiguration(
 
 @pytest.mark.parametrize('arch_in, job_in, job_out, launcher_out', [
     (
-        {'launcher': {'launcher_type': 'SrunLauncher'}, 'cpu_config': _cpu_config_1, 'set_explicit': False},
+        {'launcher': {'class_name': 'SrunLauncher'}, 'cpu_config': _cpu_config_1, 'set_explicit': False},
         {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1},
         {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1},
         SrunLauncher()

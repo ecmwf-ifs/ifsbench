@@ -26,7 +26,7 @@ from ifsbench import DefaultApplication, Job, EnvHandler, EnvOperation
             ['ls', '-l'],
             [
                 {
-                    'handler_type': 'ExtractHandler',
+                    'class_name': 'ExtractHandler',
                     'archive_path': 'in',
                     'target_dir': 'out',
                 }
@@ -67,7 +67,7 @@ def test_default_application(
         data_out = application.get_data_handlers(tmp_path, job)
         assert len(data_out) == len(data_handlers)
         assert [type(x).__name__ for x in data_out] == [
-            dh['handler_type'] for dh in data_handlers
+            dh['class_name'] for dh in data_handlers
         ]
     else:
         assert len(application.get_data_handlers(tmp_path, job)) == 0

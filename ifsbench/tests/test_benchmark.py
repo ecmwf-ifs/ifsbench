@@ -52,7 +52,7 @@ def fixture_test_setup_files():
     science_files = [Path('file1'), Path('file2')]
 
     science = ScienceSetup(
-        application={'application_type': 'DefaultApplication', 'command': ['pwd']},
+        application={'class_name': 'DefaultApplication', 'command': ['pwd']},
         env_handlers=env_handlers,
         data_handlers_init=data_handlers,
     )
@@ -142,8 +142,6 @@ class _DummyLauncher(Launcher):
     Dummy launcher that just calls the given executable.
     """
 
-    launcher_type: Literal['Dummy'] = 'Dummy'
-
     _prepare_called = False
 
     def prepare(
@@ -177,7 +175,7 @@ def test_defaultbenchmark_run(
     arch = (
         DefaultArch.from_config(
             {
-                'launcher': {'launcher_type': 'Dummy'},
+                'launcher': {'class_name': '_DummyLauncher'},
                 'cpu_config': CpuConfiguration(),
             }
         )

@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List
 
-from ifsbench.config_mixin import PydanticConfigMixin
+from ifsbench.config_mixin import AbstractDataClass, DataClass
 from ifsbench.env import EnvHandler
 from ifsbench.job import CpuConfiguration, Job
 from ifsbench.launch.launcher import Launcher
@@ -20,14 +20,13 @@ from ifsbench.launch.launcher import Launcher
 __all__ = ['Arch', 'DefaultArch']
 
 
-@dataclass
-class ArchResult:
+class ArchResult(DataClass):
     """
     Holds results of an :meth:`Arch.process` run.
     """
 
     #: The updated job after the architecture processing.
-    job = None
+    job: Job = None
 
     #: Additional EnvHandler objects that set architecture-specific environment flags.
     env_handlers: List[EnvHandler] = field(default_factory=list)
@@ -39,7 +38,7 @@ class ArchResult:
     default_launcher_flags: List[str] = field(default_factory=list)
 
 
-class Arch(ABC):
+class Arch(AbstractDataClass):
     """
     Architecture/system description.
 
@@ -92,7 +91,7 @@ class Arch(ABC):
         """
 
 
-class DefaultArch(Arch, PydanticConfigMixin):
+class DefaultArch(Arch):
 
     #: The default launcher that is used on this system
     launcher: Launcher

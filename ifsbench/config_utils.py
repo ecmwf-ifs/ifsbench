@@ -10,7 +10,7 @@ from typing import Dict, List, Union
 
 import yaml
 
-from ifsbench.config_mixin import CLASSNAME, ConfigMixin
+from ifsbench.config_mixin import DataClass
 from ifsbench.data import ExtractHandler, NamelistHandler
 from ifsbench.results import EnsembleStats
 
@@ -25,16 +25,16 @@ _SUPPORTED_CONFIGS = {
 
 def _parse_config(
     config: Dict[str, Union[str, float, int, bool, List, None]]
-) -> Dict[str, ConfigMixin]:
+) -> Dict[str, DataClass]:
     result = {}
-    for key, value in config.items():
-        classname = value.pop(CLASSNAME, '')
-        clazz = _SUPPORTED_CONFIGS[classname]
-        result[key] = clazz.from_config(value)
+    # for key, value in config.items():
+    #     classname = value.pop(CLASSNAME, '')
+    #     clazz = _SUPPORTED_CONFIGS[classname]
+    #     result[key] = clazz.from_config(value)
     return result
 
 
-def read_yaml_config(input_path: str) -> Dict[str, ConfigMixin]:
+def read_yaml_config(input_path: str) -> Dict[str, DataClass]:
     """Read config from file in yam format.
 
     Args:

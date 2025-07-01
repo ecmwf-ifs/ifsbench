@@ -26,11 +26,10 @@ def test_fetchhandler_dump_config(source_url, target_path, force, ignore_errors)
     what we expect.
     """
     reference_config = {
-        'source_url': source_url, 
+        'source_url': source_url,
         'target_path': str(target_path),
         'force': force,
         'ignore_errors': ignore_errors,
-        'handler_type': 'FetchHandler'
     }
 
     handler = FetchHandler(
@@ -84,7 +83,7 @@ def fixture_rundir(tmp_path):
 @pytest.mark.parametrize('ignore_errors', [True, False])
 def test_fetchhandler_force(run_dir, ignore_errors):
     """
-    Check that files get overwritten if the force flag is True. 
+    Check that files get overwritten if the force flag is True.
     """
 
     # Essentially replace goodbye.txt with hello.txt. As force is True,
@@ -108,7 +107,7 @@ def test_fetchhandler_force(run_dir, ignore_errors):
 @pytest.mark.parametrize('ignore_errors', [True, False])
 def test_fetchhandler_no_force(run_dir, ignore_errors):
     """
-    Check that files do not get overwritten if the force flag is False. 
+    Check that files do not get overwritten if the force flag is False.
     """
 
     # Essentially replace goodbye.txt with hello.txt. As force is False,

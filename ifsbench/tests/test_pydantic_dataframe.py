@@ -16,9 +16,9 @@ from pandas import DataFrame, MultiIndex, Timestamp
 import pytest
 import yaml
 
-from ifsbench import PydanticConfigMixin, PydanticDataFrame
+from ifsbench import DataClass, PydanticDataFrame
 
-class _PydanticDataFrameTest(PydanticConfigMixin):
+class _PydanticDataFrameTest(DataClass):
     """
     Simple pydantic object that includes PydatanticDataFrame in different ways.
     """
@@ -51,7 +51,7 @@ def test_pydantic_data_frame_init(default_frames):
     assert obj.frame_dict['name'].equals(default_frames[1])
     assert obj.frame_list[0].equals(default_frames[2])
 
-class _DummyClass(PydanticConfigMixin):
+class _DummyClass(DataClass):
     frame: PydanticDataFrame
 
 def test_pydantic_data_to_config():
@@ -65,10 +65,10 @@ def test_pydantic_data_to_config():
 
     config = obj.dump_config()
     ref = {'frame': {
-            'index': ['First index'], 
-            'columns': ['mean', 'max', 'min'], 
-            'data': [[2.0, 3.0, 1.0]], 
-            'index_names': [None], 
+            'index': ['First index'],
+            'columns': ['mean', 'max', 'min'],
+            'data': [[2.0, 3.0, 1.0]],
+            'index_names': [None],
             'column_names': [None]
         }
     }
@@ -96,10 +96,10 @@ def test_pydantic_data_to_config_multiindex():
 
     config = obj.dump_config()
     ref = {'frame': {
-            'index': [['min', 'soil stuff'], ['mean', 'soil stuff'], 
+            'index': [['min', 'soil stuff'], ['mean', 'soil stuff'],
                       ['min', 'water stuff'], ['mean', 'water stuff']],
-            'columns': ['mean', 'max', 'min'], 
-            'data': [[2.0, 3.0, 1.0], [4.0, -2.0, 1.0], [0.0, 0.0, 5.0], [2.0, 3.0, 4.0]], 
+            'columns': ['mean', 'max', 'min'],
+            'data': [[2.0, 3.0, 1.0], [4.0, -2.0, 1.0], [0.0, 0.0, 5.0], [2.0, 3.0, 4.0]],
             'index_names': ['stat', 'type'],
             'column_names': [None]
         }
@@ -109,7 +109,7 @@ def test_pydantic_data_to_config_multiindex():
 
 def test_pydantic_data_from_config_python(default_frames):
     """
-    Check the from_config functionality, by 
+    Check the from_config functionality, by
         * serialising an object with dump_config
         * call from_config to restore the original object
         * check that the original and recovered object are equal.
@@ -135,7 +135,7 @@ def test_pydantic_data_from_config_python(default_frames):
 
 def test_pydantic_data_from_config_json(tmp_path, default_frames):
     """
-    Check the from_config functionality, by 
+    Check the from_config functionality, by
         * serialising an object with dump_config
         * writing the resulting dict to JSON
         * re-read from the JSON file
@@ -170,7 +170,7 @@ def test_pydantic_data_from_config_json(tmp_path, default_frames):
 
 def test_pydantic_data_from_config_yaml(tmp_path, default_frames):
     """
-    Check the from_config functionality, by 
+    Check the from_config functionality, by
         * serialising an object with dump_config
         * writing the resulting dict to YAML
         * re-read from the YAML file
@@ -217,10 +217,10 @@ def test_pydantic_data_frame_serialise_timestamp():
     config = obj.dump_config()
 
     ref = {'frame': {
-           'index': [['2024-06-24 00:00:00', 'Step 0'], ['2024-06-24 00:00:00', 'Step 1']], 
-           'columns': ['b', 'a', 'c', 'time'], 
-           'data': [[5.0, 2.0, 4.0, '2024-06-24 00:00:00'], [6.0, 1.0, 2.0, '2024-06-24 00:00:00']], 
-           'index_names': [None, None], 
+           'index': [['2024-06-24 00:00:00', 'Step 0'], ['2024-06-24 00:00:00', 'Step 1']],
+           'columns': ['b', 'a', 'c', 'time'],
+           'data': [[5.0, 2.0, 4.0, '2024-06-24 00:00:00'], [6.0, 1.0, 2.0, '2024-06-24 00:00:00']],
+           'index_names': [None, None],
            'column_names': [None]
         }
     }

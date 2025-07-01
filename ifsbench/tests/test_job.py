@@ -34,10 +34,7 @@ def test_cpuconfiguration_from_config_dump_config(cpu_config):
 
     cc = CpuConfiguration.from_config(cpu_config)
 
-    conf_out = cc.dump_config(with_class=True)
-
-    clsname = conf_out.pop('classname')
-    assert clsname == 'CpuConfiguration'
+    conf_out = cc.dump_config()
 
     for field, field_value in CpuConfiguration.model_fields.items():
         if field not in cpu_config:

@@ -32,7 +32,7 @@ __all__ = ['PydanticDataFrame']
 
 class _DataFrameAnnotation:
     """
-    Annotation class for pandas.DataFrame. 
+    Annotation class for pandas.DataFrame.
 
     This follows the example in https://docs.pydantic.dev/latest/concepts/types/#handling-third-party-types
     to add automatic serialisation/validation to support to pandas.DataFrame
@@ -85,7 +85,7 @@ class _DataFrameAnnotation:
 
             Allowed = TypeAliasType(
                 'Allowed',
-                'Union[Dict[str, Allowed], List[Allowed], TimestampType, str, int, float, bool, None]',  
+                'Union[Dict[str, Allowed], List[Allowed], TimestampType, str, int, float, bool, None]',
             )
 
             allowed_type = TypeAdapter(Dict[str, Allowed])

@@ -37,7 +37,6 @@ def test_renamehandler_from_config_dump_config(pattern, repl, mode):
     config_out = rh.dump_config()
 
     expected = dict(config_in)
-    expected['handler_type'] = RenameHandler.__name__
     assert config_out == expected
 
 

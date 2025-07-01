@@ -21,9 +21,6 @@ class FetchHandler(DataHandler):
     Fetch a file from a given URL.
     """
 
-    #: Identifier for the DataHandler type.
-    handler_type: Literal['FetchHandler'] = 'FetchHandler'
-
     #: The source URL from where the file gets fetched.
     source_url: str
 
