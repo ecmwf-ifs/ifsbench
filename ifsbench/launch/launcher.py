@@ -17,7 +17,7 @@ from pydantic import model_validator, TypeAdapter, Field
 from pydantic_core.core_schema import ValidatorFunctionWrapHandler
 from typing_extensions import Annotated
 
-from ifsbench.config_mixin import PydanticConfigMixin
+from ifsbench.config_mixin import AbstractDataClass
 from ifsbench.env import EnvPipeline
 from ifsbench.job import Job
 from ifsbench.logging import debug, info
@@ -69,37 +69,11 @@ class LaunchData:
         )
 
 
-class Launcher(PydanticConfigMixin):
+class Launcher(AbstractDataClass):
     """
     Abstract base class for launching parallel jobs.
     Subclasses must implement the prepare function.
     """
-
-    # launcher_type is used to distinguish Launcher subclasses and has
-    # to be defined in all subclasses.
-    launcher_type: str
-
-    _subclasses: ClassVar[Dict[str, Type[Any]]] = {}
-    _discriminating_type_adapter: ClassVar[TypeAdapter]
-
-    @model_validator(mode='wrap')
-    @classmethod
-    def _parse_into_subclass(
-        cls, v: Any, handler: ValidatorFunctionWrapHandler
-    ) -> 'Launcher':
-        if cls is Launcher:
-            return Launcher._discriminating_type_adapter.validate_python(v)
-        return handler(v)
-
-    @classmethod
-    def __pydantic_init_subclass__(cls, **kwargs):
-        Launcher._subclasses[cls.model_fields['launcher_type'].default] = cls
-        Launcher._discriminating_type_adapter = TypeAdapter(
-            Annotated[
-                Union[tuple(Launcher._subclasses.values())],
-                Field(discriminator='launcher_type'),
-            ]
-        )
 
     @abstractmethod
     def prepare(

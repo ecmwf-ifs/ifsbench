@@ -13,7 +13,7 @@ from typing import List, Optional, Set
 import pandas as pd
 import xarray as xr
 
-from ifsbench.config_mixin import PydanticConfigMixin
+from ifsbench.config_mixin import DataClass
 from ifsbench.netcdf_file_reader import NetcdfFileReader
 from ifsbench.gribfile import GribFileReader
 
@@ -52,7 +52,7 @@ _reader_from_file_type = {
 }
 
 
-class DataFileStats(PydanticConfigMixin):
+class DataFileStats(DataClass):
     """
     Calculate various statistics from the data in a file.
 

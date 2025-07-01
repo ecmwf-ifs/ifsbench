@@ -85,7 +85,6 @@ def test_extracthandler_model_dump(target_dir):
     config_dump = eh.dump_config()
 
     expected = dict(config)
-    expected['handler_type'] = ExtractHandler.__name__
     assert config_dump == expected
 
 

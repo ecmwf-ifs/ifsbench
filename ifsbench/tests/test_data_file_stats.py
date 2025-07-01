@@ -71,7 +71,7 @@ def test_dump_config_full():
     assert len(config_out) == 4
     assert config_out['input_path'] == 'some/where'
     assert config_out['stat_names'] == ['s1', 's2']
-    assert config_out['stat_dims'] == {'d1', 'd2'}
+    assert set(config_out['stat_dims']) == {'d1', 'd2'}
     assert config_out['filetype'] == 'grib'
 
 
@@ -84,7 +84,7 @@ def test_dump_config_minimal():
     assert len(config_out) == 3
     assert config_out['input_path'] == 'some/where'
     assert config_out['stat_names'] == data_file_stats._DEFAULT_STAT_NAMES
-    assert config_out['stat_dims'] == data_file_stats._DEFAULT_STAT_DIMS
+    assert set(config_out['stat_dims']) == set(data_file_stats._DEFAULT_STAT_DIMS)
     assert 'filetype' not in config_out
 
 

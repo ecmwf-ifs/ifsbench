@@ -14,12 +14,12 @@ from pydantic import model_validator, TypeAdapter, Field
 from pydantic_core.core_schema import ValidatorFunctionWrapHandler
 from typing_extensions import Annotated
 
-from ifsbench.config_mixin import PydanticConfigMixin
+from ifsbench.config_mixin import AbstractDataClass
 
 __all__ = ['DataHandler']
 
 
-class DataHandler(PydanticConfigMixin):
+class DataHandler(AbstractDataClass):
     """
     Base class for data pipeline steps.
 
@@ -27,32 +27,6 @@ class DataHandler(PydanticConfigMixin):
     DataHandler objects can be executed sequentially to perform specific data
     setup tasks.
     """
-
-    # handler_type is used to distinguish DataHandler subclasses and has
-    # to be defined for any subclass.
-    handler_type: str
-
-    _subclasses: ClassVar[Dict[str, Type[Any]]] = {}
-    _discriminating_type_adapter: ClassVar[TypeAdapter]
-
-    @model_validator(mode='wrap')
-    @classmethod
-    def _parse_into_subclass(
-        cls, v: Any, handler: ValidatorFunctionWrapHandler
-    ) -> 'DataHandler':
-        if cls is DataHandler:
-            return DataHandler._discriminating_type_adapter.validate_python(v)
-        return handler(v)
-
-    @classmethod
-    def __pydantic_init_subclass__(cls, **kwargs):
-        DataHandler._subclasses[cls.model_fields['handler_type'].default] = cls
-        DataHandler._discriminating_type_adapter = TypeAdapter(
-            Annotated[
-                Union[tuple(DataHandler._subclasses.values())],
-                Field(discriminator='handler_type'),
-            ]
-        )
 
     @abstractmethod
     def execute(self, wdir: Union[str, Path], **kwargs):

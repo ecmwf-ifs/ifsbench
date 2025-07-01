@@ -34,7 +34,6 @@ class ExtractHandler(DataHandler):
         :meth:`execute`.
     """
 
-    handler_type: Literal['ExtractHandler'] = 'ExtractHandler'
     archive_path: pathlib.Path
     target_dir: Optional[pathlib.Path] = None
 

@@ -5,6 +5,7 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
+from functools import cached_property
 import json
 import pathlib
 import re
@@ -12,14 +13,12 @@ from typing import Dict, List, Union
 
 import pandas as pd
 
-from ifsbench.config_mixin import ConfigMixin
+from ifsbench.config_mixin import DataClass
+from ifsbench.pydantic_utils import PydanticDataFrame
 
-__all__ = ['EnsembleStats', 'ENSEMBLE_DATA_PATH_KEY', 'ENSEMBLE_DATA_KEY']
+__all__ = ['EnsembleStats']
 
-# keys of the config entries holding the path to the data file
-# and the data.
-ENSEMBLE_DATA_PATH_KEY = 'ensemble_data_file'
-ENSEMBLE_DATA_KEY = 'ensemble_data'
+
 # Statistics keywords available when calling calc_stats. In addition
 # percentiles are supported with format '[p,P](\d{1,2})'.
 AVAILABLE_BASIC_STATS = ['min', 'max', 'mean', 'median', 'sum', 'std']
@@ -27,70 +26,15 @@ AVAILABLE_BASIC_STATS = ['min', 'max', 'mean', 'median', 'sum', 'std']
 _JSON_ORIENT = 'columns'
 
 
-class EnsembleStats(ConfigMixin):
+class EnsembleStats(DataClass):
     """Reads, writes, summarises results across ensemble members."""
 
-    _data_file = None
+    frames: List[PydanticDataFrame]
 
-    def __init__(self, data: List[pd.DataFrame]):
-        self._raw_data = data
-        dfc = pd.concat(data)
-        self._group = dfc.groupby(dfc.index)
-
-    @classmethod
-    def from_data(cls, raw_data: List[pd.DataFrame]) -> 'EnsembleStats':
-        """Create class from pandas data."""
-        return cls(raw_data)
-
-    @classmethod
-    def from_config(cls, config: Dict[str, str]) -> 'EnsembleStats':
-        """Read data from the json file specified in the config or
-        directly from the in-line data.
-
-        Args:
-            config: dictionary specifying either path to a file containing
-                the data or containing the data in-line.
-        """
-        if len(config) > 1:
-            raise ValueError(
-                f'unexpected entries in config for EnsembleStats: {config}'
-            )
-        if ENSEMBLE_DATA_PATH_KEY in config:
-            input_path = pathlib.Path(config[ENSEMBLE_DATA_PATH_KEY])
-            with open(input_path, 'r', encoding='utf-8') as jin:
-                data = json.load(jin)
-            dfs = [pd.DataFrame.from_dict(json.loads(entry)) for entry in data]
-            es = cls(dfs)
-            es._data_file = config[ENSEMBLE_DATA_PATH_KEY]
-            return es
-        if ENSEMBLE_DATA_KEY in config:
-            data = config[ENSEMBLE_DATA_KEY]
-            dfs = [pd.DataFrame.from_dict(entry) for entry in data]
-            es = cls(dfs)
-            return es
-
-        raise ValueError(
-            f'missing config entry: either {ENSEMBLE_DATA_PATH_KEY} or {ENSEMBLE_DATA_KEY}'
-        )
-
-    def dump_config(
-        self, with_class: bool = False
-    ) -> Dict[str, Union[str, float, int, bool, List]]:
-        config = {}
-        if not self._data_file:
-            config[ENSEMBLE_DATA_KEY] = [df.to_dict() for df in self._raw_data]
-        else:
-            config[ENSEMBLE_DATA_PATH_KEY] = self._data_file
-        if with_class:
-            config['classname'] = type(self).__name__
-        return config
-
-    def dump_data_to_json(self, output_file: Union[pathlib.Path, str]):
-        """Output original data frames to json."""
-        self._data_file = str(output_file)
-        js = [df.to_json(orient=_JSON_ORIENT) for df in self._raw_data]
-        with open(output_file, 'w', encoding='utf-8') as outf:
-            json.dump(js, outf)
+    @cached_property
+    def group(self):
+        dfc = pd.concat(self.frames)
+        return dfc.groupby(dfc.index)
 
     def calc_stats(self, stats: Union[str, List[str]]) -> Dict[str, pd.DataFrame]:
         """Calculate statistics.
@@ -139,5 +83,5 @@ class EnsembleStats(ConfigMixin):
                 raise ValueError(
                     f'Unknown stat: {stat}. Supported: {AVAILABLE_BASIC_STATS} and percentiles (e.g. p85).'
                 )
-        df = self._group.agg(to_request)
+        df = self.group.agg(to_request)
         return {stat: df.xs(stat, level=1, axis=1) for stat in stats}

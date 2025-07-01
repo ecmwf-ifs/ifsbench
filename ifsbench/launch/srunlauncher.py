@@ -21,8 +21,6 @@ class SrunLauncher(Launcher):
     :any:`Launcher` implementation for Slurm's srun.
     """
 
-    launcher_type: Literal['SrunLauncher'] = 'SrunLauncher'
-
     _job_options_map = {
         'nodes': '--nodes={}',
         'tasks': '--ntasks={}',
