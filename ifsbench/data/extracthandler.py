@@ -9,8 +9,6 @@ import pathlib
 import shutil
 from typing import Optional, Union
 
-from typing_extensions import Literal
-
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug
 

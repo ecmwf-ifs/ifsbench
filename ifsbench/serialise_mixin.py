@@ -5,19 +5,16 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Type, Union
-from typing_extensions import Annotated, Literal
+from typing_extensions import Annotated, Literal, TypeAliasType
 
-from pydantic import BaseModel, model_validator, TypeAdapter, Field, computed_field
+from pydantic import BaseModel, Field, model_validator, TypeAdapter
 from pydantic.fields import FieldInfo
 from pydantic_core.core_schema import ValidatorFunctionWrapHandler
 
 
-from typing_extensions import Self, TypeAliasType
-
-__all__ = ['AbstractDataClass', 'DataClass', 'CLASSNAME', 'RESERVED_NAMES']
+__all__ = ['AbstractSerialisationMixin', 'SerialisationMixin', 'CLASSNAME', 'RESERVED_NAMES']
 
 # Reserved strings:
 # CLASSNAME is used in the configuration to indicate which class has to be
@@ -29,17 +26,19 @@ RESERVED_NAMES = [
 ]
 
 
-class DataClass(BaseModel, use_enum_values=True):
+class SerialisationMixin(BaseModel, use_enum_values=True):
     """
-    Base class for handling configurations in a format that can be used for storage.
+    Mixin class that enablse automatic serialisation features for this class.
 
-    Uses pydantic for type checking and managing the config dictionary.
+    This class uses the ``pydantic`` module to enable automatic serialisation of
+    an objects' attributes.
+    All attributes must be defined with typehints.
     """
 
     @classmethod
     def from_config(
         cls, config: Dict[str, Union[str, float, int, bool, List, None]]
-    ) -> 'DataClass':
+    ) -> 'SerialisationMixin':
         """Create instance based on config.
 
         Args:
@@ -88,9 +87,11 @@ class DataClass(BaseModel, use_enum_values=True):
 
         return allowed_type.validate_python(config)
 
-class AbstractDataClass(DataClass):
+class AbstractSerialisationMixin(SerialisationMixin):
     """
-    Base class for DataClass hierarchies.
+    Mixin class that enablse automatic serialisation features for an abstract
+    base class.
+
 
     This allows us to serialise dataclass hierarchies like
     ```
@@ -119,15 +120,16 @@ class AbstractDataClass(DataClass):
     @classmethod
     def _get_abstract_dataclass(cls) -> Type:
         """
-        For a given class, return its parent class that inherits from
-        AbstractDataClass.
+        For a given class, return the first parent class that inherits from
+        AbstractSerialisationMixin.
         """
         candidates = [cls]
 
+        # Do a breadth-first search over the parent classes.
         while candidates:
             current = candidates.pop(0)
 
-            if AbstractDataClass in current.__bases__:
+            if AbstractSerialisationMixin in current.__bases__:
                 return current
 
             candidates += list(current.__bases__)
@@ -138,7 +140,7 @@ class AbstractDataClass(DataClass):
     @classmethod
     def _parse_into_subclass(
         cls, v: Any, handler: ValidatorFunctionWrapHandler
-    ) -> 'AbstractDataClass':
+    ) -> 'AbstractSerialisationMixin':
         """
         Recover the corresponding (sub-)class from data.
         """
@@ -165,7 +167,7 @@ class AbstractDataClass(DataClass):
         # Force a model rebuild to apply the field changes.
         cls.model_rebuild(force=True)
 
-        # Get the "root" AbstractDataClass and add the current class to the
+        # Get the "root" AbstractSerialisationMixin and add the current class to the
         # list of subclasses.
         abstract_cls = cls._get_abstract_dataclass()
 

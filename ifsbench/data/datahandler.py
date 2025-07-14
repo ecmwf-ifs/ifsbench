@@ -8,18 +8,14 @@
 from abc import abstractmethod
 from pathlib import Path
 
-from typing import Any, ClassVar, Dict, Type, Union
+from typing import Union
 
-from pydantic import model_validator, TypeAdapter, Field
-from pydantic_core.core_schema import ValidatorFunctionWrapHandler
-from typing_extensions import Annotated
-
-from ifsbench.config_mixin import AbstractDataClass
+from ifsbench.serialise_mixin import AbstractSerialisationMixin
 
 __all__ = ['DataHandler']
 
 
-class DataHandler(AbstractDataClass):
+class DataHandler(AbstractSerialisationMixin):
     """
     Base class for data pipeline steps.
 

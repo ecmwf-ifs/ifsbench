@@ -18,7 +18,7 @@ from pydantic import Field
 
 from ifsbench.application import Application
 from ifsbench.arch import Arch
-from ifsbench.config_mixin import DataClass
+from ifsbench.serialise_mixin import SerialisationMixin
 from ifsbench.data import DataHandler
 from ifsbench.env import EnvHandler, DefaultEnvPipeline
 from ifsbench.job import Job
@@ -27,7 +27,7 @@ from ifsbench.launch import Launcher
 
 __all__ = ['ScienceSetup', 'TechSetup', 'Benchmark']
 
-class ScienceSetup(DataClass):
+class ScienceSetup(SerialisationMixin):
     """
     Generic (scientific) benchmark setup.
 
@@ -55,7 +55,7 @@ class ScienceSetup(DataClass):
     #: Environment handlers that are used when the benchmark is run.
     env_handlers:  List[EnvHandler] = Field(default_factory=list)
 
-class TechSetup(DataClass):
+class TechSetup(SerialisationMixin):
     """
     Additional technical details for benchmarks.
 
@@ -78,7 +78,7 @@ class TechSetup(DataClass):
     #: Environment handlers that are used for the initial data setup.
     env_handlers:  List[EnvHandler] = Field(default_factory=list)
 
-class BenchmarkSummary(DataClass):
+class BenchmarkSummary(SerialisationMixin):
     """
     Summary of a benchmark run.
     """
@@ -93,7 +93,7 @@ class BenchmarkSummary(DataClass):
     walltime: float
 
 
-class Benchmark(DataClass):
+class Benchmark(SerialisationMixin):
     """
     Generic benchmark implementation.
 

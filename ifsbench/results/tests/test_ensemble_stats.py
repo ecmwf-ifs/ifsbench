@@ -5,12 +5,10 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-import json
-import pathlib
+
 from typing import List
 
 import pytest
-
 import pandas as pd
 
 from ifsbench.results import EnsembleStats
@@ -65,7 +63,7 @@ def test_from_config_inline_data():
 
 def test_from_config_invalid_fails():
 
-    with pytest.raises(ValueError) as exceptinfo:
+    with pytest.raises(ValueError):
         EnsembleStats.from_config(
             {
                 'parrot': 'dead',

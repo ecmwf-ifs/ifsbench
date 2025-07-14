@@ -70,6 +70,7 @@ def test_defaultarch_process(arch_in, job_in, job_out, launcher_out):
     result = arch.process_job(job)
 
     # DefaultArch shouldn't add any handlers or default flags.
+    # pylint: disable=C1803
     assert result.env_handlers == []
     assert result.default_launcher_flags == []
 

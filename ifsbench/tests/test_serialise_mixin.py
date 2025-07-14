@@ -11,10 +11,10 @@ from typing import Dict, List
 import pytest
 from pydantic import ValidationError
 
-from ifsbench import DataClass, CLASSNAME
+from ifsbench import SerialisationMixin, CLASSNAME
 
 
-class TestImpl(DataClass):
+class TestImpl(SerialisationMixin):
     field_str: str
     field_int: int
     field_list: List[Dict[str, str]]
@@ -97,25 +97,3 @@ def test_dumb_config_with_class_succeeds():
     expected = config.copy()
     expected[CLASSNAME] = 'TestImpl'
     assert ti.dump_config(with_class=True) == expected
-
-
-def test_from_config_invalid_class_member_fails():
-
-    class TestInvalidImpl(DataClass):
-        class_name: str
-        field_int: int
-        field_list: List[Dict[str, str]]
-
-    # config = {
-    #     'class_name': 'clz',
-    #     'field_int': 666,
-    #     'field_list': [
-    #         {'sub1': 'val1', 'sub2': 'val2'},
-    #     ],
-    # }
-
-    # with pytest.raises(ValidationError) as exceptinfo:
-    #     TestInvalidImpl(**config)
-    # expected = 'Value error, Invalid ConfigMixin class: contains reserved member name(s). Reserved:'
-
-    # assert expected in str(exceptinfo.value)

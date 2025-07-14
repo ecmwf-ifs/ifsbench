@@ -11,13 +11,9 @@ Implementation of launch commands for various MPI launchers
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Optional, Type, Union
+from typing import List, Optional
 
-from pydantic import model_validator, TypeAdapter, Field
-from pydantic_core.core_schema import ValidatorFunctionWrapHandler
-from typing_extensions import Annotated
-
-from ifsbench.config_mixin import AbstractDataClass
+from ifsbench.serialise_mixin import AbstractSerialisationMixin
 from ifsbench.env import EnvPipeline
 from ifsbench.job import Job
 from ifsbench.logging import debug, info
@@ -69,7 +65,7 @@ class LaunchData:
         )
 
 
-class Launcher(AbstractDataClass):
+class Launcher(AbstractSerialisationMixin):
     """
     Abstract base class for launching parallel jobs.
     Subclasses must implement the prepare function.
