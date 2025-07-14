@@ -9,10 +9,9 @@
 Architecture specifications
 """
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
-from ifsbench.config_mixin import AbstractDataClass, DataClass
+from ifsbench.serialise_mixin import AbstractSerialisationMixin, SerialisationMixin
 from ifsbench.env import EnvHandler
 from ifsbench.job import CpuConfiguration, Job
 from ifsbench.launch.launcher import Launcher
@@ -20,7 +19,7 @@ from ifsbench.launch.launcher import Launcher
 __all__ = ['Arch', 'DefaultArch']
 
 
-class ArchResult(DataClass):
+class ArchResult(SerialisationMixin):
     """
     Holds results of an :meth:`Arch.process` run.
     """
@@ -29,16 +28,16 @@ class ArchResult(DataClass):
     job: Job = None
 
     #: Additional EnvHandler objects that set architecture-specific environment flags.
-    env_handlers: List[EnvHandler] = field(default_factory=list)
+    env_handlers: List[EnvHandler] = []
 
     #: The default launcher that is used on this system.
     default_launcher: Launcher = None
 
     #: Additional launcher flags that should be added to launcher invocations.
-    default_launcher_flags: List[str] = field(default_factory=list)
+    default_launcher_flags: List[str] = []
 
 
-class Arch(AbstractDataClass):
+class Arch(ABC, SubclassableSerialisationMixin):
     """
     Architecture/system description.
 

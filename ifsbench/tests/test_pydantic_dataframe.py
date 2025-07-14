@@ -16,9 +16,9 @@ from pandas import DataFrame, MultiIndex, Timestamp
 import pytest
 import yaml
 
-from ifsbench import DataClass, PydanticDataFrame
+from ifsbench import SerialisationMixin, PydanticDataFrame
 
-class _PydanticDataFrameTest(DataClass):
+class _PydanticDataFrameTest(SerialisationMixin):
     """
     Simple pydantic object that includes PydatanticDataFrame in different ways.
     """
@@ -51,7 +51,7 @@ def test_pydantic_data_frame_init(default_frames):
     assert obj.frame_dict['name'].equals(default_frames[1])
     assert obj.frame_list[0].equals(default_frames[2])
 
-class _DummyClass(DataClass):
+class _DummyClass(SerialisationMixin):
     frame: PydanticDataFrame
 
 def test_pydantic_data_to_config():

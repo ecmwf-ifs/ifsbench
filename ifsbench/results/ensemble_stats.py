@@ -6,27 +6,22 @@
 # nor does it submit to any jurisdiction.
 
 from functools import cached_property
-import json
-import pathlib
 import re
 from typing import Dict, List, Union
 
 import pandas as pd
 
-from ifsbench.config_mixin import DataClass
+from ifsbench.serialise_mixin import SerialisationMixin
 from ifsbench.pydantic_utils import PydanticDataFrame
 
-__all__ = ['EnsembleStats']
+__all__ = ['AVAILABLE_BASIC_STATS', 'EnsembleStats']
 
 
 # Statistics keywords available when calling calc_stats. In addition
 # percentiles are supported with format '[p,P](\d{1,2})'.
 AVAILABLE_BASIC_STATS = ['min', 'max', 'mean', 'median', 'sum', 'std']
 
-_JSON_ORIENT = 'columns'
-
-
-class EnsembleStats(DataClass):
+class EnsembleStats(SerialisationMixin):
     """Reads, writes, summarises results across ensemble members."""
 
     frames: List[PydanticDataFrame]

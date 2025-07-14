@@ -5,15 +5,11 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Type, Union
+from typing import List
 
-from pydantic import model_validator, TypeAdapter, Field
-from pydantic_core.core_schema import ValidatorFunctionWrapHandler
-from typing_extensions import Annotated, Literal
-
-from ifsbench.config_mixin import AbstractDataClass
+from ifsbench.serialise_mixin import AbstractSerialisationMixin
 from ifsbench.data import DataHandler
 from ifsbench.env import EnvHandler
 from ifsbench.job import Job
@@ -21,7 +17,7 @@ from ifsbench.job import Job
 __all__ = ['Application', 'DefaultApplication']
 
 
-class Application(AbstractDataClass):
+class Application(ABC, AbstractSerialisationMixin):
     """
     Base class for applications that can be launched.
     """
@@ -131,9 +127,9 @@ class DefaultApplication(Application):
     """
 
     command: List[str]
-    data_handlers: List[DataHandler] = Field(default_factory=list)
-    env_handlers: List[EnvHandler] = Field(default_factory=list)
-    library_paths: List[Path] = Field(default_factory=list)
+    data_handlers: List[DataHandler] = []
+    env_handlers: List[EnvHandler] = []
+    library_paths: List[Path] = []
 
     def get_data_handlers(self, run_dir: Path, job: Job) -> List[DataHandler]:
         del run_dir, job  # Unused

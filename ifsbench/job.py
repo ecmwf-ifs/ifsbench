@@ -11,12 +11,12 @@ Hardware and job resource description classes.
 
 from enum import Enum
 
-from ifsbench.config_mixin import DataClass
+from ifsbench.serialise_mixin import SerialisationMixin
 
 __all__ = ['CpuBinding', 'CpuDistribution', 'CpuConfiguration', 'Job']
 
 
-class CpuConfiguration(DataClass):
+class CpuConfiguration(SerialisationMixin):
     """
     This class describes the hardware configuration of compute nodes.
     """
@@ -94,7 +94,7 @@ class CpuDistribution(str, Enum):
     """Indicate that a different user-specified strategy should be used"""
 
 
-class Job(DataClass):
+class Job(SerialisationMixin):
     """
     Description of a parallel job setup.
     """

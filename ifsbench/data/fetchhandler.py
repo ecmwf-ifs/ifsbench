@@ -6,7 +6,7 @@
 # nor does it submit to any jurisdiction.
 
 import pathlib
-from typing import Union, Literal
+from typing import Union
 import shutil
 import urllib.error
 import urllib.request
