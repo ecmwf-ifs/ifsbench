@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
-from ifsbench.serialise_mixin import AbstractSerialisationMixin
+from ifsbench.serialisation_mixin import SubclassableSerialisationMixin
 from ifsbench.env import EnvPipeline
 from ifsbench.job import Job
 from ifsbench.logging import debug, info
@@ -65,7 +65,7 @@ class LaunchData:
         )
 
 
-class Launcher(AbstractSerialisationMixin):
+class Launcher(SubclassableSerialisationMixin):
     """
     Abstract base class for launching parallel jobs.
     Subclasses must implement the prepare function.

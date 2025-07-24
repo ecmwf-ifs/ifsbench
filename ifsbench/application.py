@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List
 
-from ifsbench.serialise_mixin import AbstractSerialisationMixin
+from ifsbench.serialisation_mixin import SubclassableSerialisationMixin
 from ifsbench.data import DataHandler
 from ifsbench.env import EnvHandler
 from ifsbench.job import Job
@@ -17,7 +17,7 @@ from ifsbench.job import Job
 __all__ = ['Application', 'DefaultApplication']
 
 
-class Application(ABC, AbstractSerialisationMixin):
+class Application(ABC, SubclassableSerialisationMixin):
     """
     Base class for applications that can be launched.
     """

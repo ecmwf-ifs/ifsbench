@@ -13,7 +13,7 @@ from typing import List, Optional, Set
 import pandas as pd
 import xarray as xr
 
-from ifsbench.serialise_mixin import SerialisationMixin
+from ifsbench.serialisation_mixin import SerialisationMixin
 from ifsbench.netcdf_file_reader import NetcdfFileReader
 from ifsbench.gribfile import GribFileReader
 

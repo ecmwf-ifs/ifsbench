@@ -18,7 +18,7 @@ from pydantic import Field
 
 from ifsbench.application import Application
 from ifsbench.arch import Arch
-from ifsbench.serialise_mixin import SerialisationMixin
+from ifsbench.serialisation_mixin import SerialisationMixin
 from ifsbench.data import DataHandler
 from ifsbench.env import EnvHandler, DefaultEnvPipeline
 from ifsbench.job import Job

@@ -11,7 +11,7 @@ Architecture specifications
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from ifsbench.serialise_mixin import AbstractSerialisationMixin, SerialisationMixin
+from ifsbench.serialisation_mixin import SubclassableSerialisationMixin, SerialisationMixin
 from ifsbench.env import EnvHandler
 from ifsbench.job import CpuConfiguration, Job
 from ifsbench.launch.launcher import Launcher
@@ -37,7 +37,7 @@ class ArchResult(SerialisationMixin):
     default_launcher_flags: List[str] = []
 
 
-class Arch(ABC, AbstractSerialisationMixin):
+class Arch(ABC, SubclassableSerialisationMixin):
     """
     Architecture/system description.
 

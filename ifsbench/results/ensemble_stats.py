@@ -11,7 +11,7 @@ from typing import Dict, List, Union
 
 import pandas as pd
 
-from ifsbench.serialise_mixin import SerialisationMixin
+from ifsbench.serialisation_mixin import SerialisationMixin
 from ifsbench.pydantic_utils import PydanticDataFrame
 
 __all__ = ['AVAILABLE_BASIC_STATS', 'EnsembleStats']

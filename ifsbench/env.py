@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Union
 from pydantic import Field, model_validator
 from typing_extensions import Self
 
-from ifsbench.serialise_mixin import AbstractSerialisationMixin, SerialisationMixin
+from ifsbench.serialisation_mixin import SubclassableSerialisationMixin, SerialisationMixin
 from ifsbench.logging import debug
 
 __all__ = ['EnvHandler', 'EnvOperation', 'EnvPipeline']
@@ -117,7 +117,7 @@ class EnvHandler(SerialisationMixin):
             env.clear()
 
 
-class EnvPipeline(ABC, AbstractSerialisationMixin):
+class EnvPipeline(ABC, SubclassableSerialisationMixin):
     """
     Abstract base class for environment update pipelines.
 
