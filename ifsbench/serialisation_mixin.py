@@ -14,7 +14,7 @@ from pydantic.fields import FieldInfo
 from pydantic_core.core_schema import ValidatorFunctionWrapHandler
 
 
-__all__ = ['AbstractSerialisationMixin', 'SerialisationMixin', 'CLASSNAME', 'RESERVED_NAMES']
+__all__ = ['SubclassableSerialisationMixin', 'SerialisationMixin', 'CLASSNAME', 'RESERVED_NAMES']
 
 # Reserved strings:
 # CLASSNAME is used in the configuration to indicate which class has to be
@@ -28,7 +28,7 @@ RESERVED_NAMES = [
 
 class SerialisationMixin(BaseModel, use_enum_values=True):
     """
-    Mixin class that enablse automatic serialisation features for this class.
+    Mixin class that enables automatic serialisation features for this class.
 
     This class uses the ``pydantic`` module to enable automatic serialisation of
     an objects' attributes.
@@ -87,15 +87,13 @@ class SerialisationMixin(BaseModel, use_enum_values=True):
 
         return allowed_type.validate_python(config)
 
-class AbstractSerialisationMixin(SerialisationMixin):
+class SubclassableSerialisationMixin(SerialisationMixin):
     """
-    Mixin class that enablse automatic serialisation features for an abstract
-    base class.
-
+    Mixin class that enables automatic serialisation features for subclasses.
 
     This allows us to serialise dataclass hierarchies like
     ```
-    class BaseClass(AbstractDataClass):
+    class BaseClass(SubclassableSerialisationMixin):
         ...
 
     class FirstClass(BaseClass):
@@ -121,7 +119,7 @@ class AbstractSerialisationMixin(SerialisationMixin):
     def _get_abstract_dataclass(cls) -> Type:
         """
         For a given class, return the first parent class that inherits from
-        AbstractSerialisationMixin.
+        SubclassableSerialisationMixin.
         """
         candidates = [cls]
 
@@ -129,7 +127,7 @@ class AbstractSerialisationMixin(SerialisationMixin):
         while candidates:
             current = candidates.pop(0)
 
-            if AbstractSerialisationMixin in current.__bases__:
+            if SubclassableSerialisationMixin in current.__bases__:
                 return current
 
             candidates += list(current.__bases__)
@@ -140,7 +138,7 @@ class AbstractSerialisationMixin(SerialisationMixin):
     @classmethod
     def _parse_into_subclass(
         cls, v: Any, handler: ValidatorFunctionWrapHandler
-    ) -> 'AbstractSerialisationMixin':
+    ) -> 'SubclassableSerialisationMixin':
         """
         Recover the corresponding (sub-)class from data.
         """
@@ -167,7 +165,7 @@ class AbstractSerialisationMixin(SerialisationMixin):
         # Force a model rebuild to apply the field changes.
         cls.model_rebuild(force=True)
 
-        # Get the "root" AbstractSerialisationMixin and add the current class to the
+        # Get the "root" SubclassableSerialisationMixin and add the current class to the
         # list of subclasses.
         abstract_cls = cls._get_abstract_dataclass()
 

@@ -14,7 +14,7 @@ from typing_extensions import Self
 
 import f90nml
 
-from ifsbench.serialise_mixin import SerialisationMixin
+from ifsbench.serialisation_mixin import SerialisationMixin
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug, info
 from ifsbench.namelist import SanitiseMode, sanitise_namelist

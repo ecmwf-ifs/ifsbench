@@ -10,12 +10,12 @@ from pathlib import Path
 
 from typing import Union
 
-from ifsbench.serialise_mixin import AbstractSerialisationMixin
+from ifsbench.serialisation_mixin import SubclassableSerialisationMixin
 
 __all__ = ['DataHandler']
 
 
-class DataHandler(AbstractSerialisationMixin):
+class DataHandler(SubclassableSerialisationMixin):
     """
     Base class for data pipeline steps.
 

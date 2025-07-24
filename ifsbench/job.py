@@ -11,7 +11,7 @@ Hardware and job resource description classes.
 
 from enum import Enum
 
-from ifsbench.serialise_mixin import SerialisationMixin
+from ifsbench.serialisation_mixin import SerialisationMixin
 
 __all__ = ['CpuBinding', 'CpuDistribution', 'CpuConfiguration', 'Job']
 
