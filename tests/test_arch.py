@@ -73,6 +73,18 @@ def test_arch_run(watcher, arch, np, nt, hyperthread, expected):
         '--cpus-per-task=32', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
         'select_gpu.sh'
     ], ['VISIBLE_DEVICES_PER_RANK=(1)', 'CUDA_VISIBLE_DEVICES=${VISIBLE_DEVICES_PER_RANK[${SLURM_LOCALID}]']),
+    ('atos_ag', 64, 72, 1, 0, [
+        'srun', '--ntasks=64', '--ntasks-per-node=4',
+        '--cpus-per-task=72', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
+    ], None),
+    ('atos_ag', 64, 72, 1, 1, [
+        'srun', '--ntasks=64', '--ntasks-per-node=4',
+        '--cpus-per-task=72', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
+    ], None),
+    ('atos_ag', 64, 72, 1, 4, [
+        'srun', '--ntasks=64', '--ntasks-per-node=1',
+        '--cpus-per-task=72', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
+    ], None),
     ('lumi_g', 256, 4, 1, None, [
         'srun', '--ntasks=256', '--ntasks-per-node=14', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1'
