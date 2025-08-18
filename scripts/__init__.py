@@ -6,8 +6,5 @@
 # nor does it submit to any jurisdiction.
 
 """
-Install the ifsbench package.
+Standalone scripts that provide the top-level entry-point to the IFSbench API.
 """
-import setuptools
-
-setuptools.setup()

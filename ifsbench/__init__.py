@@ -11,7 +11,7 @@ ifsbench: IFS benchmark and testing utilities in Python
 This package contains Python utilities to run and benchmark the IFS.
 """
 
-from pkg_resources import get_distribution, DistributionNotFound
+from importlib.metadata import version, PackageNotFoundError
 
 from .arch import * # noqa
 from .benchmark import * # noqa
@@ -31,7 +31,7 @@ from .runrecord import * # noqa
 from .util import * # noqa
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+    __version__ = version(__name__)
+except PackageNotFoundError:
     # package is not installed
     pass
