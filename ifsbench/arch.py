@@ -314,7 +314,9 @@ class Atos(Arch):
                 gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
 
         if gpus_per_node:
-            launch_user_options.insert(0, '--qos=ng')
+            qos = cls.get_gpu_qos_spec()
+            if qos:
+                launch_user_options.insert(0, qos)
 
             # To ensure we correctly bind GPUs to CPUs we write a little
             # wrapper script that maps the correct CUDA_VISIBLE_DEVICES
@@ -362,7 +364,9 @@ exec $*
             # By default, stuff on Atos runs on the GPIL nodes which allow only
             # up to 32 cores. If more resources are needed, the compute
             # partition should be requested.
-            launch_user_options.insert(0, '--qos=np')
+            qos = cls.get_cpu_qos_spec()
+            if qos:
+                launch_user_options.insert(0, qos)
 
 
         # Bind to cores
@@ -382,6 +386,17 @@ exec $*
         cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
                     logfile=logfile, env=env, **kwargs)
 
+    @staticmethod
+    def get_gpu_qos_spec():
+        """Return qos specification for GPU queue."""
+        return ""
+
+    @staticmethod
+    def get_cpu_qos_spec():
+        """Return qos specification for CPU queue."""
+        return ""
+
+
 class AtosAaIntel(Atos):
     """
     Intel compiler-toolchain setup for :any:`AtosAa`
@@ -397,6 +412,11 @@ class AtosAaIntel(Atos):
     cpu_config = AtosAaCpuConfig
 
     launcher = SrunLauncher
+
+    @staticmethod
+    def get_cpu_qos_spec():
+        """Return qos specification for CPU queue."""
+        return "--qos=np"
 
 
 class AtosAc(Atos):
@@ -415,6 +435,16 @@ class AtosAc(Atos):
     cpu_config = AtosAcCpuConfig
 
     launcher = SrunLauncher
+
+    @staticmethod
+    def get_gpu_qos_spec():
+        """Return qos specification for GPU queue."""
+        return "--qos=ng"
+
+    @staticmethod
+    def get_cpu_qos_spec():
+        """Return qos specification for CPU queue."""
+        return "--qos=np"
 
 class AtosAg(Atos):
     """
