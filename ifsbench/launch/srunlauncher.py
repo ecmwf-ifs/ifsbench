@@ -26,7 +26,7 @@ class SrunLauncher(Launcher):
         'tasks_per_socket': '--ntasks-per-socket={}',
         'cpus_per_task': '--cpus-per-task={}',
         'threads_per_core': '--ntasks-per-core={}',
-        'gpus_per_task': '--gpus-per-task={}',
+        'gpus_per_node': '--gpus-per-node={}',
         'account': '--account={}',
         'partition': '--partition={}',
     }

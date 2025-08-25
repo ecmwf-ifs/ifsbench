@@ -117,8 +117,8 @@ class Job(SerialisationMixin):
     #: The number of threads that each CPU core should run.
     threads_per_core: int = None
 
-    #: The number of GPUs that are required by each task.
-    gpus_per_task: int = None
+    #: The number of GPUs that are required by each node.
+    gpus_per_node: int = None
 
     #: The account that is passed to the scheduler.
     account: str = None
@@ -180,9 +180,9 @@ class Job(SerialisationMixin):
         if not threads_per_core:
             threads_per_core = 1
 
-        gpus_per_task = self.gpus_per_task
-        if not gpus_per_task:
-            gpus_per_task = 0
+        gpus_per_node = self.gpus_per_node
+        if not gpus_per_node:
+            gpus_per_node = 0
 
         if not self.tasks_per_node:
             # If tasks_per_node wasn't specified, calculate it from the other
@@ -201,18 +201,15 @@ class Job(SerialisationMixin):
 
             # If GPUs are used, make sure that tasks_per_node is compatible with
             # the number of available GPUs.
-            if gpus_per_task > 0:
+            if gpus_per_node > 0:
                 self.tasks_per_node = min(
                     self.tasks_per_node,
-                    cpu_configuration.gpus_per_node // gpus_per_task,
+                    cpu_configuration.gpus_per_node,
                 )
 
             if self.tasks_per_node <= 0:
                 raise ValueError('Failed to determine the number of tasks per node!')
 
-        elif gpus_per_task > 0:
-            if self.tasks_per_node * gpus_per_task > cpu_configuration.gpus_per_node:
-                raise ValueError('Not enough GPUs are available on a node.')
 
         if self.nodes is None:
             threads_per_node = self.tasks_per_node * threads_per_core * cpus_per_task
@@ -226,3 +223,7 @@ class Job(SerialisationMixin):
 
         if self.tasks is None:
             self.tasks = self.nodes * self.tasks_per_node
+
+        if gpus_per_node > cpu_configuration.gpus_per_node:
+            raise ValueError('The number of requested GPUs per node is '
+                             'higher than the number of GPUs per node.')

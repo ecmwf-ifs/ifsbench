@@ -132,11 +132,11 @@ def test_srunlauncher_prepare_run_dir(
         ),
         (
             ['whatever'],
-            {'nodes': 12, 'gpus_per_task': 2},
+            {'nodes': 12, 'gpus_per_node': 2},
             ['/library/path'],
             'test_env',
             [],
-            ['srun', '--nodes=12', '--gpus-per-task=2', 'whatever'],
+            ['srun', '--nodes=12', '--gpus-per-node=2', 'whatever'],
         ),
         (
             ['bind_hell'],
