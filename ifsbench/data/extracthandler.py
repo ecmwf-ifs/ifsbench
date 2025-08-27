@@ -9,8 +9,6 @@ import pathlib
 import shutil
 from typing import Optional, Union
 
-from typing_extensions import Literal
-
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug
 
@@ -34,7 +32,6 @@ class ExtractHandler(DataHandler):
         :meth:`execute`.
     """
 
-    handler_type: Literal['ExtractHandler'] = 'ExtractHandler'
     archive_path: pathlib.Path
     target_dir: Optional[pathlib.Path] = None
 

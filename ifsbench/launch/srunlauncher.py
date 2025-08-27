@@ -8,8 +8,6 @@
 from pathlib import Path
 from typing import List, Optional
 
-from typing_extensions import Literal
-
 from ifsbench.env import DefaultEnvPipeline, EnvOperation, EnvPipeline, EnvHandler
 from ifsbench.job import CpuBinding, CpuDistribution, Job
 from ifsbench.logging import debug
@@ -20,8 +18,6 @@ class SrunLauncher(Launcher):
     """
     :any:`Launcher` implementation for Slurm's srun.
     """
-
-    launcher_type: Literal['SrunLauncher'] = 'SrunLauncher'
 
     _job_options_map = {
         'nodes': '--nodes={}',

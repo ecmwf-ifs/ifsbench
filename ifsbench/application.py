@@ -5,15 +5,11 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Type, Union
+from typing import List
 
-from pydantic import model_validator, TypeAdapter, Field
-from pydantic_core.core_schema import ValidatorFunctionWrapHandler
-from typing_extensions import Annotated, Literal
-
-from ifsbench.config_mixin import PydanticConfigMixin
+from ifsbench.serialisation_mixin import SubclassableSerialisationMixin
 from ifsbench.data import DataHandler
 from ifsbench.env import EnvHandler
 from ifsbench.job import Job
@@ -21,36 +17,10 @@ from ifsbench.job import Job
 __all__ = ['Application', 'DefaultApplication']
 
 
-class Application(PydanticConfigMixin):
+class Application(ABC, SubclassableSerialisationMixin):
     """
     Base class for applications that can be launched.
     """
-
-    # application_type is used to distinguish Application subclasses and has
-    # to be defined in all subclasses.
-    application_type: str
-
-    _subclasses: ClassVar[Dict[str, Type[Any]]] = {}
-    _discriminating_type_adapter: ClassVar[TypeAdapter]
-
-    @model_validator(mode='wrap')
-    @classmethod
-    def _parse_into_subclass(
-        cls, v: Any, handler: ValidatorFunctionWrapHandler
-    ) -> 'Application':
-        if cls is Application:
-            return Application._discriminating_type_adapter.validate_python(v)
-        return handler(v)
-
-    @classmethod
-    def __pydantic_init_subclass__(cls, **kwargs):
-        Application._subclasses[cls.model_fields['application_type'].default] = cls
-        Application._discriminating_type_adapter = TypeAdapter(
-            Annotated[
-                Union[tuple(Application._subclasses.values())],
-                Field(discriminator='application_type'),
-            ]
-        )
 
     @abstractmethod
     def get_data_handlers(self, run_dir: Path, job: Job) -> List[DataHandler]:
@@ -156,12 +126,10 @@ class DefaultApplication(Application):
         The library path list that is returned by get_library_paths.
     """
 
-    application_type: Literal['DefaultApplication'] = 'DefaultApplication'
-
     command: List[str]
-    data_handlers: List[DataHandler] = Field(default_factory=list)
-    env_handlers: List[EnvHandler] = Field(default_factory=list)
-    library_paths: List[Path] = Field(default_factory=list)
+    data_handlers: List[DataHandler] = []
+    env_handlers: List[EnvHandler] = []
+    library_paths: List[Path] = []
 
     def get_data_handlers(self, run_dir: Path, job: Job) -> List[DataHandler]:
         del run_dir, job  # Unused

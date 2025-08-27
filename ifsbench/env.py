@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Union
 from pydantic import Field, model_validator
 from typing_extensions import Self
 
-from ifsbench.config_mixin import PydanticConfigMixin
+from ifsbench.serialisation_mixin import SubclassableSerialisationMixin, SerialisationMixin
 from ifsbench.logging import debug
 
 __all__ = ['EnvHandler', 'EnvOperation', 'EnvPipeline']
@@ -42,7 +42,7 @@ class EnvOperation(str, Enum):
     CLEAR = 'clear'
 
 
-class EnvHandler(PydanticConfigMixin):
+class EnvHandler(SerialisationMixin):
     """
     Specify changes to environment variables.
 
@@ -117,7 +117,7 @@ class EnvHandler(PydanticConfigMixin):
             env.clear()
 
 
-class EnvPipeline(ABC):
+class EnvPipeline(ABC, SubclassableSerialisationMixin):
     """
     Abstract base class for environment update pipelines.
 
@@ -149,7 +149,7 @@ class EnvPipeline(ABC):
         """
 
 
-class DefaultEnvPipeline(EnvPipeline, PydanticConfigMixin):
+class DefaultEnvPipeline(EnvPipeline):
     """
     Default environment pipeline.
 

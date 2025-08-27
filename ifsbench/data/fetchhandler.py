@@ -6,7 +6,7 @@
 # nor does it submit to any jurisdiction.
 
 import pathlib
-from typing import Union, Literal
+from typing import Union
 import shutil
 import urllib.error
 import urllib.request
@@ -20,9 +20,6 @@ class FetchHandler(DataHandler):
     """
     Fetch a file from a given URL.
     """
-
-    #: Identifier for the DataHandler type.
-    handler_type: Literal['FetchHandler'] = 'FetchHandler'
 
     #: The source URL from where the file gets fetched.
     source_url: str

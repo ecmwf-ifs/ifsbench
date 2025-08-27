@@ -10,11 +10,11 @@ import pathlib
 from typing import List, Union
 
 from pydantic import model_validator
-from typing_extensions import Literal, Self
+from typing_extensions import Self
 
 import f90nml
 
-from ifsbench.config_mixin import PydanticConfigMixin
+from ifsbench.serialisation_mixin import SerialisationMixin
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug, info
 from ifsbench.namelist import SanitiseMode, sanitise_namelist
@@ -30,7 +30,7 @@ class NamelistOperation(str, Enum):
     DELETE = 'delete'
 
 
-class NamelistOverride(PydanticConfigMixin):
+class NamelistOverride(SerialisationMixin):
     """
     Specify changes that will be applied to a namelist.
 
@@ -140,7 +140,6 @@ class NamelistHandler(DataHandler):
         The NamelistOverrides that will be applied.
     """
 
-    handler_type: Literal['NamelistHandler'] = 'NamelistHandler'
     input_path: pathlib.Path
     output_path: pathlib.Path
     overrides: List[NamelistOverride]
