@@ -9,7 +9,7 @@
 Architecture specifications
 """
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List
 
 from ifsbench.serialisation_mixin import SubclassableSerialisationMixin, SerialisationMixin
 from ifsbench.env import EnvHandler

@@ -522,7 +522,6 @@ def test_namelisthandlersanitise_dump_config(mode):
     nh = NamelistSanitiseHandler.from_config(config)
 
     expected = {
-        'handler_type': NamelistSanitiseHandler.__name__,
         'input_path': input_path,
         'output_path': output_path,
         'mode': mode.value,

@@ -186,8 +186,6 @@ class NamelistSanitiseHandler(DataHandler):
     using different resolution strategies.
     """
 
-    handler_type: Literal['NamelistSanitiseHandler'] = 'NamelistSanitiseHandler'
-
     #: The path to the namelist that will be modified. If a relative path is
     #: given, this will be relative to the ``wdir`` argument in :meth:`execute`.
     input_path: pathlib.Path
