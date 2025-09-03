@@ -58,7 +58,7 @@ _cpu_config_2 = CpuConfiguration(
     (
         {'launcher': MpirunLauncher(), 'cpu_config': _cpu_config_2, 'set_explicit': True,
          'launcher_flags': ['--account=myaccount']},
-        {'tasks': 64, 'gpus_per_task': 32},
+        {'tasks': 64, 'gpus_per_node': 32},
         None,
         None
     )])
