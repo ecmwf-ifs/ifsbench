@@ -226,4 +226,4 @@ class Job(SerialisationMixin):
 
         if gpus_per_node > cpu_configuration.gpus_per_node:
             raise ValueError('The number of requested GPUs per node is '
-                             'higher than the number of GPUs per node.')
+                             'higher than the available number of GPUs per node.')
