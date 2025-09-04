@@ -180,9 +180,7 @@ class Job(SerialisationMixin):
         if not threads_per_core:
             threads_per_core = 1
 
-        gpus_per_node = self.gpus_per_node
-        if not gpus_per_node:
-            gpus_per_node = 0
+        gpus_per_node = self.gpus_per_node or 0
 
         if not self.tasks_per_node:
             # If tasks_per_node wasn't specified, calculate it from the other
