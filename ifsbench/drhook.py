@@ -157,7 +157,7 @@ class DrHookRecord:
             df.set_index('id', inplace=True)
 
             # Extract the thread ID into individual column and drop '*'
-            df['thread'] = df['routine'].apply(lambda n: int(n.split('@')[-1]))
+            df['thread'] = df['routine'].apply(lambda n: int(n.split('@')[-1].split(':')[0]))
             df['routine'] = df['routine'].apply(lambda n: n.split('@')[0].replace('*', ''))
             dfs += [df]
 
