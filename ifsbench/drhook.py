@@ -211,17 +211,23 @@ class DrHookRecord:
 
         Parameters
         ----------
-        routine : str or list of str
-            Single of list of subroutine names for which to extract values.
+        routine : str or list of str or dict
+            Single or list or dict of subroutine names for which to extract values.
         metric : str
             Name of the measurement metric for which to extract values.
         fill : any, optional
             Fill value to use for missing result entries
         """
+        if isinstance(routine, dict):
+            result = {}
+            for key in routine:
+                result[key] = self.get(routine[key], metric=metric, fill=fill)['_']
+            return result
         if isinstance(routine, Iterable) and not isinstance(routine, str):
             # Extract a list of entries if an iterable of keys is given
             result = [self.data.loc[self.data['routine'] == r][metric] for r in routine]
-            return [fill if r.empty else r.iloc[0] for r in result]
+            return {'_': [fill if r.empty else r.iloc[0] for r in result]}
 
-        result = self.data.loc[self.data['routine'] == routine][metric]
-        return fill if result.empty else result.iloc[0]
+        _result = self.data.loc[self.data['routine'] == routine][metric]
+        result = {'_': [fill if _result.empty else _result.iloc[0]]}
+        return result
