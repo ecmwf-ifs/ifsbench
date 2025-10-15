@@ -8,9 +8,57 @@
 import pandas as pd
 from pathlib import Path
 import xml.etree.ElementTree as ET
+import ast
 
 __all__ = ['GStatsRecord']
 
+def as_float(element):
+    #If you expect None to be passed:
+    try:
+        float(element)
+        return ast.literal_eval(element)
+    except ValueError:
+        return element
+
+def extract_table_with_pandas(file_path, start_marker=None, end_marker=None):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    counter = 0
+    # Optionally extract only the part between start and end markers
+    if start_marker and end_marker:
+        in_table = False
+        table_lines = []
+        for line in lines:
+            if start_marker in line:
+                in_table = True
+                continue
+            if end_marker in line:
+                break
+            if in_table:
+                if counter == 0:
+                    header = line
+                else:
+                    table_lines.append(line)
+                counter += 1
+    else:
+        table_lines = lines
+
+    spans = [(0, 4), (5, 48), (49, 54), (55, 68), (69, 82), (83, 92), (93, -1)]
+    # Split lines into columns using regex (e.g., multiple spaces or tabs)
+
+    header_str = [header[span[0]:span[1]].strip().lower().replace('(ms)', '').replace('(%)', '') for span in spans]
+
+    rows = []
+    for line in table_lines:
+        columns = [as_float(line[span[0]:span[1]].strip()) for span in spans]
+        if columns:
+            rows.append(columns)
+
+    # Create DataFrame
+    df = pd.DataFrame(rows, columns=header_str)
+
+    return df
 
 class GStatsRecord:
     """
@@ -23,9 +71,20 @@ class GStatsRecord:
     @classmethod
     def from_file(cls, path):
         path = Path(path)
-        path = path/'gstats.xml' if path.is_dir() else path
-        df = pd.read_xml(path, xpath='*/item', parser='etree')
-        df = df.set_index('id')
+        path_xml = path/'gstats.xml' if path.is_dir() else path
+        if path.is_dir():
+            path_node_files = list(path.glob('NODE.*'))
+            path_node = path_node_files[0] if path_node_files else path
+        else:
+            path_node = path
+        if path_xml.is_file():
+            df = pd.read_xml(path_xml, xpath='*/item', parser='etree')
+            df = df.set_index('id')
+        elif path_node.is_file():
+            df = extract_table_with_pandas(path_node, start_marker='STATS FOR ALL TASKS', end_marker='TOTAL MEASURED IMBALANCE')
+            df = df.set_index('num')
+        else:
+            raise FileNotFoundError
         return cls(data=df)
 
     def total_time(self, gid):
