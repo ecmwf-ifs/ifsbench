@@ -30,12 +30,32 @@ class GStatsRecord:
 
     def total_time(self, gid):
         """ Cumulative total time in seconds for a given GStats-ID """
-        return self.data.at[gid, 'mean'] * self.data.at[gid, 'calls'] / 1000.
+        try:
+            return self.data.at[gid, 'mean'] * self.data.at[gid, 'calls'] / 1000.
+        except Exception:
+            return 0
+
+    @property
+    def total_time_execution(self):
+        """ Cumulative total time in seconds for a given GStats-ID """
+        return self.total_time(gid=0)
+
 
     @property
     def total_time_steps(self):
         """ Total time spent in forward integration time steps """
         return self.total_time(gid=1)  # CNT4     - FORWARD INTEGRATION
+
+    @property
+    def total_io(self):
+        """ Total time spent in IO"""
+        t = self.total_time(gid=11) # IOPACK
+        t += self.total_time(gid=17) # GRIDFPOS
+        t += self.total_time(gid=29) # SU4FPOS
+        t += self.total_time(gid=30) # DYNFPOS
+        t += self.total_time(gid=31) # POSDDH
+        t += self.total_time(gid=25) # SPECRT
+        return t
 
     @property
     def total_trans(self):
