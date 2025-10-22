@@ -94,7 +94,7 @@ class GribModification(ABC):
             )
 
     @abstractmethod
-    def modify_message(self, grb: gribmessage) -> gribmessage:
+    def modify_message(self, grb: gribmessage) -> gribmessage: # pylint: disable=possibly-used-before-assignment
         """Modifies the data in that GRIB message."""
         raise NotImplementedError()
 
