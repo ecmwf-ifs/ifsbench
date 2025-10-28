@@ -28,10 +28,14 @@ def config_from_yaml(path):
     return config
 
 
-def data_from_preset(drhook, preset, groups, do_sums=True):
+def data_from_preset(drhook, preset, groups, do_sums=True, label=None):
     """
     Construct an array of timing values, summing any list of grouped keys.
     """
+    if label:
+        label = f' ({label})'
+    else:
+        label = ''
 
     data = []
     for k in groups:
@@ -44,11 +48,11 @@ def data_from_preset(drhook, preset, groups, do_sums=True):
 
             for l, v in zip(lbl, val):
                 if v == 0.:
-                    warning(f'[Perfplot] Could not find label {l} in DR_HOOK timings')
+                    warning(f'[Perfplot] Could not find label {l} in DR_HOOK timings{label}')
 
             data.append( sum(val) if do_sums else val )
         else:
-            warning(f'[Perfplot] Could not find group key {k} in preset')
+            warning(f'[Perfplot] Could not find group key {k} in preset{label}')
             data.append( 0.0 )
 
     return data
@@ -57,6 +61,62 @@ def data_from_preset(drhook, preset, groups, do_sums=True):
 @click.group()
 def perfplot():
     pass
+
+
+@perfplot.command('ecrad-stacked')
+@click.option(
+    '--config', '-c', type=click.Path(),
+    help='Paths to plot configuration YAML file'
+)
+@click.option(
+    '--output', '-o', default='plot.pdf', type=click.Path(),
+    help='Filename of the output plot'
+)
+@click.option(
+    '--cmap', '-cm', default='viridis',
+    help='Colormap to use for different component bars'
+)
+@click.option(
+    '--verbose', '-v', is_flag=True, default=False,
+    help='Enable verbose (debugging) output.'
+)
+def plot_ecrad_stacked(config, output, cmap, verbose):
+    """
+    Plot ecrad performance as a stacked barplot for comparing difference runs.
+    """
+    metric = 'avgTimeTotal'
+
+    if verbose:
+        logger.setLevel(DEBUG)
+
+    config = config_from_yaml(config)
+
+    groups = config['groups']
+
+    groups += ['SLCOMM Input', 'SLCOMM Output', 'Other']
+    plot = StackedBarPlot(groups, cmap=cmap)#, nruns=len(config['runs']))
+
+    for run in config['runs']:
+        label = run['label']
+        path = Path(run['path'])
+        preset = run['preset']
+
+        drhook = DrHookRecord.from_raw(path)
+        gstats = GStatsRecord.from_file(path)
+
+        data = data_from_preset(drhook=drhook, preset=preset, groups=groups[:-3], label=label)
+
+        data += [gstats.total_time(gid=66), gstats.total_time(gid=65)]
+
+        # Add "other" as the difference to the RADIATION gstats label
+#        data += [gstats.total_radiation - sum(data)]
+
+        # Add "other" as the difference to the RADINTG drhook label
+        data += [drhook.get('RADINTG') - sum(data)]
+
+        plot.add_stack(data, label=label)
+
+    plot.plot(filename=output)
 
 
 @perfplot.command('ecphys-stacked')
@@ -90,7 +150,7 @@ def plot_ecphysics_stacked(config, output, cmap, verbose):
     groups = config['groups']
 
     groups += ['Other']
-    plot = StackedBarPlot(groups, cmap=cmap, nruns=len(config['runs']))
+    plot = StackedBarPlot(groups, cmap=cmap)#, nruns=len(config['runs']))
 
     for run in config['runs']:
         label = run['label']
@@ -100,7 +160,7 @@ def plot_ecphysics_stacked(config, output, cmap, verbose):
         drhook = DrHookRecord.from_raw(path)
         gstats = GStatsRecord.from_file(path)
 
-        data = data_from_preset(drhook=drhook, preset=preset, groups=groups[:-1])
+        data = data_from_preset(drhook=drhook, preset=preset, groups=groups[:-1], label=label)
 
         # Add "other" as the difference to the EC_PHYS gstats label
         data += [gstats.total_ecphys - sum(data)]
@@ -145,7 +205,7 @@ def plot_ecphysics_compare(config, output, verbose):
         drhook = DrHookRecord.from_raw(path)
         gstats = GStatsRecord.from_file(path)
 
-        data = data_from_preset(drhook=drhook, preset=preset, groups=groups, do_sums=False)
+        data = data_from_preset(drhook=drhook, preset=preset, groups=groups, do_sums=False, label=label)
 
         plot.add_group(data, label=label)
 
