@@ -92,7 +92,7 @@ class GribModification(ABC):
             raise RuntimeError(
                 'Cannot modify GRIB files - pygrib or eccodes not available.'
             )
-
+    # pylint: disable=possibly-used-before-assignment
     @abstractmethod
     def modify_message(self, grb: gribmessage) -> gribmessage:
         """Modifies the data in that GRIB message."""
@@ -102,6 +102,7 @@ class GribModification(ABC):
 class NoGribModification(GribModification):
     """Does not apply any modification."""
 
+    # pylint: disable=possibly-used-before-assignment
     def modify_message(self, grb: gribmessage) -> gribmessage:
         return grb
 
