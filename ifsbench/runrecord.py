@@ -248,7 +248,9 @@ class RunRecord:
             # Validate all recorded spectral norms
             sp_diff = self.spectral_norms - reference.spectral_norms
             if not (sp_diff == 0.).all(axis=None):
-                error(f'FAILURE: Spectral norms deviate from reference:\n{sp_diff}\n')
+                error('FAILURE: Spectral norms deviate from reference:')
+                with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+                    error(sp_diff.loc[:, (sp_diff != 0.).any(axis=0)])
                 failure = True
                 if exit_on_error:
                     sys.exit(-1)
@@ -256,7 +258,9 @@ class RunRecord:
             # Validate avg/min/max norms for all recorded gridpoint fields
             gp_diff = self.gridpoint_norms - reference.gridpoint_norms
             if not (gp_diff == 0.).all(axis=None):
-                error(f'FAILURE: Gridpoint norms deviate from reference:\n{gp_diff}\n')
+                error('FAILURE: Gridpoint norms deviate from reference:')
+                with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+                    error(gp_diff.loc[:, (gp_diff != 0.).any(axis=0)])
                 failure = True
                 if exit_on_error:
                     sys.exit(-1)

@@ -30,7 +30,7 @@ tests = [
   "pytest",
   "pytest-cov",
   "coverage2clover",
-  "pylint",
+  "pylint<4.0.0",
 ]
 grib = [
   "cfgrib",
