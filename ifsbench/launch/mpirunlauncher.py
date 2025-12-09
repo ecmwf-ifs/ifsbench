@@ -96,6 +96,16 @@ class MpirunLauncher(Launcher):
                     )
                 )
 
+        if job.cpus_per_task:
+            # We automatically set OMP_NUM_THREADS here. This may not be
+            # necessary for each application (as not all application may use
+            # OpenMP-based multithreading.
+            env_pipeline.add(EnvHandler(
+                mode=EnvOperation.APPEND,
+                key='OMP_NUM_THREADS',
+                value=str(job.cpus_per_task)
+            ))
+
         flags += cmd
 
         env = env_pipeline.execute()

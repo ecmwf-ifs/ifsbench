@@ -41,7 +41,8 @@ def fixture_test_env_none():
 @pytest.mark.parametrize(
     'cmd,job_in,library_paths,env_pipeline_name,custom_flags,env_out',
     [
-        (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], 'test_env_none', [], {}),
+        (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], 'test_env_none',
+            [], {'OMP_NUM_THREADS': '4'}),
         (
             ['something'],
             {},
