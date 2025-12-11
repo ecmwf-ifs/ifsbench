@@ -121,7 +121,7 @@ def test_mpirunLauncher_prepare_run_dir(
             [],
             'test_env_none',
             [],
-            ['mpirun', '-n', '64', '--cpus-per-proc', '4', 'ls', '-l'],
+            ['mpirun', '-n', '64', '--map-by', 'core:PE=4', 'ls', '-l'],
         ),
         (
             ['something'],
@@ -149,6 +149,18 @@ def test_mpirunLauncher_prepare_run_dir(
             'test_env',
             [],
             ['mpirun', '--bind-to', 'hwthread', '--map-by', 'numa', 'bind_hell'],
+        ),
+        (
+            ['bind_hell'],
+            {
+                'cpus_per_task': 2,
+                'bind': CpuBinding.BIND_THREADS,
+                'distribute_local': CpuDistribution.DISTRIBUTE_CYCLIC,
+            },
+            ['/library/path'],
+            'test_env',
+            [],
+            ['mpirun', '--bind-to', 'hwthread', '--map-by', 'numa:PE=2', 'bind_hell'],
         ),
     ],
 )
