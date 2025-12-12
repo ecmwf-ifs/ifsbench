@@ -307,10 +307,11 @@ class Atos(Arch):
                     'ignoring gpus_per_task'
                 ))
             else:
-                tasks_per_node = min(
-                    tasks_per_node,
-                    cls.cpu_config.gpus_per_node // gpus_per_task
-                )
+                if tasks_per_node > (cls.cpu_config.gpus_per_node * gpus_per_task):
+                    warning((
+                        'Too many GPUs requested per node, please reduce tasks_per_node or gpus_per_task unless GPU '
+                        'oversubscription is desired.'
+                    ))
                 gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
 
         if gpus_per_node:

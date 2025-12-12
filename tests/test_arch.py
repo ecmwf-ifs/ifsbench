@@ -54,55 +54,56 @@ def test_arch_run(watcher, arch, np, nt, hyperthread, expected):
     for string in expected:
         assert string in watcher.output
 
-@pytest.mark.parametrize('arch,np,nt,hyperthread,gpus_per_task,expected,launch_script_expected', [
-    ('atos_ac', 64, 4, 1, None, [
+@pytest.mark.parametrize('arch,np,nt,hyperthread,gpus_per_task,tasks_per_node,expected,launch_script_expected', [
+    ('atos_ac', 64, 4, 1, None, None, [
         'srun', '--ntasks=64', '--ntasks-per-node=32',
         '--cpus-per-task=4', '--ntasks-per-core=1', '--qos=np', '--hint=nomultithread'
     ], None),
-    ('atos_ac', 64, 4, 1, 0, [
+    ('atos_ac', 64, 4, 1, 0, None, [
         'srun', '--ntasks=64', '--ntasks-per-node=32',
         '--cpus-per-task=4', '--ntasks-per-core=1', '--qos=np', '--hint=nomultithread'
     ], None),
-    ('atos_ac', 64, 32, 1, 1, [
+    ('atos_ac', 64, 32, 1, 1, None, [
         'srun', '--ntasks=64', '--ntasks-per-node=4', '--qos=ng',
         '--cpus-per-task=32', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
         'select_gpu.sh'
     ], ['VISIBLE_DEVICES_PER_RANK=(1 0 3 2)', 'CUDA_VISIBLE_DEVICES=${VISIBLE_DEVICES_PER_RANK[${SLURM_LOCALID}]']),
-    ('atos_ac', 64, 32, 1, 4, [
+    ('atos_ac', 64, 32, 1, 4, 1, [
         'srun', '--ntasks=64', '--ntasks-per-node=1', '--qos=ng',
         '--cpus-per-task=32', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
         'select_gpu.sh'
     ], ['VISIBLE_DEVICES_PER_RANK=(1)', 'CUDA_VISIBLE_DEVICES=${VISIBLE_DEVICES_PER_RANK[${SLURM_LOCALID}]']),
-    ('atos_ag', 64, 72, 1, 0, [
+    ('atos_ag', 64, 72, 1, 0, None, [
         'srun', '--ntasks=64', '--ntasks-per-node=4',
         '--cpus-per-task=72', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
     ], None),
-    ('atos_ag', 64, 72, 1, 1, [
+    ('atos_ag', 64, 72, 1, 1, None, [
         'srun', '--ntasks=64', '--ntasks-per-node=4',
         '--cpus-per-task=72', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
     ], None),
-    ('atos_ag', 64, 72, 1, 4, [
+    ('atos_ag', 64, 72, 1, 4, 1, [
         'srun', '--ntasks=64', '--ntasks-per-node=1',
         '--cpus-per-task=72', '--ntasks-per-core=1', '--gres=gpu:4', '--hint=nomultithread',
     ], None),
-    ('lumi_g', 256, 4, 1, None, [
+    ('lumi_g', 256, 4, 1, None, None, [
         'srun', '--ntasks=256', '--ntasks-per-node=14', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1'
     ], None),
-    ('lumi_g', 256, 4, 1, 0, [
+    ('lumi_g', 256, 4, 1, 0, None, [
         'srun', '--ntasks=256', '--ntasks-per-node=14', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1'
     ], None),
-    ('lumi_g', 256, 4, 1, 1, [
+    ('lumi_g', 256, 4, 1, 1, None, [
         'srun', '--ntasks=256', '--ntasks-per-node=8', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:8'
     ], None),
-    ('lumi_g', 256, 4, 1, 4, [
+    ('lumi_g', 256, 4, 1, 4, None, [
         'srun', '--ntasks=256', '--ntasks-per-node=2', '--partition=standard-g',
         '--cpus-per-task=4', '--ntasks-per-core=1', '--gres=gpu:8'
     ], None),
 ])
-def test_arch_gpu_run(tmp_path, watcher, arch, np, nt, gpus_per_task, hyperthread, expected, launch_script_expected):
+def test_arch_gpu_run(tmp_path, watcher, arch, np, nt, gpus_per_task, tasks_per_node,
+                      hyperthread, expected, launch_script_expected):
     """
     Verify the launch command for certain architecture configurations
     looks as expected
@@ -110,7 +111,11 @@ def test_arch_gpu_run(tmp_path, watcher, arch, np, nt, gpus_per_task, hyperthrea
     obj = arch_registry[arch]
 
     with watcher:
-        obj.run('cmd', np, nt, hyperthread, gpus_per_task=gpus_per_task, dryrun=True, cwd=tmp_path)
+        if tasks_per_node:
+            obj.run('cmd', np, nt, hyperthread, tasks_per_node=tasks_per_node,
+                    gpus_per_task=gpus_per_task, dryrun=True, cwd=tmp_path)
+        else:
+            obj.run('cmd', np, nt, hyperthread, gpus_per_task=gpus_per_task, dryrun=True, cwd=tmp_path)
 
     for string in expected:
         assert string in watcher.output
