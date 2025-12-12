@@ -307,62 +307,36 @@ class Atos(Arch):
                     'ignoring gpus_per_task'
                 ))
             else:
-                tasks_per_node = min(
-                    tasks_per_node,
-                    cls.cpu_config.gpus_per_node // gpus_per_task
-                )
+                if tasks_per_node > (cls.cpu_config.gpus_per_node * gpus_per_task):
+                    warning((
+                        'Too many GPUs requested per node, please reduce tasks_per_node or gpus_per_task unless GPU '
+                        'oversubscription is desired.'
+                    ))
                 gpus_per_node = min(gpus_per_task * tasks_per_node, cls.cpu_config.gpus_per_node)
 
         if gpus_per_node:
-            launch_user_options.insert(0, '--qos=ng')
+            qos = cls.get_gpu_qos_spec()
+            if qos:
+                launch_user_options.insert(0, qos)
 
-            # To ensure we correctly bind GPUs to CPUs we write a little
-            # wrapper script that maps the correct CUDA_VISIBLE_DEVICES
-            # id to each rank locally per node.
-            # Because the mapping from NUMA domain to GPU is
-            # [1->0, 0->1, 3->2, 2->3], we need to apply some reordering here
+            wrapper_str = cls.get_gpu_binding_script(cpus_per_task, threads_per_core, tasks_per_node)
 
-            # The GPU that is closest to each core
-            core_to_gpu_mapping = {core: 1 for core in range(32)}
-            core_to_gpu_mapping.update({core: 0 for core in range(32, 64)})
-            core_to_gpu_mapping.update({core: 3 for core in range(64, 96)})
-            core_to_gpu_mapping.update({core: 2 for core in range(96, 128)})
+            if wrapper_str:
+                rundir = kwargs.get('cwd')
+                if not rundir:
+                    raise RuntimeError('No rundir given to Atos.run')
+                wrapper = Path(rundir/'select_gpu.sh')
+                wrapper.write_text(wrapper_str, encoding='utf_8')
+                wrapper.chmod(0o750)
+                cmd = [str(wrapper), *cmd]
 
-            # Determine the cores that each task is using on a node
-            physical_cpus_per_task = (cpus_per_task - 1) // threads_per_core + 1
-            physical_cores_per_task = {
-                local_rank: [physical_cpus_per_task * local_rank + i for i in range(physical_cpus_per_task)]
-                for local_rank in range(tasks_per_node)
-            }
-
-            # The GPUs to be used by each rank
-            task_gpu_strings = [
-                ','.join(dict.fromkeys(
-                    str(core_to_gpu_mapping[core])
-                    for core in physical_cores_per_task[local_rank]
-                ))
-                for local_rank in range(tasks_per_node)
-            ]
-            wrapper_str = f"""
-#!/bin/bash
-VISIBLE_DEVICES_PER_RANK=({' '.join(task_gpu_strings)})
-export CUDA_VISIBLE_DEVICES=${{VISIBLE_DEVICES_PER_RANK[${{SLURM_LOCALID}}]}}
-exec $*
-            """.strip()
-
-            rundir = kwargs.get('cwd')
-            if not rundir:
-                raise RuntimeError('No rundir given to Atos.run')
-            wrapper = Path(rundir/'select_gpu.sh')
-            wrapper.write_text(wrapper_str, encoding='utf_8')
-            wrapper.chmod(0o750)
-
-            cmd = [str(wrapper), *cmd]
         elif tasks * cpus_per_task > 32:
             # By default, stuff on Atos runs on the GPIL nodes which allow only
             # up to 32 cores. If more resources are needed, the compute
             # partition should be requested.
-            launch_user_options.insert(0, '--qos=np')
+            qos = cls.get_cpu_qos_spec()
+            if qos:
+                launch_user_options.insert(0, qos)
 
 
         # Bind to cores
@@ -382,6 +356,23 @@ exec $*
         cls.run_job(cmd, job, launch_cmd=launch_cmd, launch_user_options=launch_user_options,
                     logfile=logfile, env=env, **kwargs)
 
+    @classmethod
+    def get_gpu_binding_script(cls, cpus_per_task, threads_per_core, tasks_per_node): #pylint: disable=unused-argument
+        """Create script to bind GPUs to CPU cores."""
+
+        return ""
+
+    @staticmethod
+    def get_gpu_qos_spec():
+        """Return qos specification for GPU queue."""
+        return ""
+
+    @staticmethod
+    def get_cpu_qos_spec():
+        """Return qos specification for CPU queue."""
+        return ""
+
+
 class AtosAaIntel(Atos):
     """
     Intel compiler-toolchain setup for :any:`AtosAa`
@@ -397,6 +388,11 @@ class AtosAaIntel(Atos):
     cpu_config = AtosAaCpuConfig
 
     launcher = SrunLauncher
+
+    @staticmethod
+    def get_cpu_qos_spec():
+        """Return qos specification for CPU queue."""
+        return "--qos=np"
 
 
 class AtosAc(Atos):
@@ -415,6 +411,81 @@ class AtosAc(Atos):
     cpu_config = AtosAcCpuConfig
 
     launcher = SrunLauncher
+
+    @classmethod
+    def get_gpu_binding_script(cls, cpus_per_task, threads_per_core, tasks_per_node):
+        """Create script to bind GPUs to CPU cores."""
+
+        # To ensure we correctly bind GPUs to CPUs we write a little
+        # wrapper script that maps the correct CUDA_VISIBLE_DEVICES
+        # id to each rank locally per node.
+        # Because the mapping from NUMA domain to GPU is
+        # [1->0, 0->1, 3->2, 2->3], we need to apply some reordering here
+
+        # The GPU that is closest to each core
+        core_to_gpu_mapping = {core: 1 for core in range(32)}
+        core_to_gpu_mapping.update({core: 0 for core in range(32, 64)})
+        core_to_gpu_mapping.update({core: 3 for core in range(64, 96)})
+        core_to_gpu_mapping.update({core: 2 for core in range(96, 128)})
+
+        # Determine the cores that each task is using on a node
+        physical_cpus_per_task = (cpus_per_task - 1) // threads_per_core + 1
+        physical_cores_per_task = {
+            local_rank: [physical_cpus_per_task * local_rank + i for i in range(physical_cpus_per_task)]
+            for local_rank in range(tasks_per_node)
+        }
+
+        # The GPUs to be used by each rank
+        task_gpu_strings = [
+            ','.join(dict.fromkeys(
+                str(core_to_gpu_mapping[core])
+                for core in physical_cores_per_task[local_rank]
+            ))
+            for local_rank in range(tasks_per_node)
+        ]
+        wrapper_str = f"""
+#!/bin/bash
+VISIBLE_DEVICES_PER_RANK=({' '.join(task_gpu_strings)})
+export CUDA_VISIBLE_DEVICES=${{VISIBLE_DEVICES_PER_RANK[${{SLURM_LOCALID}}]}}
+exec $*
+        """.strip()
+
+        return wrapper_str
+
+    @staticmethod
+    def get_gpu_qos_spec():
+        """Return qos specification for GPU queue."""
+        return "--qos=ng"
+
+    @staticmethod
+    def get_cpu_qos_spec():
+        """Return qos specification for CPU queue."""
+        return "--qos=np"
+
+class AtosAg(Atos):
+    """
+    Architecture for the Atos ac partition that also offers NVIDIA A100 GPUs.
+    """
+
+    class AtosAgCpuConfig(CpuConfiguration):
+
+        sockets_per_node = 4
+        cores_per_socket = 72
+        threads_per_core = 1
+        gpus_per_node = 4
+
+    cpu_config = AtosAgCpuConfig
+
+    launcher = SrunLauncher
+
+    @classmethod
+    def run(cls, cmd, tasks, cpus_per_task, threads_per_core, gpus_per_task=None,
+            **kwargs): #pylint: disable=arguments-differ
+        """Build job description using :attr:`cpu_config`"""
+
+        # Ensure that we always request GPUs even for CPU only runs
+        super().run(cmd, tasks, cpus_per_task, threads_per_core, gpus_per_task=gpus_per_task or 1,
+                    **kwargs)
 
 class Lumi(Arch):
     # Define the default partition
@@ -527,6 +598,7 @@ arch_registry = {
     'xc40intel': XC40Intel,
     'atos_aa': AtosAaIntel,
     'atos_ac': AtosAc,
+    'atos_ag': AtosAg,
     'lumi_c': LumiC,
     'lumi_g': LumiG
 }
