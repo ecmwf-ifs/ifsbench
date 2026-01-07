@@ -110,12 +110,12 @@ class DrHookRecord:
                             metadata=pd.DataFrame.from_dict(metadata, orient=orient))
 
     @classmethod
-    def from_raw(cls, filepath):
+    def from_raw(cls, filepath, batch_size=20):
         """
         Load raw drhook output and aggregate into merged performance record
         """
         filepath = Path(filepath)
-        data, metadata = cls.parse_profiles(filepath)
+        data, metadata = cls.parse_profiles(filepath, batch_size=batch_size)
         return DrHookRecord(data, metadata)
 
     @classmethod
@@ -129,41 +129,52 @@ class DrHookRecord:
         return DrHookRecord(data, metadata)
 
     @classmethod
-    def parse_profiles(cls, filepath):
+    def parse_profiles(cls, filepath, batch_size=20):
         """
         Parse the raw DrHook (per-process) profile files into a :any:`pandas.DataFrame`.
         """
-        debug(f'Parsing DrHook profile: {filepath}')
+        def batch(iterable, batch_size=1):
+            length = len(iterable)
+            for i_batch in range(0, length, batch_size):
+                yield iterable[i_batch:min(i_batch + batch_size, length)]
+
+        debug(f'Parsing DrHook profile: {filepath} with batch size {batch_size}')
 
         filepath = Path(filepath)
         columns = ['id', 'percent', 'cumul', 'self', 'total', 'calls', 'routine']
 
-        dfs = []
-        metas = []
-        for path in filepath.parent.glob(filepath.name):
-            with Path(path).open('r', encoding='utf-8') as f:
-                raw = f.read()
+        batched_dfs = []
+        batched_metas = []
+        all_paths = list(filepath.parent.glob(filepath.name))
+        for paths in batch(all_paths, batch_size):
+            dfs = []
+            metas = []
+            for path in paths:
+                with Path(path).open('r', encoding='utf-8') as f:
+                    raw = f.read()
 
-            # Parse metadata into series object
-            # m = [m.groupdict() for m in cls.re_walltime.finditer(raw)]
-            m = cls.re_program.search(raw).groupdict()
-            m.update(cls.re_walltime.search(raw).groupdict())
-            # m_memory = cls.re_walltime.search(raw)
-            # m.update(m_memory if m_memory else {}}
-            metas += [pd.Series(m).to_frame().transpose()]
+                # Parse metadata into series object
+                # m = [m.groupdict() for m in cls.re_walltime.finditer(raw)]
+                m = cls.re_program.search(raw).groupdict()
+                m.update(cls.re_walltime.search(raw).groupdict())
+                # m_memory = cls.re_walltime.search(raw)
+                # m.update(m_memory if m_memory else {}}
+                metas += [pd.Series(m).to_frame().transpose()]
 
-            rows = [m.groups() for m in cls.re_row.finditer(raw)]
-            df = pd.DataFrame(rows, columns=columns)
-            df.set_index('id', inplace=True)
+                rows = [m.groups() for m in cls.re_row.finditer(raw)]
+                df = pd.DataFrame(rows, columns=columns)
+                df.set_index('id', inplace=True)
 
-            # Extract the thread ID into individual column and drop '*'
-            df['thread'] = df['routine'].apply(lambda n: int(n.split('@')[-1].split(':')[0]))
-            df['routine'] = df['routine'].apply(lambda n: n.split('@')[0].replace('*', ''))
-            dfs += [df]
+                # Extract the thread ID into individual column and drop '*'
+                df['thread'] = df['routine'].apply(lambda n: int(n.split('@')[-1].split(':')[0]))
+                df['routine'] = df['routine'].apply(lambda n: n.split('@')[0].replace('*', ''))
+                dfs += [df]
+            batched_dfs.append(pd.concat(dfs))
+            batched_metas.append(pd.concat(metas))
 
         # Concatenate all DrHook profiles
-        data = pd.concat(dfs)
-        meta = pd.concat(metas)
+        data = pd.concat(batched_dfs)
+        meta = pd.concat(batched_metas)
 
         # Provide across process statistics for metadata
         meta['walltime'] = pd.to_numeric(meta['walltime'], errors='coerce')
