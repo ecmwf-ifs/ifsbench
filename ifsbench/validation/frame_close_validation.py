@@ -72,4 +72,3 @@ class FrameCloseValidation:
         mismatch = [(frame1.index[i], frame1.columns[j]) for i,j in mismatch]
 
         return numpy.all(close), mismatch
-        
