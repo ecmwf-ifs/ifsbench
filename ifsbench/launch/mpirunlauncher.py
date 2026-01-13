@@ -43,6 +43,7 @@ class MpirunLauncher(Launcher):
         do_nothing = [
             CpuDistribution.DISTRIBUTE_DEFAULT,
             CpuDistribution.DISTRIBUTE_USER,
+            None
         ]
         if (
             hasattr(job, 'distribute_remote')
