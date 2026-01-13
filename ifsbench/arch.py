@@ -59,6 +59,19 @@ class Arch(ABC, SubclassableSerialisationMixin):
         """
 
     @abstractmethod
+    def get_default_launcher_flags(self) -> List[str]:
+        """
+        Return additional default launcher flags that belong to the default
+        launcher.
+
+        Returns
+        -------
+        List[str]
+            The additional default launcher flags.
+        """
+
+
+    @abstractmethod
     def get_cpu_configuration(self) -> CpuConfiguration:
         """
         Return the hardware setup that is used.
@@ -114,6 +127,9 @@ class DefaultArch(Arch):
 
     def get_default_launcher(self) -> Launcher:
         return self.launcher
+
+    def get_default_launcher_flags(self) -> List[str]:
+        return self.launcher_flags
 
     def get_cpu_configuration(self) -> CpuConfiguration:
         return self.cpu_config
