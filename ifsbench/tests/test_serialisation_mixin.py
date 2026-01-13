@@ -100,7 +100,7 @@ def test_dumb_config_with_class_succeeds():
 
 
 class TestBase(SubclassableSerialisationMixin):
-    pass
+    float_value: float
 
 
 class TestChild1(TestBase):
@@ -119,18 +119,19 @@ def test_subclass_serialisation():
     Test that subclasses serialise properly.
     """
 
-    obj = TestCombine(child=TestChild1(list_str=['Hello', 'world']))
+    obj = TestCombine(child=TestChild1(list_str=['Hello', 'world'], float_value=4.5))
 
     config = obj.dump_config()
 
     assert config == {
         'child': {
             'class_name': 'TestChild1',
-            'list_str': ['Hello', 'world']
+            'list_str': ['Hello', 'world'],
+            'float_value': 4.5
         }
     }
 
-    obj = TestCombine(child=TestChild2(first_int=5, second_int=6))
+    obj = TestCombine(child=TestChild2(first_int=5, second_int=6, float_value=2.1))
 
     config = obj.dump_config()
 
@@ -138,6 +139,7 @@ def test_subclass_serialisation():
         'child': {
             'class_name': 'TestChild2',
             'first_int': 5,
-            'second_int': 6
+            'second_int': 6,
+            'float_value': 2.1
         }
     }
