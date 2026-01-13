@@ -39,7 +39,10 @@ def cli_test(cmd_flags):
     runner = CliRunner()
     result = runner.invoke(test_command, cmd_flags, standalone_mode=False)
 
-    print(result.output_bytes)
+    if hasattr(result, 'output_bytes'):
+        print(result.output_bytes)
+    else:
+        print(result.stdout_bytes, result.stderr_bytes)
 
     if result.exception:
         raise result.exception
