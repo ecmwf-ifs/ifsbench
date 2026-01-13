@@ -63,7 +63,7 @@ class BashLauncher(Launcher):
         script_dir.mkdir(parents=True, exist_ok=True)
 
         # Always use UTC time and format it.
-        time_str = datetime.datetime.now(datetime.UTC).strftime('%Y-%m-%d:%H-%M-%S-%f')
+        time_str = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d:%H-%M-%S-%f')
         cmd_str = cmd[0]
 
         script_path = script_dir/f'{cmd_str}_{time_str}.sh'

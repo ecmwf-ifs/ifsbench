@@ -10,7 +10,7 @@ click-based decorators for specifying launchers + launcher flags.
 """
 
 from functools import wraps
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import click
 
@@ -54,7 +54,7 @@ class LauncherBuilder(SerialisationMixin):
     #: Whether the whole launch command is put into a bash file.
     bash: bool = False
 
-    def build_from_arch(self, arch: Optional[Arch] = None) -> tuple[Launcher, List[str]]:
+    def build_from_arch(self, arch: Optional[Arch] = None) -> Tuple[Launcher, List[str]]:
         """
         Build a launcher, using information from an `Arch` object.
         """
@@ -68,7 +68,7 @@ class LauncherBuilder(SerialisationMixin):
     def build_launcher(self,
         default_launcher: Optional[Launcher]=None,
         default_launcher_flags: Optional[List[str]]=None
-        ) -> tuple[Launcher, List[str]] :
+        ) -> Tuple[Launcher, List[str]] :
         """
         Build a launcher using a given default launcher and default flags.
         """
