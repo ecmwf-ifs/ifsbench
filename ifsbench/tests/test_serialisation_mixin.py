@@ -11,7 +11,7 @@ from typing import Dict, List
 import pytest
 from pydantic import ValidationError
 
-from ifsbench import SerialisationMixin, CLASSNAME
+from ifsbench import SerialisationMixin, SubclassableSerialisationMixin, CLASSNAME
 
 
 class TestImpl(SerialisationMixin):
@@ -97,3 +97,47 @@ def test_dumb_config_with_class_succeeds():
     expected = config.copy()
     expected[CLASSNAME] = 'TestImpl'
     assert ti.dump_config(with_class=True) == expected
+
+
+class TestBase(SubclassableSerialisationMixin):
+    pass
+
+
+class TestChild1(TestBase):
+    list_str: List[str]
+
+class TestChild2(TestBase):
+    first_int: int
+    second_int: int
+
+
+class TestCombine(SerialisationMixin):
+    child: TestBase
+
+def test_subclass_serialisation():
+    """
+    Test that subclasses serialise properly.
+    """
+
+    obj = TestCombine(child=TestChild1(list_str=['Hello', 'world']))
+
+    config = obj.dump_config()
+
+    assert config == {
+        'child': {
+            'class_name': 'TestChild1',
+            'list_str': ['Hello', 'world']
+        }
+    }
+
+    obj = TestCombine(child=TestChild2(first_int=5, second_int=6))
+
+    config = obj.dump_config()
+
+    assert config == {
+        'child': {
+            'class_name': 'TestChild2',
+            'first_int': 5,
+            'second_int': 6
+        }
+    }
