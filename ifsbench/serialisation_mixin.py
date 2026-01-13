@@ -9,9 +9,9 @@ from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Type, Union
 from typing_extensions import Annotated, Literal, TypeAliasType
 
-from pydantic import BaseModel, Field, model_validator, TypeAdapter
+from pydantic import BaseModel, Field, model_validator, TypeAdapter, model_serializer
 from pydantic.fields import FieldInfo
-from pydantic_core.core_schema import ValidatorFunctionWrapHandler
+from pydantic_core.core_schema import SerializationInfo, SerializerFunctionWrapHandler, ValidatorFunctionWrapHandler
 
 
 __all__ = ['SubclassableSerialisationMixin', 'SerialisationMixin', 'CLASSNAME', 'RESERVED_NAMES']
@@ -133,6 +133,62 @@ class SubclassableSerialisationMixin(SerialisationMixin):
             candidates += list(current.__bases__)
 
         return None
+
+    @model_serializer(mode='wrap')
+    def _serialize_model(self, handler: SerializerFunctionWrapHandler,
+        info: SerializationInfo) -> Any:
+        """
+        Workaround for proper serialisation of subclasses.
+
+        When pydantic tries to serialise something of type BaseClass, it will
+        use the serialisation method of BaseClass, even if the object is an
+        instance of a child class. This is not desired here, therefore we use
+        this serializer to always use the serialisation function of the actual
+        object.
+        """
+
+        # Essentially we call the model_dump function of the actual object
+        # (self). As the model_dump function eventually invokes this function
+        # again, we have to make sure that we are not stuck in an endless
+        # recursion.
+        # To avoid this, we add a flag to the info.context object.
+
+
+        # Check if we are in a recursive call to this function. If we are, just
+        # use the default serialisation handler (which this function wraps) to
+        # do the serialisation.
+        if info.context:
+            recursive = info.context.get('recursive', False)
+
+            if recursive:
+                return handler(self)
+
+        # If we are not recursive yet, add the 'recursive' flag to the context.
+        if info.context == dict:
+            context = dict(info.context)
+        else:
+            context = {}
+
+        context['recursive'] = True
+
+        # Convert options into a dictionary so we can pass it to model_dump.
+        # Unfortunately, the info object has no routine for this inbuilt and
+        # the parameters that it holds also vary depending on the
+        # Python/pydantic version. Therefore we have to check which attributes
+        # exist.
+        options = {}
+
+        for key in ['mode', 'by_alias', 'exclude_unset', 'exclude_defaults',
+            'exclude_none', 'exclude_computed_fields', 'round_trip', 'serialize_as_any']:
+            if hasattr(info, key):
+                options[key] = getattr(info, key)
+
+        # Call model_dump, using the actual self object and all the options
+        # that are stored in info.
+        return self.model_dump(
+            **options,
+            context=context
+        )
 
     @model_validator(mode='wrap')
     @classmethod
