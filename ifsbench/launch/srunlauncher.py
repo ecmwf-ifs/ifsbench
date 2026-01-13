@@ -90,6 +90,8 @@ class SrunLauncher(Launcher):
         executable = 'srun'
         if env_pipeline is None:
             env_pipeline = DefaultEnvPipeline()
+        else:
+            env_pipeline = env_pipeline.copy(deep=True)
 
         flags = []
 
