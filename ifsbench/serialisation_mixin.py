@@ -171,17 +171,22 @@ class SubclassableSerialisationMixin(SerialisationMixin):
 
         context['recursive'] = True
 
+        # Convert options into a dictionary so we can pass it to model_dump.
+        # Unfortunately, the info object has no routine for this inbuilt and
+        # the parameters that it holds also vary depending on the
+        # Python/pydantic version. Therefore we have to check which attributes
+        # exist.
+        options = {}
+
+        for key in ['mode', 'by_alias', 'exclude_unset', 'exclude_defaults',
+            'exclude_none', 'exclude_computed_fields', 'round_trip', 'serialize_as_any']:
+            if hasattr(info, key):
+                options[key] = getattr(info, key)
+
         # Call model_dump, using the actual self object and all the options
         # that are stored in info.
         return self.model_dump(
-            mode=info.mode,
-            by_alias=info.by_alias,
-            exclude_unset=info.exclude_unset,
-            exclude_defaults=info.exclude_defaults,
-            exclude_none=info.exclude_none,
-            exclude_computed_fields=info.exclude_computed_fields,
-            round_trip=info.round_trip,
-            serialize_as_any=info.serialize_as_any,
+            **options,
             context=context
         )
 
