@@ -5,5 +5,5 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-from ifsbench.validation.frame_close_validation import * # noqa
-from ifsbench.validation.frame_util import * # noqa
+from ifsbench.validation.frame_close_validation import *  # noqa
+from ifsbench.validation.frame_util import *  # noqa
