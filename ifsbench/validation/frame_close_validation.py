@@ -121,7 +121,7 @@ def validate_result_identical(
             f"Result is of wrong type, expected {result_type}, found {type(result)}"
         )
 
-    with Path(reference_path).open("r", encoding="utf-8") as f:
+    with reference_path.open("r", encoding="utf-8") as f:
         reference_data = result_type.from_config(yaml.safe_load(f))
 
     info(f"Validating result type {result_type} against {reference_path}")

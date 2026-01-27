@@ -11,7 +11,10 @@ Some sanity tests for the :class:`FrameCloseValidation` implementation.
 
 import itertools
 
+
 import json
+from pathlib import Path
+
 from pandas import DataFrame, MultiIndex
 import pytest
 
@@ -158,7 +161,7 @@ def test_validate_result_from_result(tmp_path, test_frames):
         frames={"frame1": test_frames[0], "frame2": test_frames[1]}
     )
 
-    assert validate_result_identical(test_result, ref_path, TestResult) is True
+    assert validate_result_identical(test_result, Path(ref_path), TestResult) is True
 
 
 def test_validate_result_from_file(tmp_path, test_frames):
@@ -174,7 +177,7 @@ def test_validate_result_from_file(tmp_path, test_frames):
     with result_path.open("w") as f:
         json.dump(test_result.dump_config(), f)
 
-    validate_result_identical(result_path, ref_path, TestResult)
+    validate_result_identical(result_path, Path(ref_path), TestResult)
 
 
 def test_validate_result_from_result_wrongtype_fails(tmp_path, test_frames):
@@ -191,7 +194,7 @@ def test_validate_result_from_result_wrongtype_fails(tmp_path, test_frames):
     )
 
     with pytest.raises(RuntimeError) as exceptinfo:
-        validate_result_identical(test_result, ref_path, TestResult)
+        validate_result_identical(test_result, Path(ref_path), TestResult)
 
     assert "Result is of wrong type, expected" in str(exceptinfo.value)
     assert "found" in str(exceptinfo.value)
@@ -209,4 +212,4 @@ def test_validate_result_mismatch(tmp_path, test_frames):
         frames={"frame1": test_frames[0], "frame2": mismatched_frame}
     )
 
-    assert validate_result_identical(test_result, ref_path, TestResult) is False
+    assert validate_result_identical(test_result, Path(ref_path), TestResult) is False
