@@ -6,3 +6,4 @@
 # nor does it submit to any jurisdiction.
 
 from ifsbench.results.ensemble_stats import * # noqa
+from ifsbench.results.result_format import * # noqa

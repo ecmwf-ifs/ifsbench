@@ -5,9 +5,10 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-__all__ = ['get_float_columns', 'get_int_columns']
+__all__ = ["get_float_columns", "get_int_columns"]
 
 from pandas import DataFrame
+
 
 def get_float_columns(frame: DataFrame) -> DataFrame:
     """
@@ -28,10 +29,11 @@ def get_float_columns(frame: DataFrame) -> DataFrame:
     # Gather the column keys that correspond to float values.
     column_keys = []
     for key, value in frame.dtypes.items():
-        if 'float' in str(value):
+        if "float" in str(value):
             column_keys.append(key)
 
     return frame[column_keys]
+
 
 def get_int_columns(frame: DataFrame) -> DataFrame:
     """
@@ -52,7 +54,7 @@ def get_int_columns(frame: DataFrame) -> DataFrame:
     # Gather the column keys that correspond to int values.
     column_keys = []
     for key, value in frame.dtypes.items():
-        if 'int' in str(value):
+        if "int" in str(value):
             column_keys.append(key)
 
     return frame[column_keys]
