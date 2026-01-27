@@ -14,7 +14,7 @@ from pandas import DataFrame
 import yaml
 
 from ifsbench.logging import debug, error, info
-from ifsbench.serialisation_mixin import SerialisationMixin
+from ifsbench.results import ResultData
 from ifsbench.validation.frame_util import get_float_columns
 
 
@@ -81,12 +81,34 @@ class FrameCloseValidation:
 
 
 def validate_result_identical(
-    result: Union[str, Path, SerialisationMixin],
-    reference_path: str,
-    result_type: Type[SerialisationMixin],
+    result: Union[str, Path, ResultData],
+    reference_path: Path,
+    result_type: Type[ResultData],
     atol: float = 0,
     rtol: float = 0,
 ) -> bool:
+    """
+    Compare result to reference to check if they are within specified tolerances.
+
+    Parameters
+    ----------
+    result: str or path to file holding result, or ifsbench.results.ResultData
+      The result data to compare.
+    reference_path: pathlib.Path
+      The reference data file to which to compare the result.
+    result_type: Type[ResultData]
+      The specific class of ResultData used to read the reference data
+    atol: float
+      The absolute tolerance when comparing data values.
+    rtol: float
+      The relative tolerance when comparing data values.
+
+    Returns
+    -------
+    bool:
+      Whether or not the two frames are equal up to the given tolerances.
+    """
+
     validator = FrameCloseValidation(atol, rtol)
 
     if isinstance(result, (str, Path)):

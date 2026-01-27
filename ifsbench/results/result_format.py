@@ -5,7 +5,7 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-from typing import Dict
+from typing import Dict, Optional
 
 from ifsbench import PydanticDataFrame
 from ifsbench.serialisation_mixin import SerialisationMixin
@@ -29,10 +29,10 @@ class ResultInfo(ResultData):
     """
 
     #: Standard out of the run.
-    stdout: str = None
+    stdout: Optional[str] = None
 
     #: Standard error of the run.
-    stderr: str = None
+    stderr: Optional[str] = None
 
     #: Walltime of the run in seconds.
-    walltime: float = None
+    walltime: Optional[float] = None
