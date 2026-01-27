@@ -19,7 +19,7 @@ class ResultData(SerialisationMixin):
     """
 
     #: Numerical results of the run, stored as DataFrames (with corresponding
-    #: file name).
+    #: keys).
     frames: Dict[str, PydanticDataFrame]
 
 
