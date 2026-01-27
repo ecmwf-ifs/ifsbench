@@ -23,7 +23,6 @@ class MpirunLauncher(Launcher):
         'tasks': '-n {}',
         'tasks_per_node': '--npernode {}',
         'tasks_per_socket': '--npersocket {}',
-        'cpus_per_task': '--cpus-per-proc {}',
     }
 
     _bind_options_map = {
@@ -44,6 +43,7 @@ class MpirunLauncher(Launcher):
         do_nothing = [
             CpuDistribution.DISTRIBUTE_DEFAULT,
             CpuDistribution.DISTRIBUTE_USER,
+            None
         ]
         if (
             hasattr(job, 'distribute_remote')
@@ -51,10 +51,24 @@ class MpirunLauncher(Launcher):
         ):
             warning('Specified remote distribution option ignored in MpirunLauncher')
 
-        if job.distribute_local is None or job.distribute_local in do_nothing:
+        # By default use core mapping. At least that's the default in the
+        # OpenMPI implementation
+        # (https://docs.open-mpi.org/en/main/man-openmpi/man1/mpirun.1.html#label-schizo-ompi-map-by).
+        map_by = 'core'
+
+        if job.distribute_local and job.distribute_local not in do_nothing:
+            map_by = self._distribution_options_map[job.distribute_local]
+        elif job.cpus_per_task is None:
+            # If no local distribution must be set and the number of threads
+            # isn't specified, we don't have to add any flags.
             return []
 
-        return ['--map-by', f'{self._distribution_options_map[job.distribute_local]}']
+        # If multithreading is used, we have to specify the number of threads
+        # per process in the map_by statement.
+        if job.cpus_per_task:
+            return ['--map-by', f'{map_by}:PE={job.cpus_per_task}']
+
+        return ['--map-by', f'{map_by}']
 
     def prepare(
         self,
