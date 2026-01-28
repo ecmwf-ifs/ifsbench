@@ -17,7 +17,7 @@ requires-python = ">=3.8"
 license = {text = "Apache-2.0"}
 dynamic = ["version", "readme"]
 dependencies = [
-  "pandas >= 1.4.0,<3.0.0",   # essential for benchmarking data
+  "pandas >= 1.4.0",   # essential for benchmarking data
   "pyyaml",   # essential for file handling
   "pydantic", # essential for typing and configs
   "click",    # essential for CLI scripts
