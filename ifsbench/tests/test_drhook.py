@@ -15,7 +15,7 @@ import pytest
 from ifsbench import DrHookRecord
 
 def get_data(df, routine, metric):
-    return df.loc[df['routine'] == routine][metric][0]
+    return (df.loc[df['routine'] == routine][metric]).iloc[0]
 
 def get_metadata(df, metric):
     return df.loc[0][metric]
