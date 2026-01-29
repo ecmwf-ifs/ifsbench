@@ -6,5 +6,8 @@
 # nor does it submit to any jurisdiction.
 
 from ifsbench.launch.launcher import * # noqa
+from ifsbench.launch.bashlauncher import * # noqa
+from ifsbench.launch.directlauncher import * # noqa
+from ifsbench.launch.ddtlauncher import * # noqa
 from ifsbench.launch.mpirunlauncher import * # noqa
 from ifsbench.launch.srunlauncher import * # noqa
