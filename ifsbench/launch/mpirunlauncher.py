@@ -20,22 +20,22 @@ class MpirunLauncher(Launcher):
     """
 
     _job_options_map = {
-        'tasks': '-n {}',
-        'tasks_per_node': '--npernode {}',
-        'tasks_per_socket': '--npersocket {}',
+        "tasks": "-n {}",
+        "tasks_per_node": "--npernode {}",
+        "tasks_per_socket": "--npersocket {}",
     }
 
     _bind_options_map = {
-        CpuBinding.BIND_NONE: ['--bind-to', 'none'],
-        CpuBinding.BIND_SOCKETS: ['--bind-to', 'socket'],
-        CpuBinding.BIND_CORES: ['--bind-to', 'core'],
-        CpuBinding.BIND_THREADS: ['--bind-to', 'hwthread'],
+        CpuBinding.BIND_NONE: ["--bind-to", "none"],
+        CpuBinding.BIND_SOCKETS: ["--bind-to", "socket"],
+        CpuBinding.BIND_CORES: ["--bind-to", "core"],
+        CpuBinding.BIND_THREADS: ["--bind-to", "hwthread"],
         CpuBinding.BIND_USER: [],
     }
 
     _distribution_options_map = {
-        CpuDistribution.DISTRIBUTE_BLOCK: 'core',
-        CpuDistribution.DISTRIBUTE_CYCLIC: 'numa',
+        CpuDistribution.DISTRIBUTE_BLOCK: "core",
+        CpuDistribution.DISTRIBUTE_CYCLIC: "numa",
     }
 
     def _get_distribution_options(self, job: Job) -> List[str]:
@@ -43,18 +43,18 @@ class MpirunLauncher(Launcher):
         do_nothing = [
             CpuDistribution.DISTRIBUTE_DEFAULT,
             CpuDistribution.DISTRIBUTE_USER,
-            None
+            None,
         ]
         if (
-            hasattr(job, 'distribute_remote')
+            hasattr(job, "distribute_remote")
             and job.distribute_remote not in do_nothing
         ):
-            warning('Specified remote distribution option ignored in MpirunLauncher')
+            warning("Specified remote distribution option ignored in MpirunLauncher")
 
         # By default use core mapping. At least that's the default in the
         # OpenMPI implementation
         # (https://docs.open-mpi.org/en/main/man-openmpi/man1/mpirun.1.html#label-schizo-ompi-map-by).
-        map_by = 'core'
+        map_by = "core"
 
         if job.distribute_local and job.distribute_local not in do_nothing:
             map_by = self._distribution_options_map[job.distribute_local]
@@ -66,9 +66,9 @@ class MpirunLauncher(Launcher):
         # If multithreading is used, we have to specify the number of threads
         # per process in the map_by statement.
         if job.cpus_per_task:
-            return ['--map-by', f'{map_by}:PE={job.cpus_per_task}']
+            return ["--map-by", f"{map_by}:PE={job.cpus_per_task}"]
 
-        return ['--map-by', f'{map_by}']
+        return ["--map-by", f"{map_by}"]
 
     def prepare(
         self,
@@ -79,7 +79,7 @@ class MpirunLauncher(Launcher):
         env_pipeline: Optional[EnvPipeline] = None,
         custom_flags: Optional[List[str]] = None,
     ) -> LaunchData:
-        executable = 'mpirun'
+        executable = "mpirun"
         if env_pipeline is None:
             env_pipeline = DefaultEnvPipeline()
         else:
@@ -108,7 +108,7 @@ class MpirunLauncher(Launcher):
             for path in library_paths:
                 env_pipeline.add(
                     EnvHandler(
-                        mode=EnvOperation.APPEND, key='LD_LIBRARY_PATH', value=str(path)
+                        mode=EnvOperation.APPEND, key="LD_LIBRARY_PATH", value=str(path)
                     )
                 )
 
@@ -116,11 +116,13 @@ class MpirunLauncher(Launcher):
             # We automatically set OMP_NUM_THREADS here. This may not be
             # necessary for each application (as not all application may use
             # OpenMP-based multithreading.
-            env_pipeline.add(EnvHandler(
-                mode=EnvOperation.APPEND,
-                key='OMP_NUM_THREADS',
-                value=str(job.cpus_per_task)
-            ))
+            env_pipeline.add(
+                EnvHandler(
+                    mode=EnvOperation.APPEND,
+                    key="OMP_NUM_THREADS",
+                    value=str(job.cpus_per_task),
+                )
+            )
 
         flags += cmd
 
