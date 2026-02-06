@@ -13,8 +13,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
+from pydantic import SerializeAsAny
+
 from ifsbench.serialisation_mixin import (
-    SerialisationMixin,
     SubclassableSerialisationMixin,
 )
 from ifsbench.env import EnvPipeline
@@ -74,6 +75,9 @@ class Launcher(SubclassableSerialisationMixin):
     Subclasses must implement the prepare function.
     """
 
+    # command line flags to pass to the laucher
+    flags: List["str"] = []
+
     @abstractmethod
     def prepare(
         self,
@@ -113,6 +117,9 @@ class Launcher(SubclassableSerialisationMixin):
 
 class LauncherWrapper(SubclassableSerialisationMixin):
 
+    # command line flags to pass to the laucher
+    flags: List["str"] = []
+
     @abstractmethod
     def wrap(
         self,
@@ -121,7 +128,6 @@ class LauncherWrapper(SubclassableSerialisationMixin):
         cmd: List[str],
         library_paths: Optional[List[str]] = None,
         env_pipeline: Optional[EnvPipeline] = None,
-        custom_flags: Optional[List[str]] = None,
     ) -> LaunchData:
         """
         Wrap a Launch with additional features.
@@ -145,14 +151,14 @@ class LauncherWrapper(SubclassableSerialisationMixin):
         return NotImplemented
 
 
-class CompositeLauncher(SerialisationMixin):
+class CompositeLauncher(Launcher):
     """
     Abstract base class for launching parallel jobs.
     Subclasses must implement the prepare function.
     """
 
-    base_launcher: Launcher
-    wrappers: List[LauncherWrapper] = []
+    base_launcher: SerializeAsAny[Launcher]
+    wrappers: List[SerializeAsAny[LauncherWrapper]] = []
 
     def prepare(
         self,
@@ -188,11 +194,9 @@ class CompositeLauncher(SerialisationMixin):
         LaunchData
         """
         launch_data = self.base_launcher.prepare(
-            run_dir, job, cmd, library_paths, env_pipeline, custom_flags
+            run_dir, job, cmd, library_paths, env_pipeline, self.flags
         )
         for wrapper in self.wrappers:
-            launch_data = wrapper.wrap(
-                launch_data, cmd, library_paths, env_pipeline, custom_flags
-            )
+            launch_data = wrapper.wrap(launch_data, cmd, library_paths, env_pipeline)
 
         return launch_data

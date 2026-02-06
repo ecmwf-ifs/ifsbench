@@ -39,7 +39,6 @@ class BashLauncher(LauncherWrapper):
         cmd: List[str],
         library_paths: Optional[List[str]] = None,
         env_pipeline: Optional[EnvPipeline] = None,
-        custom_flags: Optional[List[str]] = None,
     ) -> LaunchData:
 
         launch_data = deepcopy(launch_data)

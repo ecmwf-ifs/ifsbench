@@ -49,6 +49,8 @@ class DirectLauncher(Launcher):
         else:
             full_cmd = []
 
+        full_cmd += self.flags
+
         if custom_flags:
             full_cmd += custom_flags
 

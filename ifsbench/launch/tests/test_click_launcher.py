@@ -6,7 +6,7 @@
 # nor does it submit to any jurisdiction.
 
 """
-Some sanity tests for :any:`Arch` implementations
+Some sanity tests for :any:`Launcher` implementations
 """
 
 from pathlib import Path

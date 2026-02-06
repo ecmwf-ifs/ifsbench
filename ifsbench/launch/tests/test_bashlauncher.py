@@ -66,7 +66,10 @@ def test_bashlauncher_run_dir(
 
     env_pipeline = request.getfixturevalue(env_pipeline_name)
 
-    launcher = BashLauncher(enabled=True)
+    if custom_flags:
+        launcher = BashLauncher(flags=custom_flags)
+    else:
+        launcher = BashLauncher()
     base_launch_data = base_launcher.prepare(
         run_dir=tmp_path,
         job=job,
@@ -82,7 +85,6 @@ def test_bashlauncher_run_dir(
         cmd=cmd,
         library_paths=library_paths,
         env_pipeline=env_pipeline,
-        custom_flags=custom_flags,
     )
 
     assert result.run_dir == result.run_dir
@@ -118,7 +120,10 @@ def test_bashlauncher_env(
 
     env_pipeline = request.getfixturevalue(env_pipeline_name)
 
-    launcher = BashLauncher(enabled=True)
+    if custom_flags:
+        launcher = BashLauncher(flags=custom_flags)
+    else:
+        launcher = BashLauncher()
     base_launch_data = base_launcher.prepare(
         run_dir=tmp_path,
         job=job,
@@ -134,7 +139,6 @@ def test_bashlauncher_env(
         cmd=cmd,
         library_paths=library_paths,
         env_pipeline=env_pipeline,
-        custom_flags=custom_flags,
     )
 
     # pylint: disable=C1803
@@ -166,7 +170,10 @@ def test_bashlauncher_cmd(
 
     env_pipeline = request.getfixturevalue(env_pipeline_name)
 
-    launcher = BashLauncher(enabled=True)
+    if custom_flags:
+        launcher = BashLauncher(flags=custom_flags)
+    else:
+        launcher = BashLauncher()
     base_launch_data = base_launcher.prepare(
         run_dir=tmp_path,
         job=job,
@@ -182,7 +189,6 @@ def test_bashlauncher_cmd(
         cmd=cmd,
         library_paths=library_paths,
         env_pipeline=env_pipeline,
-        custom_flags=custom_flags,
     )
 
     # The command is expected to be /bin/bash script_path.
@@ -225,7 +231,11 @@ def test_bashlauncher_script(
 
     env_pipeline = request.getfixturevalue(env_pipeline_name)
 
-    launcher = BashLauncher(enabled=True)
+    if custom_flags:
+        launcher = BashLauncher(flags=custom_flags)
+    else:
+        launcher = BashLauncher()
+
     base_launch_data = base_launcher.prepare(
         run_dir=tmp_path,
         job=job,
@@ -241,7 +251,6 @@ def test_bashlauncher_script(
         cmd=cmd,
         library_paths=library_paths,
         env_pipeline=env_pipeline,
-        custom_flags=custom_flags,
     )
 
     script_path = Path(result.cmd[1])

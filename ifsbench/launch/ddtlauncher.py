@@ -26,14 +26,10 @@ class DDTLauncher(LauncherWrapper):
         cmd: List[str],
         library_paths: Optional[List[str]] = None,
         env_pipeline: Optional[EnvPipeline] = None,
-        custom_flags: Optional[List[str]] = None,
     ) -> LaunchData:
-
-        if custom_flags is None:
-            custom_flags = []
 
         launch_data = deepcopy(launch_data)
         # Prepend the launch command with ddt and all ddt flags.
-        launch_data.cmd = ["ddt"] + custom_flags + ["--"] + launch_data.cmd
+        launch_data.cmd = ["ddt"] + self.flags + ["--"] + launch_data.cmd
 
         return launch_data

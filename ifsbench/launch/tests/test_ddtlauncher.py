@@ -42,7 +42,7 @@ def fixture_test_env_none():
 @pytest.mark.parametrize("job", [Job(tasks=64), Job()])
 @pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
 @pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
+@pytest.mark.parametrize("custom_flags", [[], ["--cuda"]])
 @pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
 @pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
 def test_ddtlauncher_run_dir(
@@ -63,7 +63,7 @@ def test_ddtlauncher_run_dir(
 
     env_pipeline = request.getfixturevalue(env_pipeline_name)
 
-    launcher = DDTLauncher(enabled=True)
+    launcher = DDTLauncher(flags=custom_flags)
     base_launch_data = base_launcher.prepare(
         run_dir=tmp_path,
         job=job,
@@ -79,7 +79,6 @@ def test_ddtlauncher_run_dir(
         cmd=cmd,
         library_paths=library_paths,
         env_pipeline=env_pipeline,
-        custom_flags=custom_flags,
     )
 
     assert result.run_dir == base_launch_data.run_dir
@@ -89,7 +88,7 @@ def test_ddtlauncher_run_dir(
 @pytest.mark.parametrize("job", [Job(tasks=64), Job()])
 @pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
 @pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
+@pytest.mark.parametrize("custom_flags", [[], ["--cuda"]])
 @pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
 @pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
 def test_ddtlauncher_env(
@@ -110,7 +109,7 @@ def test_ddtlauncher_env(
 
     env_pipeline = request.getfixturevalue(env_pipeline_name)
 
-    launcher = DDTLauncher(enabled=True)
+    launcher = DDTLauncher(flags=custom_flags)
     base_launch_data = base_launcher.prepare(
         run_dir=tmp_path,
         job=job,
@@ -126,7 +125,6 @@ def test_ddtlauncher_env(
         cmd=cmd,
         library_paths=library_paths,
         env_pipeline=env_pipeline,
-        custom_flags=custom_flags,
     )
 
     assert result.env == base_launch_data.env
@@ -136,7 +134,7 @@ def test_ddtlauncher_env(
 @pytest.mark.parametrize("job", [Job(tasks=64), Job()])
 @pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
 @pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
+@pytest.mark.parametrize("custom_flags", [[], ["--cuda"]])
 @pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
 @pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
 def test_ddtlauncher_cmd(
@@ -157,7 +155,10 @@ def test_ddtlauncher_cmd(
 
     env_pipeline = request.getfixturevalue(env_pipeline_name)
 
-    launcher = DDTLauncher(enabled=True)
+    if custom_flags:
+        launcher = DDTLauncher(flags=custom_flags)
+    else:
+        launcher = DDTLauncher()
     base_launch_data = base_launcher.prepare(
         run_dir=tmp_path,
         job=job,
@@ -173,7 +174,6 @@ def test_ddtlauncher_cmd(
         cmd=cmd,
         library_paths=library_paths,
         env_pipeline=env_pipeline,
-        custom_flags=custom_flags,
     )
 
     if custom_flags is None:
