@@ -22,42 +22,48 @@ from ifsbench import (
 )
 
 
-@pytest.fixture(name='test_env')
+@pytest.fixture(name="test_env")
 def fixture_test_env():
     return DefaultEnvPipeline(
         handlers=[
-            EnvHandler(mode=EnvOperation.SET, key='SOME_VALUE', value='5'),
-            EnvHandler(mode=EnvOperation.SET, key='OTHER_VALUE', value='6'),
-            EnvHandler(mode=EnvOperation.DELETE, key='SOME_VALUE'),
+            EnvHandler(mode=EnvOperation.SET, key="SOME_VALUE", value="5"),
+            EnvHandler(mode=EnvOperation.SET, key="OTHER_VALUE", value="6"),
+            EnvHandler(mode=EnvOperation.DELETE, key="SOME_VALUE"),
         ]
     )
 
 
-@pytest.fixture(name='test_env_none')
+@pytest.fixture(name="test_env_none")
 def fixture_test_env_none():
     return None
 
 
 @pytest.mark.parametrize(
-    'cmd,job_in,library_paths,env_pipeline_name,custom_flags,env_out',
+    "cmd,job_in,library_paths,env_pipeline_name,custom_flags,env_out",
     [
-        (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], 'test_env_none',
-            [], {'OMP_NUM_THREADS': '4'}),
         (
-            ['something'],
-            {},
-            ['/library/path', '/more/paths'],
-            'test_env_none',
+            ["ls", "-l"],
+            {"tasks": 64, "cpus_per_task": 4},
             [],
-            {'LD_LIBRARY_PATH': '/library/path:/more/paths'},
+            "test_env_none",
+            [],
+            {"OMP_NUM_THREADS": "4"},
         ),
         (
-            ['whatever'],
-            {'nodes': 12},
-            ['/library/path'],
-            'test_env',
+            ["something"],
+            {},
+            ["/library/path", "/more/paths"],
+            "test_env_none",
             [],
-            {'LD_LIBRARY_PATH': '/library/path', 'OTHER_VALUE': '6'},
+            {"LD_LIBRARY_PATH": "/library/path:/more/paths"},
+        ),
+        (
+            ["whatever"],
+            {"nodes": 12},
+            ["/library/path"],
+            "test_env",
+            [],
+            {"LD_LIBRARY_PATH": "/library/path", "OTHER_VALUE": "6"},
         ),
     ],
 )
@@ -87,11 +93,11 @@ def test_mpirunLauncher_prepare_env(
 
 
 @pytest.mark.parametrize(
-    'cmd,job_in,library_paths,env_pipeline_name,custom_flags',
+    "cmd,job_in,library_paths,env_pipeline_name,custom_flags",
     [
-        (['ls', '-l'], {'tasks': 64, 'cpus_per_task': 4}, [], 'test_env_none', []),
-        (['something'], {}, ['/library/path', '/more/paths'], 'test_env_none', []),
-        (['whatever'], {'nodes': 12}, ['/library/path'], 'test_env', []),
+        (["ls", "-l"], {"tasks": 64, "cpus_per_task": 4}, [], "test_env_none", []),
+        (["something"], {}, ["/library/path", "/more/paths"], "test_env_none", []),
+        (["whatever"], {"nodes": 12}, ["/library/path"], "test_env", []),
     ],
 )
 def test_mpirunLauncher_prepare_run_dir(
@@ -113,54 +119,54 @@ def test_mpirunLauncher_prepare_run_dir(
 
 
 @pytest.mark.parametrize(
-    'cmd,job_in,library_paths,env_pipeline_name,custom_flags, cmd_out',
+    "cmd,job_in,library_paths,env_pipeline_name,custom_flags, cmd_out",
     [
         (
-            ['ls', '-l'],
-            {'tasks': 64, 'cpus_per_task': 4},
+            ["ls", "-l"],
+            {"tasks": 64, "cpus_per_task": 4},
             [],
-            'test_env_none',
+            "test_env_none",
             [],
-            ['mpirun', '-n', '64', '--map-by', 'core:PE=4', 'ls', '-l'],
+            ["mpirun", "-n", "64", "--map-by", "core:PE=4", "ls", "-l"],
         ),
         (
-            ['something'],
+            ["something"],
             {},
-            ['/library/path', '/more/paths'],
-            'test_env_none',
-            ['--some-more'],
-            ['mpirun', '--some-more', 'something'],
+            ["/library/path", "/more/paths"],
+            "test_env_none",
+            ["--some-more"],
+            ["mpirun", "--some-more", "something"],
         ),
         (
-            ['whatever'],
-            {'nodes': 12, 'gpus_per_task': 2},
-            ['/library/path'],
-            'test_env',
+            ["whatever"],
+            {"nodes": 12, "gpus_per_task": 2},
+            ["/library/path"],
+            "test_env",
             [],
-            ['mpirun', 'whatever'],
+            ["mpirun", "whatever"],
         ),
         (
-            ['bind_hell'],
+            ["bind_hell"],
             {
-                'bind': CpuBinding.BIND_THREADS,
-                'distribute_local': CpuDistribution.DISTRIBUTE_CYCLIC,
+                "bind": CpuBinding.BIND_THREADS,
+                "distribute_local": CpuDistribution.DISTRIBUTE_CYCLIC,
             },
-            ['/library/path'],
-            'test_env',
+            ["/library/path"],
+            "test_env",
             [],
-            ['mpirun', '--bind-to', 'hwthread', '--map-by', 'numa', 'bind_hell'],
+            ["mpirun", "--bind-to", "hwthread", "--map-by", "numa", "bind_hell"],
         ),
         (
-            ['bind_hell'],
+            ["bind_hell"],
             {
-                'cpus_per_task': 2,
-                'bind': CpuBinding.BIND_THREADS,
-                'distribute_local': CpuDistribution.DISTRIBUTE_CYCLIC,
+                "cpus_per_task": 2,
+                "bind": CpuBinding.BIND_THREADS,
+                "distribute_local": CpuDistribution.DISTRIBUTE_CYCLIC,
             },
-            ['/library/path'],
-            'test_env',
+            ["/library/path"],
+            "test_env",
             [],
-            ['mpirun', '--bind-to', 'hwthread', '--map-by', 'numa:PE=2', 'bind_hell'],
+            ["mpirun", "--bind-to", "hwthread", "--map-by", "numa:PE=2", "bind_hell"],
         ),
     ],
 )
