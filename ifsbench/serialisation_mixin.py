@@ -47,7 +47,8 @@ class SerialisationMixin(BaseModel, use_enum_values=True, validate_assignment=Tr
         Returns:
             class instance
         """
-        return cls(**config)
+        adapter = TypeAdapter(cls)
+        return adapter.validate_python(config)
 
     def dump_config(
         self, with_class: bool = False

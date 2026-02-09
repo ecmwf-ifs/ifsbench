@@ -10,21 +10,16 @@ click-based decorators for specifying launchers + launcher flags.
 """
 
 from functools import wraps
+from pathlib import Path
 from typing import List, Optional, Tuple
+import yaml
 
 import click
 
 from ifsbench.arch import Arch
 from ifsbench.launch import (
-    BashLauncher,
-    CompositeLauncher,
-    DirectLauncher,
-    DDTLauncher,
     Launcher,
-    MpirunLauncher,
-    SrunLauncher,
 )
-from ifsbench.logging import warning
 from ifsbench.serialisation_mixin import SerialisationMixin
 
 
@@ -39,29 +34,10 @@ class LauncherBuilder(SerialisationMixin):
     """
 
     #: Whether the srun launcher is used.
-    launcher_srun: bool = False
-
-    #: Whether the mpirun launcher is used.
-    launcher_mpirun: bool = False
-
-    #: The executable that is used in the direct launcher (direct launcher
-    # isn't used if value is None).
-    launcher_direct: Optional[str] = None
-
-    #: Whether the DDT debugger is used.
-    debug_ddt: bool = False
-
-    #: Additional launcher flags that should be passed to the debug launcher.
-    debug_launcher_flags: List[str] = []
+    launcher_config: Optional[str] = None
 
     #: Additional launcher flags that should be used.
-    add_launcher_flags: List[str] = []
-
-    #: Launcher flags that should replace the flags used by `launcher`.
-    launcher_flags: Optional[List[str]] = None
-
-    #: Whether the whole launch command is put into a bash file.
-    bash: bool = False
+    launcher_flags: List[str] = []
 
     def build_from_arch(
         self, arch: Optional[Arch] = None
@@ -85,50 +61,19 @@ class LauncherBuilder(SerialisationMixin):
         Build a launcher using a given default launcher and default flags.
         """
 
-        if default_launcher_flags is None:
-            default_launcher_flags = []
+        if self.launcher_config:
 
-        base_launcher = default_launcher
+            with Path(self.launcher_config).open("r", encoding="utf-8") as f:
+                loaded_yaml = yaml.safe_load(f)
+            launcher = Launcher.from_config(loaded_yaml)
+            launcher.flags += self.launcher_flags
+            return launcher, launcher.flags
 
-        if self.launcher_srun:
-            base_launcher = SrunLauncher()
-        if self.launcher_mpirun:
-            base_launcher = MpirunLauncher()
-        if self.launcher_direct is not None:
-            if self.launcher_direct:
-                base_launcher = DirectLauncher(executable=self.launcher_direct)
-            else:
-                base_launcher = DirectLauncher()
-
-        if [
-            self.launcher_srun,
-            self.launcher_mpirun,
-            self.launcher_direct is not None,
-        ].count(True) > 1:
-            warning(
-                f"More than one launcher was activated on the command line! {type(base_launcher)} will be used!"
-            )
-
-        if base_launcher is None:
-            return None, []
-
-        launcher_flags = default_launcher_flags + self.add_launcher_flags
-        if self.launcher_flags is not None:
-            launcher_flags = list(self.launcher_flags)
-
-        # wrappers added in order they should be applied, later ones wrap around the output of earlier ones.
-        wrappers = []
-
-        if self.debug_ddt:
-            wrappers.append(DDTLauncher())
-            launcher_flags = self.debug_launcher_flags
-
-        if self.bash:
-            wrappers.append(BashLauncher())
-            launcher_flags = []
-
-        launcher = CompositeLauncher(base_launcher=base_launcher, wrappers=wrappers)
-        return launcher, launcher_flags
+        if default_launcher:
+            if not default_launcher_flags:
+                default_launcher_flags = []
+            default_launcher.flags += default_launcher_flags + self.launcher_flags
+        return default_launcher, default_launcher_flags + self.launcher_flags
 
 
 def launcher_options(func):
@@ -137,8 +82,7 @@ def launcher_options(func):
 
     Addd a couple of flags to
         * specify different launchers
-        * use different debug launchers
-        * add/replace launcher flags
+        * add launcher flags
 
     This decorator passes the different options as a `LauncherBuilder` object
     to the click.command-decorated function using the `launcher_builder`
@@ -146,58 +90,27 @@ def launcher_options(func):
     """
 
     @click.option(
-        "--launcher-mpirun", is_flag=True, help="Use the default mpirun launcher"
-    )
-    @click.option("--launcher-srun", is_flag=True, help="Use the default srun Launcher")
-    @click.option(
-        "--launcher-direct",
+        "--launcher-config",
         type=str,
         default=None,
-        help="Use the given executable to launch",
-    )
-    @click.option("--debug-ddt", is_flag=True, help="Use the DDTLauncher debugger")
-    @click.option("--bash", is_flag=True, help="Write all launches as bash scripts")
-    @click.option(
-        "--replace-launcher-flags/--add-launcher-flags",
-        "replace",
-        default=False,
-        help="Whether launcher-flags replaces or adds to existing flags (default: add)",
+        help="yaml file containing launcher configuration",
     )
     @click.option(
         "--launcher-flags",
+        "-f",
         default=[],
         multiple=True,
         type=str,
-        help="Replace the base launcher flags by these flags",
-    )
-    @click.option(
-        "--debug-launcher-flags",
-        default=[],
-        multiple=True,
-        type=str,
-        help="Add additional flags to debug launchers",
+        help="Additional launcher flags",
     )
     @click.pass_context
     @wraps(func)
     def process_launcher(ctx, *args, **kwargs):
         builder = LauncherBuilder()
 
-        builder.launcher_mpirun = kwargs.pop("launcher_mpirun")
-        builder.launcher_srun = kwargs.pop("launcher_srun")
-        builder.launcher_direct = kwargs.pop("launcher_direct")
+        builder.launcher_config = kwargs.pop("launcher_config")
 
-        builder.debug_ddt = kwargs.pop("debug_ddt")
-
-        launcher_flags = kwargs.pop("launcher_flags")
-        replace = kwargs.pop("replace")
-        if replace:
-            builder.launcher_flags = launcher_flags
-        else:
-            builder.add_launcher_flags = launcher_flags
-
-        builder.debug_launcher_flags = kwargs.pop("debug_launcher_flags")
-
-        builder.bash = kwargs.pop("bash")
+        builder.launcher_flags = kwargs.pop("launcher_flags")
 
         return ctx.invoke(func, *args, **kwargs, launcher_builder=builder)
 

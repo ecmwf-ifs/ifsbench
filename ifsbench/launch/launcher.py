@@ -153,11 +153,13 @@ class LauncherWrapper(SubclassableSerialisationMixin):
 
 class CompositeLauncher(Launcher):
     """
-    Abstract base class for launching parallel jobs.
-    Subclasses must implement the prepare function.
+    Launcher implementation that allows adding different features to a base launcher.
     """
 
+    # The launcher that provides the basic launch command.
     base_launcher: SerializeAsAny[Launcher]
+    # Additional features that are added to the basic launch command.
+    # Execution is in the order they are specified.
     wrappers: List[SerializeAsAny[LauncherWrapper]] = []
 
     def prepare(
@@ -186,7 +188,7 @@ class CompositeLauncher(Launcher):
         env_pipeline: EnvPipeline
             Pipeline for modifying environment variables.
         custom_flags: list[str]
-            Additional flags that are added to the launcher command.
+            Additional flags that are added to the base launcher command.
 
         Returns
         -------

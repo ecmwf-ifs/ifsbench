@@ -9,8 +9,6 @@
 Some sanity tests for :any:`Launcher` implementations
 """
 
-from pathlib import Path
-
 import click
 from click.testing import CliRunner
 import pytest
@@ -28,8 +26,8 @@ from ifsbench import (
 )
 
 
-def cli_test(cmd_flags):
-    yaml_path = Path("result.yaml")
+def cli_test(tmp_path, cmd_flags):
+    yaml_path = tmp_path / "result.yaml"
 
     @click.command("click_test")
     @launcher_options
@@ -63,100 +61,168 @@ def cli_test(cmd_flags):
             [],
             SrunLauncher(),
             [],
-            CompositeLauncher(
-                base_launcher=SrunLauncher(),
-                wrappers=[],
-            ),
-            [],
-        ),
-        (
-            ["--debug-ddt"],
             SrunLauncher(),
             [],
-            CompositeLauncher(
-                base_launcher=SrunLauncher(),
-                wrappers=[DDTLauncher()],
-            ),
-            [],
         ),
         (
-            ["--launcher-direct", ""],
-            SrunLauncher(),
-            [],
-            CompositeLauncher(
-                base_launcher=DirectLauncher(),
-                wrappers=[],
-            ),
-            [],
-        ),
-        (
-            ["--launcher-direct", "mpirun"],
-            SrunLauncher(),
-            [],
-            CompositeLauncher(
-                base_launcher=DirectLauncher(executable="mpirun"),
-                wrappers=[],
-            ),
-            [],
-        ),
-        (
-            ["--launcher-direct", "mpirun", "--bash"],
-            SrunLauncher(),
-            [],
-            CompositeLauncher(
-                base_launcher=DirectLauncher(executable="mpirun"),
-                wrappers=[BashLauncher()],
-            ),
-            [],
-        ),
-        (["--debug-ddt", "--bash"], None, ["--flag"], None, []),
-        (
-            ["--debug-ddt", "--bash", "--launcher-flags", "--flag"],
+            ["--launcher-flags", "--flagA", "-f", "--flagB"],
             MpirunLauncher(),
             [],
-            CompositeLauncher(
-                base_launcher=MpirunLauncher(),
-                wrappers=[DDTLauncher(), BashLauncher()],
-            ),
-            [],
+            MpirunLauncher(flags=["--flagA", "--flagB"]),
+            ["--flagA", "--flagB"],
         ),
         (
-            ["--launcher-mpirun", "--replace-launcher-flags"],
-            SrunLauncher(),
-            ["--something"],
-            CompositeLauncher(
-                base_launcher=MpirunLauncher(),
-                wrappers=[],
+            [
+                "--launcher-flags",
+                "--flagA",
+                "-f",
+                "--flagB",
+            ],
+            DirectLauncher(executable="mpirun"),
+            ["--default_flagA", "--default_flagB"],
+            DirectLauncher(
+                executable="mpirun",
+                flags=["--default_flagA", "--default_flagB", "--flagA", "--flagB"],
             ),
-            [],
-        ),
-        (
-            ["--launcher-mpirun", "--add-launcher-flags"],
-            SrunLauncher(),
-            ["--something"],
-            CompositeLauncher(
-                base_launcher=MpirunLauncher(),
-                wrappers=[],
-            ),
-            ["--something"],
-        ),
-        (
-            ["--debug-launcher-flags", "--ddt-option=5"],
-            SrunLauncher(),
-            [],
-            CompositeLauncher(
-                base_launcher=SrunLauncher(),
-                wrappers=[],
-            ),
-            [],
+            ["--default_flagA", "--default_flagB", "--flagA", "--flagB"],
         ),
     ],
 )
-def test_launcher_builder_from_launcher(
-    flags_in, default_launcher, default_launcher_flags, ref_launcher, ref_flags
+def test_launcher_builder_from_default(
+    tmp_path,
+    flags_in,
+    default_launcher,
+    default_launcher_flags,
+    ref_launcher,
+    ref_flags,
 ):
 
-    builder = cli_test(flags_in)
+    builder = cli_test(tmp_path, flags_in)
+
+    launcher, flags = builder.build_launcher(
+        default_launcher=default_launcher, default_launcher_flags=default_launcher_flags
+    )
+
+    assert launcher == ref_launcher
+    assert flags == ref_flags
+
+
+@pytest.mark.parametrize(
+    "config_in, flags_in,default_launcher,default_launcher_flags,ref_launcher,ref_flags",
+    [
+        (
+            {
+                "class_name": "MpirunLauncher",
+            },
+            [],
+            SrunLauncher(),
+            ["--ignore_default_flagA", "--ignored_default_flagB"],
+            MpirunLauncher(),
+            [],
+        ),
+        (
+            {"class_name": "DirectLauncher", "executable": "mpirun"},
+            [],
+            None,
+            [],
+            DirectLauncher(executable="mpirun"),
+            [],
+        ),
+        (
+            {"class_name": "MpirunLauncher", "flags": ["--mpiflagA", "--mpiflagB"]},
+            ["-f", "--add_cli_flagA", "-f", "--add_cli_flagB"],
+            SrunLauncher(),
+            ["--ignore_default_flagA", "--ignored_default_flagB"],
+            MpirunLauncher(
+                flags=["--mpiflagA", "--mpiflagB", "--add_cli_flagA", "--add_cli_flagB"]
+            ),
+            ["--mpiflagA", "--mpiflagB", "--add_cli_flagA", "--add_cli_flagB"],
+        ),
+        (
+            {
+                "class_name": "CompositeLauncher",
+                "base_launcher": {
+                    "class_name": "MpirunLauncher",
+                    "flags": ["--mpiflagA", "--mpiflagB"],
+                },
+                "wrappers": [
+                    {
+                        "class_name": "DDTLauncher",
+                        "flags": [
+                            "--ddtflagA",
+                        ],
+                    },
+                    {"class_name": "BashLauncher"},
+                ],
+            },
+            [],
+            None,
+            [],
+            CompositeLauncher(
+                base_launcher=MpirunLauncher(flags=["--mpiflagA", "--mpiflagB"]),
+                wrappers=[DDTLauncher(flags=["--ddtflagA"]), BashLauncher()],
+            ),
+            [],
+        ),
+        (
+            {
+                "class_name": "MpirunLauncher",
+                "flags": ["--config_flagA", "--config_flagB"],
+            },
+            ["-f", "--add_flagA", "--launcher-flags", "--add_flagB"],
+            SrunLauncher(),
+            [],
+            MpirunLauncher(
+                flags=["--config_flagA", "--config_flagB", "--add_flagA", "--add_flagB"]
+            ),
+            ["--config_flagA", "--config_flagB", "--add_flagA", "--add_flagB"],
+        ),
+        (
+            {
+                "class_name": "CompositeLauncher",
+                "base_launcher": {
+                    "class_name": "MpirunLauncher",
+                    "flags": ["--mpiflagA", "--mpiflagB"],
+                },
+                "wrappers": [
+                    {
+                        "class_name": "DDTLauncher",
+                        "flags": [
+                            "--ddtflagA",
+                        ],
+                    },
+                    {"class_name": "BashLauncher"},
+                ],
+            },
+            ["--launcher-flags", "cli_flagA", "--launcher-flags", "cli_flagB"],
+            None,
+            [],
+            CompositeLauncher(
+                base_launcher=MpirunLauncher(flags=["--mpiflagA", "--mpiflagB"]),
+                wrappers=[DDTLauncher(flags=["--ddtflagA"]), BashLauncher()],
+                flags=["cli_flagA", "cli_flagB"],
+            ),
+            ["cli_flagA", "cli_flagB"],
+        ),
+    ],
+)
+def test_launcher_builder_from_config(
+    tmp_path,
+    config_in,
+    flags_in,
+    default_launcher,
+    default_launcher_flags,
+    ref_launcher,
+    ref_flags,
+):
+
+    config_path = tmp_path / "launcher.yml"
+    flags_in.extend(["--launcher-config", config_path])
+
+    builder = cli_test(tmp_path, flags_in)
+
+    with config_path.open("w", encoding="utf-8") as f:
+        yaml.dump(config_in, f)
 
     launcher, flags = builder.build_launcher(
         default_launcher=default_launcher, default_launcher_flags=default_launcher_flags
