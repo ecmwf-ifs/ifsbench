@@ -85,7 +85,7 @@ class MpirunLauncher(Launcher):
         else:
             env_pipeline = env_pipeline.copy(deep=True)
 
-        flags = self.flags
+        flags = list(self.flags)
 
         for attr, option in self._job_options_map.items():
             value = getattr(job, attr, None)

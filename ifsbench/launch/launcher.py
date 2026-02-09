@@ -199,6 +199,8 @@ class CompositeLauncher(Launcher):
             run_dir, job, cmd, library_paths, env_pipeline, self.flags
         )
         for wrapper in self.wrappers:
-            launch_data = wrapper.wrap(launch_data, cmd, library_paths, env_pipeline)
+            launch_data = wrapper.wrap(
+                launch_data, run_dir, cmd, library_paths, env_pipeline
+            )
 
         return launch_data

@@ -6,24 +6,58 @@
 # nor does it submit to any jurisdiction.
 
 """
-Some sanity tests for :any:`Launcher` implementations
+Some sanity tests for :any:`CompositeLauncher` implementations
 """
 
+import datetime
 from typing import Dict, List
 
 import pytest
 
 from ifsbench import (
+    Job,
     BashLauncher,
     CompositeLauncher,
     DDTLauncher,
+    DefaultEnvPipeline,
     DirectLauncher,
+    EnvHandler,
+    EnvOperation,
     Launcher,
     LauncherWrapper,
     MpirunLauncher,
     SerialisationMixin,
     SrunLauncher,
 )
+
+
+@pytest.fixture(name="test_env")
+def fixture_test_env():
+    return DefaultEnvPipeline(
+        handlers=[
+            EnvHandler(mode=EnvOperation.SET, key="SOME_VALUE", value="5"),
+            EnvHandler(mode=EnvOperation.SET, key="OTHER_VALUE", value="6"),
+            EnvHandler(mode=EnvOperation.DELETE, key="SOME_VALUE"),
+        ]
+    )
+
+
+@pytest.fixture(name="test_env_none")
+def fixture_test_env_none():
+    return None
+
+
+@pytest.fixture(name="test_now")
+def fixture_test_now(monkeypatch):
+    NOW_TIME = datetime.datetime(2026, 2, 9, 15, 57, 10)
+
+    class DatetimeMock(datetime.datetime):
+        @classmethod
+        def now(cls, *args, **kwargs):
+            del args, kwargs
+            return NOW_TIME
+
+    monkeypatch.setattr(datetime, "datetime", DatetimeMock)
 
 
 def build_config(
@@ -118,7 +152,7 @@ def build_config(
         ),
     ],
 )
-def test_composite_launcher(
+def test_composite_launcher_from_config(
     base_launcher_type,
     base_executable,
     base_launcher_flags,
@@ -144,3 +178,76 @@ def test_composite_launcher(
     launcher = CompositeLauncher.from_config(config)
 
     assert launcher == ref_launcher
+
+
+@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
+@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
+@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
+@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
+@pytest.mark.parametrize(
+    "base_launcher", [SrunLauncher(), DirectLauncher(), MpirunLauncher()]
+)
+@pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
+def test_compositelauncher_wrap_ddt_bash(
+    tmp_path,
+    cmd,
+    job,
+    library_paths,
+    env_pipeline_name,
+    base_launcher,
+    base_launcher_flags,
+    request,
+):
+    """
+    Test the cmd component of the LaunchData object that is returned by
+    CompositeLauncher.prepare with BashLauncher wrapper.
+    """
+
+    env_pipeline = request.getfixturevalue(env_pipeline_name)
+    request.getfixturevalue("test_now")
+
+    launcher = CompositeLauncher(
+        flags=base_launcher_flags,
+        base_launcher=base_launcher,
+        wrappers=[
+            DDTLauncher(),
+            BashLauncher(),
+        ],
+    )
+
+    result = launcher.prepare(
+        run_dir=tmp_path,
+        job=job,
+        cmd=cmd,
+        library_paths=library_paths,
+        env_pipeline=env_pipeline,
+        custom_flags=[],
+    )
+
+    # Reference outputs per wrap
+    base_launch_data = base_launcher.prepare(
+        run_dir=tmp_path,
+        job=job,
+        cmd=cmd,
+        library_paths=library_paths,
+        env_pipeline=env_pipeline,
+        custom_flags=[],
+    )
+
+    ddt_data = DDTLauncher().wrap(
+        launch_data=base_launch_data,
+        run_dir=tmp_path,
+        cmd=cmd,
+        library_paths=library_paths,
+        env_pipeline=env_pipeline,
+    )
+
+    bash_data = BashLauncher().wrap(
+        launch_data=ddt_data,
+        run_dir=tmp_path,
+        cmd=cmd,
+        library_paths=library_paths,
+        env_pipeline=env_pipeline,
+    )
+
+    assert result == bash_data
