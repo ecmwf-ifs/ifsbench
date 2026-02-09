@@ -11,7 +11,7 @@ click-based decorators for specifying launchers + launcher flags.
 
 from functools import wraps
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 import yaml
 
 import click
@@ -39,16 +39,14 @@ class LauncherBuilder(SerialisationMixin):
     #: Additional launcher flags that should be used.
     launcher_flags: List[str] = []
 
-    def build_from_arch(
-        self, arch: Optional[Arch] = None
-    ) -> Tuple[Launcher, List[str]]:
+    def build_from_arch(self, arch: Optional[Arch] = None) -> Optional[Launcher]:
         """
         Build a launcher, using information from an `Arch` object.
         """
         if arch:
             return self.build_launcher(
                 default_launcher=arch.get_default_launcher(),
-                default_launcher_flags=arch.default_launcher_flags,
+                default_launcher_flags=arch.get_default_launcher_flags(),
             )
         return self.build_launcher()
 
@@ -56,7 +54,7 @@ class LauncherBuilder(SerialisationMixin):
         self,
         default_launcher: Optional[Launcher] = None,
         default_launcher_flags: Optional[List[str]] = None,
-    ) -> Tuple[Launcher, List[str]]:
+    ) -> Optional[Launcher]:
         """
         Build a launcher using a given default launcher and default flags.
         """
@@ -67,13 +65,13 @@ class LauncherBuilder(SerialisationMixin):
                 loaded_yaml = yaml.safe_load(f)
             launcher = Launcher.from_config(loaded_yaml)
             launcher.flags += self.launcher_flags
-            return launcher, launcher.flags
+            return launcher
 
         if default_launcher:
             if not default_launcher_flags:
                 default_launcher_flags = []
             default_launcher.flags += default_launcher_flags + self.launcher_flags
-        return default_launcher, default_launcher_flags + self.launcher_flags
+        return default_launcher
 
 
 def launcher_options(func):

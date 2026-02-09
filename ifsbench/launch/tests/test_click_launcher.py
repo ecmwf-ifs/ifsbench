@@ -9,6 +9,8 @@
 Some sanity tests for :any:`Launcher` implementations
 """
 
+from typing import List
+
 import click
 from click.testing import CliRunner
 import pytest
@@ -17,10 +19,12 @@ import yaml
 from ifsbench.launch.click_launcher import LauncherBuilder, launcher_options
 
 from ifsbench import (
+    Arch,
     BashLauncher,
     CompositeLauncher,
     DDTLauncher,
     DirectLauncher,
+    Launcher,
     MpirunLauncher,
     SrunLauncher,
 )
@@ -55,21 +59,19 @@ def cli_test(tmp_path, cmd_flags):
 
 
 @pytest.mark.parametrize(
-    "flags_in,default_launcher,default_launcher_flags,ref_launcher,ref_flags",
+    "flags_in,default_launcher,default_launcher_flags,ref_launcher",
     [
         (
             [],
             SrunLauncher(),
             [],
             SrunLauncher(),
-            [],
         ),
         (
             ["--launcher-flags", "--flagA", "-f", "--flagB"],
             MpirunLauncher(),
             [],
             MpirunLauncher(flags=["--flagA", "--flagB"]),
-            ["--flagA", "--flagB"],
         ),
         (
             [
@@ -84,7 +86,6 @@ def cli_test(tmp_path, cmd_flags):
                 executable="mpirun",
                 flags=["--default_flagA", "--default_flagB", "--flagA", "--flagB"],
             ),
-            ["--default_flagA", "--default_flagB", "--flagA", "--flagB"],
         ),
     ],
 )
@@ -94,21 +95,19 @@ def test_launcher_builder_from_default(
     default_launcher,
     default_launcher_flags,
     ref_launcher,
-    ref_flags,
 ):
 
     builder = cli_test(tmp_path, flags_in)
 
-    launcher, flags = builder.build_launcher(
+    launcher = builder.build_launcher(
         default_launcher=default_launcher, default_launcher_flags=default_launcher_flags
     )
 
     assert launcher == ref_launcher
-    assert flags == ref_flags
 
 
 @pytest.mark.parametrize(
-    "config_in, flags_in,default_launcher,default_launcher_flags,ref_launcher,ref_flags",
+    "config_in, flags_in,default_launcher,default_launcher_flags,ref_launcher",
     [
         (
             {
@@ -118,7 +117,6 @@ def test_launcher_builder_from_default(
             SrunLauncher(),
             ["--ignore_default_flagA", "--ignored_default_flagB"],
             MpirunLauncher(),
-            [],
         ),
         (
             {"class_name": "DirectLauncher", "executable": "mpirun"},
@@ -126,7 +124,6 @@ def test_launcher_builder_from_default(
             None,
             [],
             DirectLauncher(executable="mpirun"),
-            [],
         ),
         (
             {"class_name": "MpirunLauncher", "flags": ["--mpiflagA", "--mpiflagB"]},
@@ -136,7 +133,6 @@ def test_launcher_builder_from_default(
             MpirunLauncher(
                 flags=["--mpiflagA", "--mpiflagB", "--add_cli_flagA", "--add_cli_flagB"]
             ),
-            ["--mpiflagA", "--mpiflagB", "--add_cli_flagA", "--add_cli_flagB"],
         ),
         (
             {
@@ -162,7 +158,6 @@ def test_launcher_builder_from_default(
                 base_launcher=MpirunLauncher(flags=["--mpiflagA", "--mpiflagB"]),
                 wrappers=[DDTLauncher(flags=["--ddtflagA"]), BashLauncher()],
             ),
-            [],
         ),
         (
             {
@@ -175,7 +170,6 @@ def test_launcher_builder_from_default(
             MpirunLauncher(
                 flags=["--config_flagA", "--config_flagB", "--add_flagA", "--add_flagB"]
             ),
-            ["--config_flagA", "--config_flagB", "--add_flagA", "--add_flagB"],
         ),
         (
             {
@@ -202,7 +196,6 @@ def test_launcher_builder_from_default(
                 wrappers=[DDTLauncher(flags=["--ddtflagA"]), BashLauncher()],
                 flags=["cli_flagA", "cli_flagB"],
             ),
-            ["cli_flagA", "cli_flagB"],
         ),
     ],
 )
@@ -213,7 +206,6 @@ def test_launcher_builder_from_config(
     default_launcher,
     default_launcher_flags,
     ref_launcher,
-    ref_flags,
 ):
 
     config_path = tmp_path / "launcher.yml"
@@ -224,9 +216,31 @@ def test_launcher_builder_from_config(
     with config_path.open("w", encoding="utf-8") as f:
         yaml.dump(config_in, f)
 
-    launcher, flags = builder.build_launcher(
+    launcher = builder.build_launcher(
         default_launcher=default_launcher, default_launcher_flags=default_launcher_flags
     )
 
     assert launcher == ref_launcher
-    assert flags == ref_flags
+
+
+def test_build_from_arch():
+
+    class DummyArch(Arch):
+        def get_default_launcher(self) -> Launcher:
+            return SrunLauncher(flags=["ini_flagA", "ini_flagB"])
+
+        def get_default_launcher_flags(self) -> List[str]:
+            return ["default_flagA", "default_flagB"]
+
+        def get_cpu_configuration(self):
+            pass
+
+        def process_job(self, job, **kwargs):
+            pass
+
+    arch = DummyArch()
+    launcher = LauncherBuilder().build_from_arch(arch)
+
+    assert launcher == SrunLauncher(
+        flags=["ini_flagA", "ini_flagB", "default_flagA", "default_flagB"]
+    )

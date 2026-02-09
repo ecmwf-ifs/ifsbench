@@ -9,6 +9,7 @@
 Some sanity tests for :any:`Launcher` implementations
 """
 
+from typing import Dict, List
 
 import pytest
 
@@ -27,8 +28,8 @@ from ifsbench import (
 
 def build_config(
     base_launcher: Launcher,
-    wrappers: list[LauncherWrapper],
-) -> dict[str, SerialisationMixin]:
+    wrappers: List[LauncherWrapper],
+) -> Dict[str, SerialisationMixin]:
     composite = CompositeLauncher(base_launcher=base_launcher, wrappers=wrappers)
     return composite.dump_config()
 
