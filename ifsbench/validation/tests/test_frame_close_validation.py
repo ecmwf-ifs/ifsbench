@@ -10,12 +10,12 @@ Some sanity tests for the :class:`FrameCloseValidation` implementation.
 """
 
 import itertools
-
+import logging
 
 import json
 from pathlib import Path
 
-from pandas import DataFrame, MultiIndex
+import pandas as pd
 import pytest
 
 from ifsbench.results import ResultData
@@ -28,14 +28,14 @@ from ifsbench.validation.frame_close_validation import (
 @pytest.fixture(name="test_frames")
 def build_frames():
     return [
-        DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]]),
-        DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=["Step 0", "Step 1"]),
-        DataFrame(
+        pd.DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]]),
+        pd.DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=["Step 0", "Step 1"]),
+        pd.DataFrame(
             [[2.0, 3.0, 4], [5.0, 1.0, 3]],
             index=["Step 0", "Step 1"],
             columns=["value1", "value2", "value3"],
         ),
-        DataFrame(
+        pd.DataFrame(
             [[2.0, 3.0, 4], [5.0, 1.0, 3]], columns=["value1", "value2", "value3"]
         ),
     ]
@@ -98,8 +98,8 @@ def test_frameclose_explicit_mismatch(atol, rtol):
     """
     validation = FrameCloseValidation(atol=atol, rtol=rtol)
 
-    frame1 = DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=["Step 0", "Step 1"])
-    frame2 = DataFrame([[2.0, 3.001, 4], [5.0, 1.0, 3]], index=["Step 0", "Step 1"])
+    frame1 = pd.DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=["Step 0", "Step 1"])
+    frame2 = pd.DataFrame([[2.0, 3.001, 4], [5.0, 1.0, 3]], index=["Step 0", "Step 1"])
 
     equal, mismatch = validation.compare(frame1, frame2)
 
@@ -115,10 +115,12 @@ def test_frameclose_explicit_mismatch_dtype(atol, rtol):
     """
     validation = FrameCloseValidation(atol=atol, rtol=rtol)
 
-    frame1 = DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=["Step 0", "Step 1"])
+    frame1 = pd.DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=["Step 0", "Step 1"])
 
     # Last column is treated as int. This shouldn't match frame1 due to this.
-    frame2 = DataFrame([[2.0, 3.001, 4.0], [5.0, 1.0, 3]], index=["Step 0", "Step 1"])
+    frame2 = pd.DataFrame(
+        [[2.0, 3.001, 4.0], [5.0, 1.0, 3]], index=["Step 0", "Step 1"]
+    )
 
     equal, mismatch = validation.compare(frame1, frame2)
 
@@ -138,10 +140,10 @@ def test_frame_mismatch_multiindex(atol, rtol):
     """
     validation = FrameCloseValidation(atol=atol, rtol=rtol)
 
-    index = MultiIndex.from_tuples([("Step 0", "type a"), ("Step 0", "type b")])
+    index = pd.MultiIndex.from_tuples([("Step 0", "type a"), ("Step 0", "type b")])
 
-    frame1 = DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=index)
-    frame2 = DataFrame([[2.0, 3.001, 4], [5.0, 1.0, 3]], index=index)
+    frame1 = pd.DataFrame([[2.0, 3.0, 4], [5.0, 1.0, 3]], index=index)
+    frame2 = pd.DataFrame([[2.0, 3.001, 4], [5.0, 1.0, 3]], index=index)
 
     equal, mismatch = validation.compare(frame1, frame2)
 
@@ -200,7 +202,47 @@ def test_validate_result_from_result_wrongtype_fails(tmp_path, test_frames):
     assert "found" in str(exceptinfo.value)
 
 
-def test_validate_result_mismatch(tmp_path, test_frames):
+def test_validate_result_not_equal(tmp_path, caplog, test_frames):
+    logging.getLogger("ifsbench").setLevel(logging.DEBUG)
+    caplog.set_level(logging.DEBUG)
+
+    added_row = pd.DataFrame([[7.0, 8.0, 9]], index=[2])
+    mod_frame = pd.concat([test_frames[0], added_row])
+
+    ref_path = tmp_path / "ref_result.json"
+    ref_result = TestResult(
+        frames={
+            "frame1": test_frames[0],
+        }
+    )
+    with ref_path.open("w") as f:
+        json.dump(ref_result.dump_config(), f)
+
+    test_result = TestResult(
+        frames={
+            "frame1": mod_frame,
+        }
+    )
+
+    assert validate_result_identical(test_result, Path(ref_path), TestResult) is False
+
+    not_equal_log = "Frames are not equal:\nshapes: result=(3, 3), ref=(2, 3)\nindex"
+    result_data_log = (
+        "result data:\n     0    1  2\n0  2.0  3.0  4\n1  5.0  1.0  3\n2  7.0  8.0  9"
+    )
+    reference_data_log = (
+        "reference data:\n     0    1  2\n0  2.0  3.0  4\n1  5.0  1.0  3"
+    )
+
+    assert any(not_equal_log in message for message in caplog.messages)
+    assert result_data_log in caplog.messages
+    assert reference_data_log in caplog.messages
+
+
+def test_validate_result_mismatch(tmp_path, caplog, test_frames):
+    logging.getLogger("ifsbench").setLevel(logging.DEBUG)
+    caplog.set_level(logging.DEBUG)
+
     mismatched_frame = test_frames[1] + 1
 
     ref_path = tmp_path / "ref_result.json"
@@ -213,3 +255,22 @@ def test_validate_result_mismatch(tmp_path, test_frames):
     )
 
     assert validate_result_identical(test_result, Path(ref_path), TestResult) is False
+
+    result_data_log = (
+        "result data:\n          0    1  2\nStep 0  3.0  4.0  5\nStep 1  6.0  2.0  4"
+    )
+    reference_data_log = (
+        "reference data:\n          0    1  2\nStep 0  2.0  3.0  4\nStep 1  5.0  1.0  3"
+    )
+    mismatch_logs = [
+        "First mismatch at (Step 0, 0): 3.0 != 2.0.",
+        "Mismatch at (Step 0, 0): 3.0 != 2.0.",
+        "Mismatch at (Step 0, 1): 4.0 != 3.0.",
+        "Mismatch at (Step 1, 0): 6.0 != 5.0.",
+        "Mismatch at (Step 1, 1): 2.0 != 1.0.",
+    ]
+
+    assert result_data_log in caplog.messages
+    assert reference_data_log in caplog.messages
+    for mismatch in mismatch_logs:
+        assert mismatch in caplog.messages
