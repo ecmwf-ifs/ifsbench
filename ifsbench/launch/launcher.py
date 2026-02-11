@@ -13,8 +13,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
-from pydantic import SerializeAsAny
-
 from ifsbench.serialisation_mixin import (
     SubclassableSerialisationMixin,
 )
@@ -157,10 +155,10 @@ class CompositeLauncher(Launcher):
     """
 
     # The launcher that provides the basic launch command.
-    base_launcher: SerializeAsAny[Launcher]
+    base_launcher: Launcher
     # Additional features that are added to the basic launch command.
     # Execution is in the order they are specified.
-    wrappers: List[SerializeAsAny[LauncherWrapper]] = []
+    wrappers: List[LauncherWrapper] = []
 
     def prepare(
         self,
