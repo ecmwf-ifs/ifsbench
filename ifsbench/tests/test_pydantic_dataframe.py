@@ -203,6 +203,28 @@ def test_pydantic_data_from_config_yaml(tmp_path, default_frames):
     assert obj.frame_dict['name'].equals(copy.frame_dict['name'])
     assert obj.frame_list[0].equals(copy.frame_list[0])
 
+@pytest.mark.parametrize('frame', [
+    DataFrame([[2.0, 3.0, 1.0]], index=['First index'], columns=['mean', 'max', 'min']),
+    DataFrame(),
+    DataFrame([[1.0], [0.0]]),
+    DataFrame([[5.0, 2.0, 4.0, Timestamp(year=2023, day=12, month=11)],
+               [6.0, 1.0, 2.0, Timestamp(year=1991, day=5, month=2)]],
+               columns=['b', 'a', 'c', 'time'],
+               index=MultiIndex.from_product([(Timestamp(year=2000, day=1, month=4),), ('Step 0', 'Step 1')]))
+])
+def test_pydantic_data_frame_equal(frame):
+    """
+    Check the serialisation/deserialisation of a data frame yields equal data
+    frames.
+    """
+
+    obj = _DummyClass(frame=frame)
+
+    config = obj.dump_config()
+    obj_clone = _DummyClass.from_config(config)
+
+    assert obj.frame.equals(obj_clone.frame)
+
 def test_pydantic_data_frame_serialise_timestamp():
     """
     Check the serialisation of a data frame if it contains pandas.Timestamp objects.
@@ -217,9 +239,11 @@ def test_pydantic_data_frame_serialise_timestamp():
     config = obj.dump_config()
 
     ref = {'frame': {
-           'index': [['2024-06-24 00:00:00', 'Step 0'], ['2024-06-24 00:00:00', 'Step 1']],
+           'index': [['2024-06-24T00:00:00_pd_timestamp', 'Step 0'], 
+                     ['2024-06-24T00:00:00_pd_timestamp', 'Step 1']],
            'columns': ['b', 'a', 'c', 'time'],
-           'data': [[5.0, 2.0, 4.0, '2024-06-24 00:00:00'], [6.0, 1.0, 2.0, '2024-06-24 00:00:00']],
+           'data': [[5.0, 2.0, 4.0, '2024-06-24T00:00:00_pd_timestamp'], 
+                    [6.0, 1.0, 2.0, '2024-06-24T00:00:00_pd_timestamp']],
            'index_names': [None, None],
            'column_names': [None]
         }

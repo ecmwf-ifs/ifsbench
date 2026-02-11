@@ -26,7 +26,7 @@ except ImportError:
 
 from pandas import DataFrame, Timestamp
 from pydantic_core import core_schema
-from pydantic import GetCoreSchemaHandler, BeforeValidator, TypeAdapter
+from pydantic import GetCoreSchemaHandler, AfterValidator, BeforeValidator, TypeAdapter
 
 __all__ = ['PydanticDataFrame']
 
@@ -45,13 +45,49 @@ class _DataFrameAnnotation:
         _handler: GetCoreSchemaHandler,
     ) -> core_schema.CoreSchema:
 
+        def _str_to_timestamp_helper(value: str) -> Union[str, Timestamp]:
+            """
+            Helper function that takes a str and converts it to a
+            pandas.Timestamp if it ends with _pd_timestamp. Otherwise it just
+            returns the original string.
+            """
+            if value.endswith('_pd_timestamp'):
+                return Timestamp(value.split('_pd_timestamp')[0])
+
+            return value
+
         def validate_from_dict(value: dict) -> DataFrame:
             """
             Validation function to support creating a pandas.DataFrame from
             a dictionary. The dictionary must have the same form as in the
             pandas.DataFrame.to_dict(orient='split') function.
             """
-            result = DataFrame.from_dict(value, orient='tight')
+
+            # Disable pylint "unused variable" warning here. TimestampType is
+            # used, but that is hidden in a string. See the pydantic bug below.
+            # pylint: disable=W0612
+
+            # Custom type annotation that we will use to auto-convert
+            # str objects that end with _pd_timestamp back to pandas.Timestamp
+            # objects.
+            TimestampType = Annotated[str, AfterValidator(_str_to_timestamp_helper)]
+
+            # There is currently (pydantic 2.9.2) a bug which prevents us from just doing
+            # the following (https://github.com/pydantic/pydantic/issues/11320):
+            # Allowed = Union[Dict[str,'Allowed'], List['Allowed'], TimestampType, str, int, float, bool, None]
+            #
+            # Therefore, we use a TypeAlias workaround.
+
+            Allowed = TypeAliasType(
+                'Allowed',
+                'Union[Dict[Allowed, Allowed], List[Allowed], TimestampType, str, int, float, bool, None]',
+            )
+
+            allowed_type = TypeAdapter(Dict[str, Allowed])
+
+            frame_dict = allowed_type.validate_python(value)
+
+            result = DataFrame.from_dict(frame_dict, orient='tight')
             return result
 
         def serialise_frame(value: DataFrame) -> Dict[str, Any]:
@@ -74,8 +110,12 @@ class _DataFrameAnnotation:
             # pylint: disable=W0612
 
             # Custom type annotation that we will use to auto-convert
-            # pandas.Timestamp object to a string.
-            TimestampType = Annotated[str, BeforeValidator(lambda x: str(x) if isinstance(x, Timestamp) else x)]
+            # pandas.Timestamp object to a string. We'll convert the timestamp
+            # to its isoformat representation and add _pd_timestamp to it, so
+            # we can convert it back to Timestamp object on validation.
+            TimestampType = Annotated[str, BeforeValidator(
+                lambda x: x.isoformat() + '_pd_timestamp' if isinstance(x, Timestamp) else x
+            )]
 
             # There is currently (pydantic 2.9.2) a bug which prevents us from just doing
             # the following (https://github.com/pydantic/pydantic/issues/11320):
@@ -85,7 +125,7 @@ class _DataFrameAnnotation:
 
             Allowed = TypeAliasType(
                 'Allowed',
-                'Union[Dict[str, Allowed], List[Allowed], TimestampType, str, int, float, bool, None]',
+                'Union[Dict[Allowed, Allowed], List[Allowed], TimestampType, str, int, float, bool, None]',
             )
 
             allowed_type = TypeAdapter(Dict[str, Allowed])
