@@ -223,26 +223,47 @@ def test_launcher_builder_from_config(
     assert launcher == ref_launcher
 
 
+class DummyArch(Arch):
+    def get_default_launcher(self) -> Launcher:
+        return SrunLauncher(flags=["--ini_flagA", "--ini_flagB"])
+
+    def get_default_launcher_flags(self) -> List[str]:
+        return ["--default_flagA", "--default_flagB"]
+
+    def get_cpu_configuration(self):
+        pass
+
+    def process_job(self, job, **kwargs):
+        pass
+
+
 def test_build_from_arch():
 
-    class DummyArch(Arch):
-        def get_default_launcher(self) -> Launcher:
-            return SrunLauncher(flags=["--ini_flagA", "--ini_flagB"])
-
-        def get_default_launcher_flags(self) -> List[str]:
-            return ["--default_flagA", "--default_flagB"]
-
-        def get_cpu_configuration(self):
-            pass
-
-        def process_job(self, job, **kwargs):
-            pass
-
-    arch = DummyArch()
-    launcher = LauncherBuilder().build_from_arch(arch)
+    launcher = LauncherBuilder().build_from_arch(DummyArch())
 
     assert launcher == SrunLauncher(
         flags=["--ini_flagA", "--ini_flagB", "--default_flagA", "--default_flagB"]
+    )
+
+
+def test_build_from_arch_adds_flags(tmp_path):
+
+    flags_in = [
+        "-f",
+        "--cli_flagA",
+    ]
+
+    builder = cli_test(tmp_path, flags_in)
+    launcher = builder.build_from_arch(DummyArch())
+
+    assert launcher == SrunLauncher(
+        flags=[
+            "--ini_flagA",
+            "--ini_flagB",
+            "--default_flagA",
+            "--default_flagB",
+            "--cli_flagA",
+        ]
     )
 
 
