@@ -227,10 +227,10 @@ def test_build_from_arch():
 
     class DummyArch(Arch):
         def get_default_launcher(self) -> Launcher:
-            return SrunLauncher(flags=["ini_flagA", "ini_flagB"])
+            return SrunLauncher(flags=["--ini_flagA", "--ini_flagB"])
 
         def get_default_launcher_flags(self) -> List[str]:
-            return ["default_flagA", "default_flagB"]
+            return ["--default_flagA", "--default_flagB"]
 
         def get_cpu_configuration(self):
             pass
@@ -242,5 +242,30 @@ def test_build_from_arch():
     launcher = LauncherBuilder().build_from_arch(arch)
 
     assert launcher == SrunLauncher(
-        flags=["ini_flagA", "ini_flagB", "default_flagA", "default_flagB"]
+        flags=["--ini_flagA", "--ini_flagB", "--default_flagA", "--default_flagB"]
+    )
+
+
+def test_build_from_arch_noarch_uses_flags(tmp_path):
+
+    config_in = {
+        "class_name": "MpirunLauncher",
+    }
+    flags_in = [
+        "-f",
+        "--cli_flagA",
+    ]
+    config_path = tmp_path / "launcher.yml"
+    flags_in.extend(["--launcher-config", config_path])
+    with config_path.open("w", encoding="utf-8") as f:
+        yaml.dump(config_in, f)
+
+    builder = cli_test(tmp_path, flags_in)
+
+    launcher = builder.build_from_arch()
+
+    assert launcher == MpirunLauncher(
+        flags=[
+            "--cli_flagA",
+        ]
     )
