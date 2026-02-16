@@ -149,12 +149,7 @@ def validate_result_identical(
             error(
                 f"First mismatch at ({idx}, {col}): {frame.loc[idx,col]} != {frame_ref.loc[idx,col]}."
             )
-            for idx, col in mismatch:
-                debug(
-                    f"Mismatch at ({idx}, {col}): {frame.loc[idx,col]} != {frame_ref.loc[idx,col]}."
-                )
 
-        if not equal or mismatch:
             with pd.option_context(
                 "display.max_rows", None, "display.max_columns", None
             ):

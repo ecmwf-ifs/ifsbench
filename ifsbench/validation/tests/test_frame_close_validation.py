@@ -227,16 +227,8 @@ def test_validate_result_not_equal(tmp_path, caplog, test_frames):
     assert validate_result_identical(test_result, Path(ref_path), TestResult) is False
 
     not_equal_log = "Frames are not equal:\nshapes: result=(3, 3), ref=(2, 3)\nindex"
-    result_data_log = (
-        "result data:\n     0    1  2\n0  2.0  3.0  4\n1  5.0  1.0  3\n2  7.0  8.0  9"
-    )
-    reference_data_log = (
-        "reference data:\n     0    1  2\n0  2.0  3.0  4\n1  5.0  1.0  3"
-    )
 
     assert any(not_equal_log in message for message in caplog.messages)
-    assert result_data_log in caplog.messages
-    assert reference_data_log in caplog.messages
 
 
 def test_validate_result_mismatch(tmp_path, caplog, test_frames):
@@ -262,15 +254,8 @@ def test_validate_result_mismatch(tmp_path, caplog, test_frames):
     reference_data_log = (
         "reference data:\n          0    1  2\nStep 0  2.0  3.0  4\nStep 1  5.0  1.0  3"
     )
-    mismatch_logs = [
-        "First mismatch at (Step 0, 0): 3.0 != 2.0.",
-        "Mismatch at (Step 0, 0): 3.0 != 2.0.",
-        "Mismatch at (Step 0, 1): 4.0 != 3.0.",
-        "Mismatch at (Step 1, 0): 6.0 != 5.0.",
-        "Mismatch at (Step 1, 1): 2.0 != 1.0.",
-    ]
+    mismatch_log = "First mismatch at (Step 0, 0): 3.0 != 2.0."
 
     assert result_data_log in caplog.messages
     assert reference_data_log in caplog.messages
-    for mismatch in mismatch_logs:
-        assert mismatch in caplog.messages
+    assert mismatch_log in caplog.messages
