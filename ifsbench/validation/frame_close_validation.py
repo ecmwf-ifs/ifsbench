@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, List, Tuple, Type, Union
 
 import numpy
-from pandas import DataFrame
+import pandas as pd
 import yaml
 
 from ifsbench.logging import debug, error, info
@@ -38,7 +38,7 @@ class FrameCloseValidation:
     rtol: float = 0
 
     def compare(
-        self, frame1: DataFrame, frame2: DataFrame
+        self, frame1: pd.DataFrame, frame2: pd.DataFrame
     ) -> Tuple[bool, List[Tuple[Any, Any]]]:
         """
         Compare two dataframes.
@@ -134,15 +134,26 @@ def validate_result_identical(
         frame_ref = reference_data.frames[key]
 
         equal, mismatch = validator.compare(frame, frame_ref)
-        if not equal and mismatch:
+
+        if not equal and not mismatch:
+            is_identical = False
+            error(
+                f"Frames are not equal:\n"
+                f"shapes: result={frame.shape}, "
+                f"ref={frame_ref.shape}\nindex: result={frame.index}, ref={frame_ref.index}"
+            )
+
+        if mismatch:
             is_identical = False
             idx, col = mismatch[0]
             error(
                 f"First mismatch at ({idx}, {col}): {frame.loc[idx,col]} != {frame_ref.loc[idx,col]}."
             )
 
-            for idx, col in mismatch:
-                debug(
-                    f"Mismatch at ({idx}, {col}): {frame.loc[idx,col]} != {frame_ref.loc[idx,col]}."
-                )
+            with pd.option_context(
+                "display.max_rows", None, "display.max_columns", None
+            ):
+                debug(f"result data:\n{frame}")
+                debug(f"reference data:\n{frame_ref}")
+
     return is_identical
