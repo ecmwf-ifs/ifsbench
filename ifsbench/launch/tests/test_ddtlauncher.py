@@ -134,7 +134,7 @@ def test_ddtlauncher_env(
 @pytest.mark.parametrize("job", [Job(tasks=64), Job()])
 @pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
 @pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [[], ["--cuda"]])
+@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
 @pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
 @pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
 def test_ddtlauncher_cmd(
@@ -176,7 +176,7 @@ def test_ddtlauncher_cmd(
         env_pipeline=env_pipeline,
     )
 
-    if custom_flags is None:
+    if not custom_flags:
         assert ["ddt"] + ["--"] + base_launch_data.cmd == result.cmd
     else:
         assert ["ddt"] + custom_flags + ["--"] + base_launch_data.cmd == result.cmd

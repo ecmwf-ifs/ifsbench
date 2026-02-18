@@ -89,11 +89,6 @@ def test_bashlauncher_run_dir(
 
     assert result.run_dir == result.run_dir
 
-    # Asser that the corresponding bash script has been written to
-
-
-#    assert len(list((tmp_path/'bash_scripts').glob(cmd[0]+'*.sh'))) == 1
-
 
 @pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
 @pytest.mark.parametrize("job", [Job(tasks=64), Job()])
