@@ -26,7 +26,7 @@ RESERVED_NAMES = [
 ]
 
 
-class SerialisationMixin(BaseModel, use_enum_values=True):
+class SerialisationMixin(BaseModel, use_enum_values=True, validate_assignment=True):
     """
     Mixin class that enables automatic serialisation features for this class.
 
@@ -47,7 +47,8 @@ class SerialisationMixin(BaseModel, use_enum_values=True):
         Returns:
             class instance
         """
-        return cls(**config)
+        adapter = TypeAdapter(cls)
+        return adapter.validate_python(config)
 
     def dump_config(
         self, with_class: bool = False
@@ -86,6 +87,20 @@ class SerialisationMixin(BaseModel, use_enum_values=True):
         allowed_type = TypeAdapter(Dict[str, Allowed])
 
         return allowed_type.validate_python(config)
+
+    # Pylint complains that this is overriding the pydantic copy function. As
+    # the pydantic copy function is deprecated (and might get removed in the
+    # future) we define our own copy version here.
+    # pylint: disable=W0221
+    def copy(self, deep: bool=False) -> 'SerialisationMixin':
+        """
+        Create a copy of this object.
+
+        Args:
+            deep: If True, create a deep copy.
+        """
+
+        return self.model_copy(deep=deep)
 
 class SubclassableSerialisationMixin(SerialisationMixin):
     """

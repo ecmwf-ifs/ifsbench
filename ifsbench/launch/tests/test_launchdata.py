@@ -15,18 +15,33 @@ import pytest
 
 from ifsbench.launch import LaunchData
 
-@pytest.fixture(name='python_exec')
+
+@pytest.fixture(name="python_exec")
 def fixture_python():
     """
     Return the currently used Python executable.
     """
     return sys.executable
 
-@pytest.mark.parametrize('flags, env, files', [
-    (['-c', 'from pathlib import Path; Path(\'test.txt\').touch()'], {}, ['test.txt']),
-    (['-c', 'import os; from pathlib import Path; Path(os.environ[\'TARGET_FILE\']).touch()'],
-        {'TARGET_FILE': 'env_file.txt'}, ['env_file.txt']),
-])
+
+@pytest.mark.parametrize(
+    "flags, env, files",
+    [
+        (
+            ["-c", "from pathlib import Path; Path('test.txt').touch()"],
+            {},
+            ["test.txt"],
+        ),
+        (
+            [
+                "-c",
+                "import os; from pathlib import Path; Path(os.environ['TARGET_FILE']).touch()",
+            ],
+            {"TARGET_FILE": "env_file.txt"},
+            ["env_file.txt"],
+        ),
+    ],
+)
 def test_launchdata_launch_python(tmp_path, python_exec, flags, env, files):
     """
     Test the LaunchData.launch method.
@@ -35,9 +50,9 @@ def test_launchdata_launch_python(tmp_path, python_exec, flags, env, files):
     based on the given flags and environment variables. Afterwards we check the
     existence of these files.
     """
-    launch_data = LaunchData(run_dir=tmp_path, env=env, cmd=[python_exec]+flags)
+    launch_data = LaunchData(run_dir=tmp_path, env=env, cmd=[python_exec] + flags)
 
     launch_data.launch()
 
     for file in files:
-        assert (tmp_path/file).exists()
+        assert (tmp_path / file).exists()
