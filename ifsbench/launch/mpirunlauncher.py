@@ -118,7 +118,7 @@ class MpirunLauncher(Launcher):
             # OpenMP-based multithreading.
             env_pipeline.add(
                 EnvHandler(
-                    mode=EnvOperation.APPEND,
+                    mode=EnvOperation.SET,
                     key="OMP_NUM_THREADS",
                     value=str(job.cpus_per_task),
                 )
