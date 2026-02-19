@@ -51,7 +51,10 @@ class BashLauncher(LauncherWrapper):
         time_str = datetime.datetime.now(datetime.timezone.utc).strftime(
             "%Y-%m-%d:%H-%M-%S-%f"
         )
-        cmd_str = cmd[0]
+
+        # Derive the name of the bash script from the command. As the command
+        # may be a full path, only take the part after the last slash.
+        cmd_str = cmd[0].split('/')[-1]
 
         script_path = script_dir / f"{cmd_str}_{time_str}.sh"
 

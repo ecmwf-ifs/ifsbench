@@ -16,7 +16,7 @@ from click.testing import CliRunner
 import pytest
 import yaml
 
-from ifsbench.launch.click_launcher import LauncherBuilder, launcher_options
+from ifsbench.command_line.click_launcher import LauncherBuilder, launcher_options
 
 from ifsbench import (
     Arch,

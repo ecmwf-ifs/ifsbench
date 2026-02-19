@@ -202,7 +202,7 @@ def test_bashlauncher_cmd(
     assert re.match(cmd[0] + "_[0-9-:]*.sh", script_path.name)
 
 
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
+@pytest.mark.parametrize("cmd", [["ls", "-l"], ["/some/path/something"]])
 @pytest.mark.parametrize("job", [Job(tasks=64), Job()])
 @pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
 @pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
@@ -249,6 +249,9 @@ def test_bashlauncher_script(
     )
 
     script_path = Path(result.cmd[1])
+
+    cmd_short = cmd[0].split('/')[-1]
+    assert str(script_path).startswith(str(tmp_path/'bash_scripts'/cmd_short))
 
     # There are essentially only three things we have to check
     # * The header/hashbang.
