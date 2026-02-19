@@ -250,6 +250,9 @@ def test_bashlauncher_script(
 
     script_path = Path(result.cmd[1])
 
+    cmd_short = cmd[0].split('/')[-1]
+    assert str(script_path).startswith(str(tmp_path/'bash_scripts'/cmd_short))
+
     # There are essentially only three things we have to check
     # * The header/hashbang.
     # * All environmental definitions
