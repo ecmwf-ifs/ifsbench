@@ -65,9 +65,9 @@ class BashLauncher(LauncherWrapper):
 
             # We set the environment variables inside a "..." block. This means
             # that we have to escape certain special characters (", $, `).
-            escaped_value = value.replace('$', '\\$')
-            escaped_value = escaped_value.replace('"', '\\"')
-            escaped_value = escaped_value.replace('`', '\\`')
+            chars_to_escape = ['$', '"', '`']
+            trans = str.maketrans({char: '\\'+char for char in chars_to_escape})
+            escaped_value = value.translate(trans)
             f.write(f'export {key}="')
             f.write(escaped_value)
             f.write("\"\n")
