@@ -294,7 +294,7 @@ def test_bashlauncher_script(
     for key, value in base_launch_data.env.items():
         # Variables that have non-bash compatible names should not make it to
         # the bash script.
-        if not re.fullmatch('[a-zA-Z0-9_]*', key):
+        if not re.fullmatch('[a-zA-Z_][a-zA-Z_0-9]*', key):
             continue
 
         # Escape certain characters.

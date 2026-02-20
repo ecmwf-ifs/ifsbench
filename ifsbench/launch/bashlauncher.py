@@ -60,8 +60,11 @@ class BashLauncher(LauncherWrapper):
                 debug(f'Ignore non-standard bash name {key} in BashLauncher.')
                 continue
 
+            if value is None:
+                continue
+
             # We set the environment variables inside a "..." block. This means
-            # that we have to escpae certain special characters (", $, `).
+            # that we have to escape certain special characters (", $, `).
             escaped_value = value.replace('$', '\\$')
             escaped_value = escaped_value.replace('"', '\\"')
             escaped_value = escaped_value.replace('`', '\\`')
