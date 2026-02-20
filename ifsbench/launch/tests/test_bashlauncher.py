@@ -299,8 +299,8 @@ def test_bashlauncher_script(
 
         # Escape certain characters.
         value = value.replace('$', '\\$')
-        value = value.replace('$', '\\$')
         value = value.replace('"', '\\"')
+        value = value.replace('`', '\\`')
         ref_env.append(f'export {key}="{value}"')
 
     assert set(ref_env) == set(env_lines)
