@@ -32,6 +32,8 @@ def fixture_test_env():
             EnvHandler(mode=EnvOperation.SET, key="SOME_VALUE", value="5"),
             EnvHandler(mode=EnvOperation.SET, key="OTHER_VALUE", value="6"),
             EnvHandler(mode=EnvOperation.DELETE, key="SOME_VALUE"),
+            EnvHandler(mode=EnvOperation.SET, key="NOT_V@LID", value="!!"),
+            EnvHandler(mode=EnvOperation.SET, key="ESCAPE_HELL", value="echo \"Something\", '22'"),
         ]
     )
 
@@ -261,6 +263,7 @@ def test_bashlauncher_script(
     header = None
     env_lines = []
     cmd_line = None
+    run_dir = None
 
     with script_path.open("r", encoding="utf-8") as f:
         header = f.readline()
@@ -273,8 +276,13 @@ def test_bashlauncher_script(
             if not line:
                 continue
 
+            if line.startswith('#'):
+                continue
+
             if line.startswith("export"):
                 env_lines.append(line.strip())
+            elif line.startswith("cd"):
+                run_dir = line.split('"')[1]
             else:
                 cmd_line = line
                 break
@@ -284,9 +292,20 @@ def test_bashlauncher_script(
     ref_env = []
 
     for key, value in base_launch_data.env.items():
+        # Variables that have non-bash compatible names should not make it to
+        # the bash script.
+        if not re.fullmatch('[a-zA-Z_][a-zA-Z_0-9]*', key):
+            continue
+
+        # Escape certain characters.
+        value = value.replace('$', '\\$')
+        value = value.replace('"', '\\"')
+        value = value.replace('`', '\\`')
         ref_env.append(f'export {key}="{value}"')
 
     assert set(ref_env) == set(env_lines)
+
+    assert tmp_path == Path(run_dir)
 
     # pylint: disable=R1713
     ref_cmd_line = ""
