@@ -77,12 +77,17 @@ jobs:
       matrix:
         platform: ['ubuntu-latest']
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        populate: [true, false]
 
         include:
           - platform: 'macos-latest'
             python-version: '3.11'
+            populate: true
+          - platform: 'macos-latest'
+            python-version: '3.11'
+            populate: false
 
-    name: Do a cmake installation and run pytest with Python ${{ matrix.python-version }} on ${{ matrix.platform }}
+    name: CMake build and pytest with populate ${{ matrix.populate }} using ${{ matrix.python-version }} on ${{ matrix.platform }}
 
     runs-on: ${{ matrix.platform }}
 
@@ -107,15 +112,17 @@ jobs:
           ref: '3.12.0'
 
       - name: Populate (prefetch Python dependencies)
+        if: matrix.populate
         run: |
           IFSBENCH_INSTALL_OPTIONS='[tests]' ./populate
 
       - name: Build with cmake/ecbuild
         run: |
           mkdir build && cd build
-          ../ecbuild/bin/ecbuild -DENABLE_TESTS=ON -DARTIFACTS_DIR=${{ github.workspace }}/artifacts ..
+          ../ecbuild/bin/ecbuild -DENABLE_TESTS=ON \
+            ${{ matrix.populate && format('-DARTIFACTS_DIR={0}/artifacts', github.workspace) || '' }} ..
           make
 
       - name: Run pytest
         run: |
-          build/ifsbench_env/bin/python -m pytest ifsbench --cov=ifsbench --cov-report=xml
+          build/ifsbench_env/bin/python -m pytest ifsbench
