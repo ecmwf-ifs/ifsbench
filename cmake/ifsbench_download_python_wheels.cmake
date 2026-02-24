@@ -15,7 +15,7 @@
 # Download all dependencies for the given ``REQUIREMENT_SPEC`` and cache them in a
 # wheelhouse at ``WHEELS_DIR``
 #
-#   download_python_wheels( REQUIREMENT_SPEC <spec> [ WHEELS_DIR <path> ] [ PYTHON_VERSION <version str> ] 
+#   download_python_wheels( REQUIREMENT_SPEC <spec> [ WHEELS_DIR <path> ] [ PYTHON_VERSION <version str> ]
 #                           [ WHEEL_ARCH <spec> ] [ WHEEL_PYTHON_VERSION <spec> ] [ PYTHON_ROOT_DIR <path> ])
 #
 # Implementation note
@@ -84,12 +84,12 @@ function( download_python_wheels )
 
     unset( PIP_OPTIONS )
     if( DEFINED _PAR_WHEEL_ARCH AND NOT _PAR_WHEEL_ARCH MATCHES None|NONE )
-       string(REPLACE "\"" "" _WHEEL_ARCH ${_PAR_WHEEL_ARCH})
-       list( APPEND PIP_OPTIONS "--platform=${_WHEEL_ARCH}" )
+        string(REPLACE "\"" "" _WHEEL_ARCH ${_PAR_WHEEL_ARCH})
+        list( APPEND PIP_OPTIONS "--platform=${_WHEEL_ARCH}" )
     endif()
     if( DEFINED _PAR_WHEEL_PYTHON_VERSION AND NOT _PAR_WHEEL_PYTHON_VERSION MATCHES None|NONE )
-       string(REPLACE "\"" "" _PYTHON_VERSION ${_PAR_WHEEL_PYTHON_VERSION})
-       list( APPEND PIP_OPTIONS "--python-version=${_PYTHON_VERSION}" )
+        string(REPLACE "\"" "" _PYTHON_VERSION ${_PAR_WHEEL_PYTHON_VERSION})
+        list( APPEND PIP_OPTIONS "--python-version=${_PYTHON_VERSION}" )
     endif()
 
     # We use a dry-run installation to check if all dependencies have already been downloaded
@@ -120,7 +120,12 @@ function( download_python_wheels )
                 ${PIP_OPTIONS}
                 setuptools>=75.0.0,<80.10.0 wheel setuptools_scm[toml]>=6.2,<9.3
             OUTPUT_QUIET
+            RESULT_VARIABLE _RET_VAL
         )
+
+        if( NOT "${_RET_VAL}" EQUAL "0" )
+            message( FATAL_ERROR "Download build dependency wheels for ${_PAR_REQUIREMENT_SPEC} to ${WHEELS_DIR} failed" )
+        endif()
 
         # Download dependencies for the specified REQUIREMENT_SPEC
         execute_process(
@@ -130,13 +135,18 @@ function( download_python_wheels )
                 ${PIP_OPTIONS}
                 ${_PAR_REQUIREMENT_SPEC}
             OUTPUT_QUIET
+            RESULT_VARIABLE _RET_VAL
         )
+
+        if( NOT "${_RET_VAL}" EQUAL "0" )
+            message( FATAL_ERROR "Download dependency wheels for ${_PAR_REQUIREMENT_SPEC} to ${WHEELS_DIR} failed" )
+        endif()
 
     endif()
 
 endfunction()
 
 download_python_wheels( REQUIREMENT_SPEC     ${REQUIREMENT_SPEC}
-                        WHEELS_DIR           ${WHEELS_DIR}       
+                        WHEELS_DIR           ${WHEELS_DIR}
                         WHEEL_ARCH           ${IFSBENCH_WHEEL_ARCH}
                         WHEEL_PYTHON_VERSION ${IFSBENCH_WHEEL_PYTHON_VERSION} )
