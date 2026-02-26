@@ -17,36 +17,36 @@ from ifsbench import DefaultApplication, Job, EnvHandler, EnvOperation
 
 
 @pytest.mark.parametrize(
-    'job, command, data_handlers, env_handlers, library_paths',
+    "job, command, data_handlers, env_handlers, library_paths",
     [
-        (Job(tasks=5), ['ls', '-l'], None, None, None),
-        (Job(nodes=12), ['ls', '-l'], [], [], []),
+        (Job(tasks=5), ["ls", "-l"], None, None, None),
+        (Job(nodes=12), ["ls", "-l"], [], [], []),
         (
             Job(nodes=12),
-            ['ls', '-l'],
+            ["ls", "-l"],
             [
                 {
-                    'class_name': 'ExtractHandler',
-                    'archive_path': 'in',
-                    'target_dir': 'out',
+                    "class_name": "ExtractHandler",
+                    "archive_path": "in",
+                    "target_dir": "out",
                 }
             ],
             [],
-            [Path('/some/path')],
+            [Path("/some/path")],
         ),
-        (Job(nodes=12), ['ls', '-l'], [], [EnvHandler(mode=EnvOperation.CLEAR)], []),
+        (Job(nodes=12), ["ls", "-l"], [], [EnvHandler(mode=EnvOperation.CLEAR)], []),
     ],
 )
 def test_default_application(
     tmp_path, job, command, data_handlers, env_handlers, library_paths
 ):
-    config = {'command': command}
+    config = {"command": command}
     if data_handlers is not None:
-        config['data_handlers'] = data_handlers
+        config["data_handlers"] = data_handlers
     if env_handlers is not None:
-        config['env_handlers'] = env_handlers
+        config["env_handlers"] = env_handlers
     if library_paths is not None:
-        config['library_paths'] = library_paths
+        config["library_paths"] = library_paths
     application = DefaultApplication.from_config(config=config)
 
     assert application.get_command(tmp_path, job) == command
@@ -67,7 +67,7 @@ def test_default_application(
         data_out = application.get_data_handlers(tmp_path, job)
         assert len(data_out) == len(data_handlers)
         assert [type(x).__name__ for x in data_out] == [
-            dh['class_name'] for dh in data_handlers
+            dh["class_name"] for dh in data_handlers
         ]
     else:
         assert len(application.get_data_handlers(tmp_path, job)) == 0

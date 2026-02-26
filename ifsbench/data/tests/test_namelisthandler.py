@@ -16,28 +16,34 @@ from io import StringIO
 import f90nml
 import pytest
 
-from ifsbench.data import NamelistHandler, NamelistOverride, NamelistOperation, SanitiseMode, NamelistSanitiseHandler
+from ifsbench.data import (
+    NamelistHandler,
+    NamelistOverride,
+    NamelistOperation,
+    SanitiseMode,
+    NamelistSanitiseHandler,
+)
 
 
-@pytest.fixture(name='initial_namelist')
+@pytest.fixture(name="initial_namelist")
 def fixture_namelist():
     namelist = f90nml.Namelist()
 
-    namelist['namelist1'] = {'int': 2, 'str': 'test', 'list': [2, 3, 'entry']}
+    namelist["namelist1"] = {"int": 2, "str": "test", "list": [2, 3, "entry"]}
 
-    namelist['namelist2'] = {'int': 5}
+    namelist["namelist2"] = {"int": 5}
 
     return namelist
 
 
 @pytest.mark.parametrize(
-    'nlist, entry,mode,value,success',
+    "nlist, entry,mode,value,success",
     [
-        ('namelist1', 'entry', NamelistOperation.DELETE, None, True),
-        ('namelist1', 'entry', NamelistOperation.SET, None, False),
-        ('namelist1', 'entry', NamelistOperation.APPEND, None, False),
-        ('namelist1', 'entry', NamelistOperation.SET, 2, True),
-        ('namelist1', 'entry', NamelistOperation.APPEND, 3, True),
+        ("namelist1", "entry", NamelistOperation.DELETE, None, True),
+        ("namelist1", "entry", NamelistOperation.SET, None, False),
+        ("namelist1", "entry", NamelistOperation.APPEND, None, False),
+        ("namelist1", "entry", NamelistOperation.SET, 2, True),
+        ("namelist1", "entry", NamelistOperation.APPEND, 3, True),
     ],
 )
 def test_namelistoverride_init(nlist, entry, mode, value, success):
@@ -51,19 +57,19 @@ def test_namelistoverride_init(nlist, entry, mode, value, success):
     else:
         context = pytest.raises(ValueError)
 
-    config = {'namelist': nlist, 'entry': entry, 'mode': mode}
+    config = {"namelist": nlist, "entry": entry, "mode": mode}
     if value:
-        config['value'] = value
+        config["value"] = value
     with context:
         NamelistOverride.from_config(config)
 
 
 @pytest.mark.parametrize(
-    'nlist, entry,mode,value',
+    "nlist, entry,mode,value",
     [
-        ('namelist1', 'entry', NamelistOperation.DELETE, None),
-        ('namelist1', 'entry', NamelistOperation.SET, 2),
-        ('namelist1', 'entry', NamelistOperation.APPEND, 3),
+        ("namelist1", "entry", NamelistOperation.DELETE, None),
+        ("namelist1", "entry", NamelistOperation.SET, 2),
+        ("namelist1", "entry", NamelistOperation.APPEND, 3),
     ],
 )
 def test_namelistoverride_dump_config(nlist, entry, mode, value):
@@ -72,22 +78,22 @@ def test_namelistoverride_dump_config(nlist, entry, mode, value):
     accepted.
     """
 
-    config = {'namelist': nlist, 'entry': entry, 'mode': mode}
+    config = {"namelist": nlist, "entry": entry, "mode": mode}
     if value:
-        config['value'] = value
+        config["value"] = value
     no = NamelistOverride.from_config(config)
 
     assert no.dump_config() == config
 
 
 @pytest.mark.parametrize(
-    'key,value',
+    "key,value",
     [
-        (('namelist1', 'int'), 5),
-        (('namelist1', 'list'), [0, 2]),
-        (('namelist2', 'int'), 'not an int'),
-        (('namelist2', 'newvalue'), 5),
-        (('namelist3', 'anothervalue'), [2, 3, 4]),
+        (("namelist1", "int"), 5),
+        (("namelist1", "list"), [0, 2]),
+        (("namelist2", "int"), "not an int"),
+        (("namelist2", "newvalue"), 5),
+        (("namelist3", "anothervalue"), [2, 3, 4]),
     ],
 )
 def test_namelisthandler_apply_set(initial_namelist, key, value):
@@ -97,7 +103,7 @@ def test_namelisthandler_apply_set(initial_namelist, key, value):
 
     namelist = f90nml.Namelist(initial_namelist)
 
-    config = {'namelist': key[0], 'entry': key[1], 'mode': 'set', 'value': value}
+    config = {"namelist": key[0], "entry": key[1], "mode": "set", "value": value}
     override = NamelistOverride.from_config(config)
 
     override.apply(namelist)
@@ -111,15 +117,15 @@ def test_namelisthandler_apply_set(initial_namelist, key, value):
 
 
 @pytest.mark.parametrize(
-    'key,value,success',
+    "key,value,success",
     [
-        (('namelist1', 'int'), 5, False),
-        (('namelist1', 'list'), 3, True),
-        (('namelist1', 'list'), [2, 4], False),
-        (('namelist1', 'list'), 5, True),
-        (('namelist1', 'list'), 'Hello', False),
-        (('namelist2', 'int'), 'not an int', False),
-        (('namelist3', 'new_list'), 'not an int', True),
+        (("namelist1", "int"), 5, False),
+        (("namelist1", "list"), 3, True),
+        (("namelist1", "list"), [2, 4], False),
+        (("namelist1", "list"), 5, True),
+        (("namelist1", "list"), "Hello", False),
+        (("namelist2", "int"), "not an int", False),
+        (("namelist3", "new_list"), "not an int", True),
     ],
 )
 def test_namelistoverride_apply_append(initial_namelist, key, value, success):
@@ -129,7 +135,7 @@ def test_namelistoverride_apply_append(initial_namelist, key, value, success):
 
     namelist = f90nml.Namelist(initial_namelist)
 
-    config = {'namelist': key[0], 'entry': key[1], 'mode': 'append', 'value': value}
+    config = {"namelist": key[0], "entry": key[1], "mode": "append", "value": value}
     override = NamelistOverride(**config)
 
     if success:
@@ -151,14 +157,14 @@ def test_namelistoverride_apply_append(initial_namelist, key, value, success):
 
 
 @pytest.mark.parametrize(
-    'key',
+    "key",
     [
-        ('namelist1', 'int'),
-        ('namelist1', 'list'),
-        ('namelist1', 'list'),
-        ('namelist2', 'int'),
-        ('doesnot', 'exist'),
-        ('namelist1', 'missing'),
+        ("namelist1", "int"),
+        ("namelist1", "list"),
+        ("namelist1", "list"),
+        ("namelist2", "int"),
+        ("doesnot", "exist"),
+        ("namelist1", "missing"),
     ],
 )
 def test_namelistoverride_apply_delete(initial_namelist, key):
@@ -168,7 +174,7 @@ def test_namelistoverride_apply_delete(initial_namelist, key):
 
     namelist = f90nml.Namelist(initial_namelist)
 
-    config = {'namelist': key[0], 'entry': key[1], 'mode': 'delete'}
+    config = {"namelist": key[0], "entry": key[1], "mode": "delete"}
     override = NamelistOverride(**config)
 
     override.apply(namelist)
@@ -183,45 +189,45 @@ def test_namelistoverride_apply_delete(initial_namelist, key):
 
 
 @pytest.mark.parametrize(
-    'input_path,input_valid',
+    "input_path,input_valid",
     [
-        ('somewhere/namelist', True),
-        (Path('somewhere/fort.4'), True),
+        ("somewhere/namelist", True),
+        (Path("somewhere/fort.4"), True),
         (None, False),
         (2, False),
     ],
 )
 @pytest.mark.parametrize(
-    'output_path,output_valid',
+    "output_path,output_valid",
     [
-        ('somewhere/namelist', True),
-        (Path('somewhere/fort.4'), True),
+        ("somewhere/namelist", True),
+        (Path("somewhere/fort.4"), True),
         (None, False),
         (2, False),
     ],
 )
 @pytest.mark.parametrize(
-    'overrides, overrides_valid',
+    "overrides, overrides_valid",
     [
         ([], True),
-        ('Test', False),
+        ("Test", False),
         (2, False),
         (
             [
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'set', 'value': 5},
+                {"namelist": "namelist", "entry": "entry", "mode": "set", "value": 5},
             ],
             True,
         ),
         (
             [
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'set', 'value': 5},
+                {"namelist": "namelist", "entry": "entry", "mode": "set", "value": 5},
                 {
-                    'namelist': 'namelist',
-                    'entry': 'entry2',
-                    'mode': 'append',
-                    'value': 2,
+                    "namelist": "namelist",
+                    "entry": "entry2",
+                    "mode": "append",
+                    "value": 2,
                 },
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'delete'},
+                {"namelist": "namelist", "entry": "entry", "mode": "delete"},
             ],
             True,
         ),
@@ -240,32 +246,32 @@ def test_namelisthandler_init(
 
     with context:
         config = {
-            'input_path': input_path,
-            'output_path': output_path,
-            'overrides': overrides,
+            "input_path": input_path,
+            "output_path": output_path,
+            "overrides": overrides,
         }
         NamelistHandler.from_config(config)
 
 
 @pytest.mark.parametrize(
-    'overrides',
+    "overrides",
     [
         ([]),
         (
             [
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'set', 'value': 5},
+                {"namelist": "namelist", "entry": "entry", "mode": "set", "value": 5},
             ]
         ),
         (
             [
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'set', 'value': 5},
+                {"namelist": "namelist", "entry": "entry", "mode": "set", "value": 5},
                 {
-                    'namelist': 'namelist',
-                    'entry': 'entry2',
-                    'mode': 'append',
-                    'value': 2,
+                    "namelist": "namelist",
+                    "entry": "entry2",
+                    "mode": "append",
+                    "value": 2,
                 },
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'delete'},
+                {"namelist": "namelist", "entry": "entry", "mode": "delete"},
             ]
         ),
     ],
@@ -274,42 +280,42 @@ def test_namelisthandler_dump_config(overrides):
     """
     Initialise the NamelistHandler and make sure that only correct values are accepted.
     """
-    input_path = 'somewhere/namelist'
-    output_path = 'somewhere/namelist'
+    input_path = "somewhere/namelist"
+    output_path = "somewhere/namelist"
     config = {
-        'input_path': input_path,
-        'output_path': output_path,
-        'overrides': overrides,
+        "input_path": input_path,
+        "output_path": output_path,
+        "overrides": overrides,
     }
     nh = NamelistHandler.from_config(config)
 
     expected = {
-        'input_path': input_path,
-        'output_path': output_path,
-        'overrides': overrides,
+        "input_path": input_path,
+        "output_path": output_path,
+        "overrides": overrides,
     }
     assert nh.dump_config() == expected
 
 
 @pytest.mark.parametrize(
-    'overrides',
+    "overrides",
     [
         ([]),
         (
             [
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'set', 'value': 5},
+                {"namelist": "namelist", "entry": "entry", "mode": "set", "value": 5},
             ]
         ),
         (
             [
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'set', 'value': 5},
+                {"namelist": "namelist", "entry": "entry", "mode": "set", "value": 5},
                 {
-                    'namelist': 'namelist',
-                    'entry': 'entry2',
-                    'mode': 'append',
-                    'value': 2,
+                    "namelist": "namelist",
+                    "entry": "entry2",
+                    "mode": "append",
+                    "value": 2,
                 },
-                {'namelist': 'namelist', 'entry': 'entry', 'mode': 'delete'},
+                {"namelist": "namelist", "entry": "entry", "mode": "delete"},
             ]
         ),
     ],
@@ -318,44 +324,44 @@ def test_namelisthandler_dump_config_with_classname(overrides):
     """
     Initialise the NamelistHandler and make sure that only correct values are accepted.
     """
-    input_path = 'somewhere/namelist'
-    output_path = 'somewhere/namelist'
+    input_path = "somewhere/namelist"
+    output_path = "somewhere/namelist"
     config = {
-        'input_path': input_path,
-        'output_path': output_path,
-        'overrides': overrides,
+        "input_path": input_path,
+        "output_path": output_path,
+        "overrides": overrides,
     }
     nh = NamelistHandler.from_config(config)
 
     expected = {
-        'class_name': NamelistHandler.__name__,
-        'input_path': input_path,
-        'output_path': output_path,
-        'overrides': overrides,
+        "class_name": NamelistHandler.__name__,
+        "input_path": input_path,
+        "output_path": output_path,
+        "overrides": overrides,
     }
     assert nh.dump_config(with_class=True) == expected
 
 
-@pytest.mark.parametrize('input_path', ['somewhere/namelist'])
-@pytest.mark.parametrize('input_relative', [True, False])
+@pytest.mark.parametrize("input_path", ["somewhere/namelist"])
+@pytest.mark.parametrize("input_relative", [True, False])
 @pytest.mark.parametrize(
-    'output_path',
+    "output_path",
     [
-        'somewhere/namelist',
+        "somewhere/namelist",
     ],
 )
-@pytest.mark.parametrize('output_relative', [True, False])
+@pytest.mark.parametrize("output_relative", [True, False])
 @pytest.mark.parametrize(
-    'overrides',
+    "overrides",
     [
         [],
         [
-            {'namelist': 'namelist', 'entry': 'entry', 'mode': 'set', 'value': 5},
+            {"namelist": "namelist", "entry": "entry", "mode": "set", "value": 5},
         ],
         [
-            {'namelist': 'namelist', 'entry': 'entry', 'mode': 'set', 'value': 5},
-            {'namelist': 'namelist', 'entry': 'entry2', 'mode': 'append', 'value': 2},
-            {'namelist': 'namelist', 'entry': 'entry', 'mode': 'delete'},
+            {"namelist": "namelist", "entry": "entry", "mode": "set", "value": 5},
+            {"namelist": "namelist", "entry": "entry2", "mode": "append", "value": 2},
+            {"namelist": "namelist", "entry": "entry", "mode": "delete"},
         ],
     ],
 )
@@ -419,9 +425,9 @@ def test_namelisthandler_execute(
 
     # Actually extract the archive.
     config = {
-        'input_path': str(input_path),
-        'output_path': str(output_path),
-        'overrides': overrides,
+        "input_path": str(input_path),
+        "output_path": str(output_path),
+        "overrides": overrides,
     }
     handler = NamelistHandler.from_config(config)
     handler.execute(tmp_path)
@@ -430,6 +436,7 @@ def test_namelisthandler_execute(
         assert (tmp_path / output_path).exists()
     else:
         assert Path(output_path).exists()
+
 
 def test_namelisthandler_write_symlink(
     tmp_path,
@@ -441,48 +448,58 @@ def test_namelisthandler_write_symlink(
 
     namelist = f90nml.Namelist()
 
-    namelist['namelist1'] = {'int': 5}
+    namelist["namelist1"] = {"int": 5}
 
-    namelist.write(tmp_path/'namelist')
-    (tmp_path/'sym_namelist').symlink_to(tmp_path/'namelist')
+    namelist.write(tmp_path / "namelist")
+    (tmp_path / "sym_namelist").symlink_to(tmp_path / "namelist")
 
-    override = NamelistOverride(namelist='namelist1', entry='int', value=6, mode=NamelistOperation.SET)
+    override = NamelistOverride(
+        namelist="namelist1", entry="int", value=6, mode=NamelistOperation.SET
+    )
 
     handler = NamelistHandler(
-        input_path=tmp_path/'namelist',
-        output_path=tmp_path/'sym_namelist',
-        overrides=[override]
+        input_path=tmp_path / "namelist",
+        output_path=tmp_path / "sym_namelist",
+        overrides=[override],
     )
 
     handler.execute(tmp_path)
 
-    namelist1 = f90nml.read(tmp_path/'namelist')
-    namelist2 = f90nml.read(tmp_path/'sym_namelist')
+    namelist1 = f90nml.read(tmp_path / "namelist")
+    namelist2 = f90nml.read(tmp_path / "sym_namelist")
 
-    assert namelist1['namelist1']['int'] == 5
-    assert namelist2['namelist1']['int'] == 6
+    assert namelist1["namelist1"]["int"] == 5
+    assert namelist2["namelist1"]["int"] == 6
+
 
 @pytest.mark.parametrize(
-    'input_path,input_valid',
+    "input_path,input_valid",
     [
-        ('somewhere/namelist', True),
-        (Path('somewhere/fort.4'), True),
+        ("somewhere/namelist", True),
+        (Path("somewhere/fort.4"), True),
         (None, False),
         (2, False),
     ],
 )
 @pytest.mark.parametrize(
-    'output_path,output_valid',
+    "output_path,output_valid",
     [
-        ('somewhere/namelist', True),
-        (Path('somewhere/fort.4'), True),
+        ("somewhere/namelist", True),
+        (Path("somewhere/fort.4"), True),
         (None, False),
         (2, False),
     ],
 )
 @pytest.mark.parametrize(
-    'mode',
-    [SanitiseMode.FIRST, SanitiseMode.LAST, SanitiseMode.MERGE_FIRST, SanitiseMode.MERGE_LAST, 'something', 5]
+    "mode",
+    [
+        SanitiseMode.FIRST,
+        SanitiseMode.LAST,
+        SanitiseMode.MERGE_FIRST,
+        SanitiseMode.MERGE_LAST,
+        "something",
+        5,
+    ],
 )
 def test_namelisthandlersanitise_init(
     input_path, input_valid, output_path, output_valid, mode
@@ -497,39 +514,44 @@ def test_namelisthandlersanitise_init(
 
     with context:
         config = {
-            'input_path': input_path,
-            'output_path': output_path,
-            'mode': mode,
+            "input_path": input_path,
+            "output_path": output_path,
+            "mode": mode,
         }
         NamelistSanitiseHandler.from_config(config)
 
 
 @pytest.mark.parametrize(
-    'mode',
-    [SanitiseMode.FIRST, SanitiseMode.LAST, SanitiseMode.MERGE_FIRST, SanitiseMode.MERGE_LAST]
+    "mode",
+    [
+        SanitiseMode.FIRST,
+        SanitiseMode.LAST,
+        SanitiseMode.MERGE_FIRST,
+        SanitiseMode.MERGE_LAST,
+    ],
 )
 def test_namelisthandlersanitise_dump_config(mode):
     """
     Initialise the NamelistSanitiseHandler and make sure that only correct values are accepted.
     """
-    input_path = 'somewhere/namelist'
-    output_path = 'somewhere/namelist'
+    input_path = "somewhere/namelist"
+    output_path = "somewhere/namelist"
     config = {
-        'input_path': input_path,
-        'output_path': output_path,
-        'mode': mode,
+        "input_path": input_path,
+        "output_path": output_path,
+        "mode": mode,
     }
     nh = NamelistSanitiseHandler.from_config(config)
 
     expected = {
-        'input_path': input_path,
-        'output_path': output_path,
-        'mode': mode.value,
+        "input_path": input_path,
+        "output_path": output_path,
+        "mode": mode.value,
     }
     assert nh.dump_config() == expected
 
 
-@pytest.fixture(name='duplicate_namelist')
+@pytest.fixture(name="duplicate_namelist")
 def fixture_duplicate_namelist():
     nml_string = """
 &a
@@ -550,23 +572,30 @@ def fixture_duplicate_namelist():
 
     return namelist
 
-@pytest.mark.parametrize('input_path', ['somewhere/namelist'])
-@pytest.mark.parametrize('input_relative', [True, False])
+
+@pytest.mark.parametrize("input_path", ["somewhere/namelist"])
+@pytest.mark.parametrize("input_relative", [True, False])
 @pytest.mark.parametrize(
-    'output_path',
+    "output_path",
     [
-        'somewhere/namelist',
+        "somewhere/namelist",
     ],
 )
-@pytest.mark.parametrize('output_relative', [True, False])
+@pytest.mark.parametrize("output_relative", [True, False])
 @pytest.mark.parametrize(
-    'mode,reference',
+    "mode,reference",
     [
-        (SanitiseMode.FIRST, {'a': {'foo': 4, 'foobar': 3}, 'b': {'bar': 1, 'foo': 2}}),
-        (SanitiseMode.LAST, {'a': {'foo': 1, 'bar': 2}, 'b': {'bar': 1, 'foo': 2}}),
-        (SanitiseMode.MERGE_FIRST, {'a': {'foo': 4, 'foobar': 3, 'bar': 2}, 'b': {'bar': 1, 'foo': 2}}),
-        (SanitiseMode.MERGE_LAST, {'a': {'foo': 1, 'foobar': 3, 'bar': 2}, 'b': {'bar': 1, 'foo': 2}}),
-    ]
+        (SanitiseMode.FIRST, {"a": {"foo": 4, "foobar": 3}, "b": {"bar": 1, "foo": 2}}),
+        (SanitiseMode.LAST, {"a": {"foo": 1, "bar": 2}, "b": {"bar": 1, "foo": 2}}),
+        (
+            SanitiseMode.MERGE_FIRST,
+            {"a": {"foo": 4, "foobar": 3, "bar": 2}, "b": {"bar": 1, "foo": 2}},
+        ),
+        (
+            SanitiseMode.MERGE_LAST,
+            {"a": {"foo": 1, "foobar": 3, "bar": 2}, "b": {"bar": 1, "foo": 2}},
+        ),
+    ],
 )
 def test_namelistsanitisehandler_execute(
     tmp_path,
@@ -576,7 +605,7 @@ def test_namelistsanitisehandler_execute(
     output_path,
     output_relative,
     mode,
-    reference
+    reference,
 ):
     """
     Test that the execute function sanitises the namelists correctly.
@@ -632,9 +661,9 @@ def test_namelistsanitisehandler_execute(
 
     # Actually extract the archive.
     config = {
-        'input_path': str(input_path),
-        'output_path': str(output_path),
-        'mode': mode,
+        "input_path": str(input_path),
+        "output_path": str(output_path),
+        "mode": mode,
     }
     handler = NamelistSanitiseHandler.from_config(config)
     handler.execute(tmp_path)

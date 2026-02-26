@@ -19,16 +19,30 @@ from ifsbench.logging import logger, DEBUG
 from ifsbench.util import auto_post_mortem_debugger
 
 
-__all__ = ['cli', 'RunOptions', 'run_options', 'ReferenceOptions', 'reference_options']
+__all__ = ["cli", "RunOptions", "run_options", "ReferenceOptions", "reference_options"]
 
 
 @click.group()
-@click.option('--debug/--no-debug', 'debug_', default=False, show_default=True,
-              help='Enable / disable debug mode with verbose logging.')
-@click.option('--log', type=click.Path(writable=True),
-              help='Write debug-level information to a log file.')
-@click.option('--pdb', 'pdb_', default=False, is_flag=True, show_default=True,
-              help='Attach Python debugger when exceptions occur.')
+@click.option(
+    "--debug/--no-debug",
+    "debug_",
+    default=False,
+    show_default=True,
+    help="Enable / disable debug mode with verbose logging.",
+)
+@click.option(
+    "--log",
+    type=click.Path(writable=True),
+    help="Write debug-level information to a log file.",
+)
+@click.option(
+    "--pdb",
+    "pdb_",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Attach Python debugger when exceptions occur.",
+)
 @click.pass_context
 def cli(ctx, debug_, log, pdb_):
     """
@@ -66,11 +80,11 @@ def cli(ctx, debug_, log, pdb_):
     """
     if ctx.obj is None:
         ctx.obj = {}
-    ctx.obj['DEBUG'] = debug_
+    ctx.obj["DEBUG"] = debug_
     if debug_:
         logger.setLevel(DEBUG)
     if log:
-        file_handler = FileHandler(log, mode='w')
+        file_handler = FileHandler(log, mode="w")
         file_handler.setLevel(DEBUG)
         logger.addHandler(file_handler)
     if pdb_:
@@ -102,9 +116,17 @@ class RunOptions:
         The length for which the forecast should be run (default: None)
     """
 
-    def __init__(self, nproc=1, nthread=1, hyperthread=1, nproc_io=0,
-                 arch=None, launch_cmd=None, launch_options=None,
-                 forecast_length=None):
+    def __init__(
+        self,
+        nproc=1,
+        nthread=1,
+        hyperthread=1,
+        nproc_io=0,
+        arch=None,
+        launch_cmd=None,
+        launch_options=None,
+        forecast_length=None,
+    ):
 
         self.nproc = nproc
         self.nthread = nthread
@@ -147,23 +169,64 @@ def run_options(func):
             print(f'Running with {runopts.nproc} ranks and {runopts.nthread} threads')
     """
 
-    @click.option('-n', '--nproc', default=1, show_default=True, show_envvar=True,
-                  help='Number of MPI processes to lauch')
-    @click.option('-c', '--nthread', default=1, show_default=True, show_envvar=True,
-                  help='Number of OpenMP threads to use')
-    @click.option('--hyperthread', default=1, show_default=True, show_envvar=True,
-                  help='Number of hyperthreads to use per physical core')
-    @click.option('--nproc-io', default=0, show_default=True, show_envvar=True,
-                  help='Number of dedicated IO-server ranks to use')
-    @click.option('-a', '--arch', default=None, show_envvar=True,
-                  help='Architecture name for specialized invocation')
-    @click.option('-l', '--launch-cmd', default=None, show_envvar=True,
-                  help='Custom launcher command to prepend to run')
-    @click.option('--launch-options', default=None, show_envvar=True,
-                  help='User options to add to the launch command (ignored if using --launch-cmd')
-    @click.option('--forecast-length', '--fclen', default=None, show_envvar=True,
-                  help='Length of forecast (e.g., h240 or d10)')
-    @click.option('--nproma', default=None, help='Override the value of NPROMA')
+    @click.option(
+        "-n",
+        "--nproc",
+        default=1,
+        show_default=True,
+        show_envvar=True,
+        help="Number of MPI processes to lauch",
+    )
+    @click.option(
+        "-c",
+        "--nthread",
+        default=1,
+        show_default=True,
+        show_envvar=True,
+        help="Number of OpenMP threads to use",
+    )
+    @click.option(
+        "--hyperthread",
+        default=1,
+        show_default=True,
+        show_envvar=True,
+        help="Number of hyperthreads to use per physical core",
+    )
+    @click.option(
+        "--nproc-io",
+        default=0,
+        show_default=True,
+        show_envvar=True,
+        help="Number of dedicated IO-server ranks to use",
+    )
+    @click.option(
+        "-a",
+        "--arch",
+        default=None,
+        show_envvar=True,
+        help="Architecture name for specialized invocation",
+    )
+    @click.option(
+        "-l",
+        "--launch-cmd",
+        default=None,
+        show_envvar=True,
+        help="Custom launcher command to prepend to run",
+    )
+    @click.option(
+        "--launch-options",
+        default=None,
+        show_envvar=True,
+        help="User options to add to the launch command (ignored if using --launch-cmd",
+    )
+    @click.option(
+        "--forecast-length",
+        "--fclen",
+        default=None,
+        show_envvar=True,
+        help="Length of forecast (e.g., h240 or d10)",
+    )
+    @click.option("--nproma", default=None, help="Override the value of NPROMA")
     @click.pass_context
     @wraps(func)
     def process_run_options(ctx, *args, **kwargs):
@@ -171,15 +234,15 @@ def run_options(func):
         Wrapper function to parse options into a utility object
         """
         runopts = ctx.ensure_object(RunOptions)
-        runopts.nproc = kwargs.pop('nproc')
-        runopts.nthread = kwargs.pop('nthread')
-        runopts.hyperthread = kwargs.pop('hyperthread')
-        runopts.nproc_io = kwargs.pop('nproc_io')
-        runopts.arch = kwargs.pop('arch')
-        runopts.launch_cmd = kwargs.pop('launch_cmd')
-        runopts.launch_options = kwargs.pop('launch_options')
-        runopts.forecast_length = kwargs.pop('forecast_length')
-        runopts.nproma = kwargs.pop('nproma')
+        runopts.nproc = kwargs.pop("nproc")
+        runopts.nthread = kwargs.pop("nthread")
+        runopts.hyperthread = kwargs.pop("hyperthread")
+        runopts.nproc_io = kwargs.pop("nproc_io")
+        runopts.arch = kwargs.pop("arch")
+        runopts.launch_cmd = kwargs.pop("launch_cmd")
+        runopts.launch_options = kwargs.pop("launch_options")
+        runopts.forecast_length = kwargs.pop("forecast_length")
+        runopts.nproma = kwargs.pop("nproma")
         return ctx.invoke(func, *args, runopts, **kwargs)
 
     return process_run_options
@@ -235,14 +298,33 @@ def reference_options(func):
             print(f'Validate against reference record in {refopts.path}')
     """
 
-    @click.option('-r', '--reference', type=click.Path(), default=None, show_envvar=True,
-                  help='Path to custom reference record for validation')
-    @click.option('--validate/--no-validate', default=True, show_envvar=True,
-                  help='Flag to enable validation against reference')
-    @click.option('--update-reference', default=False, is_flag=True, show_envvar=True,
-                  help='Flag to update reference record with result')
-    @click.option('--comment', default=None, show_envvar=True,
-                  help='Comment to store when updating reference record')
+    @click.option(
+        "-r",
+        "--reference",
+        type=click.Path(),
+        default=None,
+        show_envvar=True,
+        help="Path to custom reference record for validation",
+    )
+    @click.option(
+        "--validate/--no-validate",
+        default=True,
+        show_envvar=True,
+        help="Flag to enable validation against reference",
+    )
+    @click.option(
+        "--update-reference",
+        default=False,
+        is_flag=True,
+        show_envvar=True,
+        help="Flag to update reference record with result",
+    )
+    @click.option(
+        "--comment",
+        default=None,
+        show_envvar=True,
+        help="Comment to store when updating reference record",
+    )
     @click.pass_context
     @wraps(func)
     def process_reference_options(ctx, *args, **kwargs):
@@ -250,10 +332,10 @@ def reference_options(func):
         Wrapper function to parse options into a utility object
         """
         refopts = ctx.ensure_object(ReferenceOptions)
-        refopts.path = kwargs.pop('reference')
-        refopts.validate = kwargs.pop('validate')
-        refopts.update = kwargs.pop('update_reference')
-        refopts.comment = kwargs.pop('comment')
+        refopts.path = kwargs.pop("reference")
+        refopts.validate = kwargs.pop("validate")
+        refopts.update = kwargs.pop("update_reference")
+        refopts.comment = kwargs.pop("comment")
         return ctx.invoke(func, *args, refopts, **kwargs)
 
     return process_reference_options

@@ -33,7 +33,11 @@ def fixture_test_env():
             EnvHandler(mode=EnvOperation.SET, key="OTHER_VALUE", value="6"),
             EnvHandler(mode=EnvOperation.DELETE, key="SOME_VALUE"),
             EnvHandler(mode=EnvOperation.SET, key="NOT_V@LID", value="!!"),
-            EnvHandler(mode=EnvOperation.SET, key="ESCAPE_HELL", value="echo \"Something\", '22'"),
+            EnvHandler(
+                mode=EnvOperation.SET,
+                key="ESCAPE_HELL",
+                value="echo \"Something\", '22'",
+            ),
         ]
     )
 
@@ -252,8 +256,8 @@ def test_bashlauncher_script(
 
     script_path = Path(result.cmd[1])
 
-    cmd_short = cmd[0].split('/')[-1]
-    assert str(script_path).startswith(str(tmp_path/'bash_scripts'/cmd_short))
+    cmd_short = cmd[0].split("/")[-1]
+    assert str(script_path).startswith(str(tmp_path / "bash_scripts" / cmd_short))
 
     # There are essentially only three things we have to check
     # * The header/hashbang.
@@ -276,7 +280,7 @@ def test_bashlauncher_script(
             if not line:
                 continue
 
-            if line.startswith('#'):
+            if line.startswith("#"):
                 continue
 
             if line.startswith("export"):
@@ -294,13 +298,13 @@ def test_bashlauncher_script(
     for key, value in base_launch_data.env.items():
         # Variables that have non-bash compatible names should not make it to
         # the bash script.
-        if not re.fullmatch('[a-zA-Z_][a-zA-Z_0-9]*', key):
+        if not re.fullmatch("[a-zA-Z_][a-zA-Z_0-9]*", key):
             continue
 
         # Escape certain characters.
-        value = value.replace('$', '\\$')
+        value = value.replace("$", "\\$")
         value = value.replace('"', '\\"')
-        value = value.replace('`', '\\`')
+        value = value.replace("`", "\\`")
         ref_env.append(f'export {key}="{value}"')
 
     assert set(ref_env) == set(env_lines)

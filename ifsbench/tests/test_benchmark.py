@@ -31,43 +31,43 @@ from ifsbench.data import DataHandler
 from ifsbench.launch import Launcher, LaunchData
 
 
-@pytest.fixture(name='test_setup_files')
+@pytest.fixture(name="test_setup_files")
 def fixture_test_setup_files():
     env_handlers = [
         EnvHandler(mode=EnvOperation.CLEAR),
     ]
 
     class TouchHandler(DataHandler):
-        handler_type: Literal['TouchHandler'] = 'TouchHandler'
+        handler_type: Literal["TouchHandler"] = "TouchHandler"
         path: str
 
         def execute(self, wdir, **kwargs):
             (wdir / self.path).touch()
 
     data_handlers = [
-        TouchHandler(path='file1'),
-        TouchHandler(path='file2'),
+        TouchHandler(path="file1"),
+        TouchHandler(path="file2"),
     ]
 
-    science_files = [Path('file1'), Path('file2')]
+    science_files = [Path("file1"), Path("file2")]
 
     science = ScienceSetup(
-        application={'class_name': 'DefaultApplication', 'command': ['pwd']},
+        application={"class_name": "DefaultApplication", "command": ["pwd"]},
         env_handlers=env_handlers,
         data_handlers_init=data_handlers,
     )
 
-    tech = TechSetup(data_handlers_init=[TouchHandler(path='file3')])
+    tech = TechSetup(data_handlers_init=[TouchHandler(path="file3")])
 
-    tech_files = [Path('file3')]
+    tech_files = [Path("file3")]
 
     # Return example tech and science setup as well as the list of files that should
     # be created by the science/tech data handles.
     return science, tech, science_files, tech_files
 
 
-@pytest.mark.parametrize('force', [True, False])
-@pytest.mark.parametrize('use_tech', [True, False])
+@pytest.mark.parametrize("force", [True, False])
+@pytest.mark.parametrize("use_tech", [True, False])
 def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force, use_tech):
     """
     Test the Benchmark.setup_rundir function.
@@ -111,7 +111,7 @@ def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force, use_te
             assert stat.st_atime == stats[file].st_atime
 
 
-@pytest.fixture(name='test_run_setup')
+@pytest.fixture(name="test_run_setup")
 def fixture_test_run_setup():
     env_handlers = [
         EnvHandler(mode=EnvOperation.CLEAR),
@@ -120,8 +120,8 @@ def fixture_test_run_setup():
     application = DefaultApplication(
         command=[
             sys.executable,
-            '-c',
-            'from pathlib import Path; Path(\'test.txt\').touch()',
+            "-c",
+            "from pathlib import Path; Path('test.txt').touch()",
         ]
     )
 
@@ -131,7 +131,7 @@ def fixture_test_run_setup():
     )
 
     tech = TechSetup(
-        env_handlers=[EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')]
+        env_handlers=[EnvHandler(mode=EnvOperation.SET, key="KEY", value="VALUE")]
     )
 
     return science, tech
@@ -157,13 +157,13 @@ class _DummyLauncher(Launcher):
         return LaunchData(run_dir=run_dir, cmd=cmd)
 
 
-@pytest.mark.parametrize('job', [Job(tasks=2)])
-@pytest.mark.parametrize('use_arch', [False, True])
+@pytest.mark.parametrize("job", [Job(tasks=2)])
+@pytest.mark.parametrize("use_arch", [False, True])
 @pytest.mark.parametrize(
-    'use_launcher, launcher_flags',
-    [(False, None), (True, None), (True, ['something'])],
+    "use_launcher, launcher_flags",
+    [(False, None), (True, None), (True, ["something"])],
 )
-@pytest.mark.parametrize('use_tech', [True, False])
+@pytest.mark.parametrize("use_tech", [True, False])
 def test_defaultbenchmark_run(
     tmp_path, test_run_setup, job, use_arch, use_launcher, launcher_flags, use_tech
 ):
@@ -175,8 +175,8 @@ def test_defaultbenchmark_run(
     arch = (
         DefaultArch.from_config(
             {
-                'launcher': {'class_name': '_DummyLauncher'},
-                'cpu_config': CpuConfiguration(),
+                "launcher": {"class_name": "_DummyLauncher"},
+                "cpu_config": CpuConfiguration(),
             }
         )
         if use_arch
@@ -209,4 +209,4 @@ def test_defaultbenchmark_run(
     elif arch is not None:
         assert arch.get_default_launcher()._prepare_called is True
 
-    assert (tmp_path / 'test.txt').exists()
+    assert (tmp_path / "test.txt").exists()

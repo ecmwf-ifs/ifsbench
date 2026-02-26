@@ -11,7 +11,7 @@ import xarray as xr
 
 from ifsbench.data_file_reader import DataFileReader
 
-__all__ = ['NetcdfFileReader']
+__all__ = ["NetcdfFileReader"]
 
 
 class NetcdfFileReader(DataFileReader):
@@ -23,4 +23,4 @@ class NetcdfFileReader(DataFileReader):
         # will determine the file type, but we want to use the grib implementation
         # for GRIB files, otherwise this code can fail in cryptic ways.
         # Explicitly setting the engine results in a clearer error.
-        return [xr.open_dataset(input_path, engine='netcdf4')]
+        return [xr.open_dataset(input_path, engine="netcdf4")]

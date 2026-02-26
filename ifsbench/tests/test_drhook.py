@@ -14,32 +14,41 @@ import pytest
 
 from ifsbench import DrHookRecord
 
+
 def get_data(df, routine, metric):
-    return (df.loc[df['routine'] == routine][metric]).iloc[0]
+    return (df.loc[df["routine"] == routine][metric]).iloc[0]
+
 
 def get_metadata(df, metric):
     return df.loc[0][metric]
 
-@pytest.fixture(name='here')
+
+@pytest.fixture(name="here")
 def fixture_here():
     """Return the full path of the test directory"""
     return Path(__file__).parent.resolve()
 
-@pytest.fixture(name='drhook_profiles')
+
+@pytest.fixture(name="drhook_profiles")
 def fixture_experiment_files(here):
     """Return the full path to the directory with dummy experiment files"""
-    return here/'drhook_profiles'
+    return here / "drhook_profiles"
 
-@pytest.mark.parametrize('batch_size', [2, 4, 6, 15, 20, 1000])
+
+@pytest.mark.parametrize("batch_size", [2, 4, 6, 15, 20, 1000])
 def test_drhook_from_raw(drhook_profiles, batch_size):
     """
     Test parsing of drhook profiles from raw (in dependence of batch size).
     """
-    drhook_record = DrHookRecord.from_raw(f'{drhook_profiles}/drhook.*', batch_size=batch_size)
+    drhook_record = DrHookRecord.from_raw(
+        f"{drhook_profiles}/drhook.*", batch_size=batch_size
+    )
     data = drhook_record.data
     metadata = drhook_record.metadata
 
-    assert get_data(data, 'ADVECTION_LOOP', 'avgTimeTotal') == pytest.approx(2.95975, 0.01)
-    assert get_data(data, 'READWIND', 'avgPercent') ==  pytest.approx(19.088125, 0.01)
-    assert int(get_metadata(metadata, 'nprocs')) == 16
-    assert float(get_metadata(metadata, 'maxtime')) == pytest.approx(6.7, 0.01)
+    assert get_data(data, "ADVECTION_LOOP", "avgTimeTotal") == pytest.approx(
+        2.95975, 0.01
+    )
+    assert get_data(data, "READWIND", "avgPercent") == pytest.approx(19.088125, 0.01)
+    assert int(get_metadata(metadata, "nprocs")) == 16
+    assert float(get_metadata(metadata, "maxtime")) == pytest.approx(6.7, 0.01)

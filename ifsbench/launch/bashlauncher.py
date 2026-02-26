@@ -34,11 +34,11 @@ class BashLauncher(LauncherWrapper):
         ###########
         """
         f.write("\n")
-        f.write('#' * 60)
+        f.write("#" * 60)
         f.write("\n")
-        f.write(f'# {header}')
+        f.write(f"# {header}")
         f.write("\n")
-        f.write('#' * 60)
+        f.write("#" * 60)
         f.write("\n")
         f.write("\n")
 
@@ -49,7 +49,7 @@ class BashLauncher(LauncherWrapper):
         f.write("#! /bin/bash\n\n")
 
         self._write_header(f, "Specify environment")
-        env_name_check = re.compile(r'[a-zA-Z_][a-zA-Z_0-9]*')
+        env_name_check = re.compile(r"[a-zA-Z_][a-zA-Z_0-9]*")
 
         for key, value in launch_data.env.items():
             # Check that the current "environment variable" is an actual
@@ -57,7 +57,7 @@ class BashLauncher(LauncherWrapper):
             # `launch_data.env` but end with `_%%` and are not proper
             # environment variables. We skip these.
             if not env_name_check.fullmatch(key):
-                debug(f'Ignore non-standard bash name {key} in BashLauncher.')
+                debug(f"Ignore non-standard bash name {key} in BashLauncher.")
                 continue
 
             if value is None:
@@ -65,12 +65,12 @@ class BashLauncher(LauncherWrapper):
 
             # We set the environment variables inside a "..." block. This means
             # that we have to escape certain special characters (", $, `).
-            chars_to_escape = ['$', '"', '`']
-            trans = str.maketrans({char: '\\'+char for char in chars_to_escape})
+            chars_to_escape = ["$", '"', "`"]
+            trans = str.maketrans({char: "\\" + char for char in chars_to_escape})
             escaped_value = value.translate(trans)
             f.write(f'export {key}="')
             f.write(escaped_value)
-            f.write("\"\n")
+            f.write('"\n')
 
         self._write_header(f, "Specify launch command")
 
@@ -98,7 +98,7 @@ class BashLauncher(LauncherWrapper):
         time_str = datetime.datetime.now(datetime.timezone.utc).strftime(
             "%Y-%m-%d:%H-%M-%S-%f"
         )
-        cmd_str = cmd[0].split('/')[-1]
+        cmd_str = cmd[0].split("/")[-1]
 
         script_path = script_dir / f"{cmd_str}_{time_str}.sh"
 

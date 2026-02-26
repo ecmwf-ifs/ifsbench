@@ -25,7 +25,8 @@ from ifsbench.job import Job
 from ifsbench.launch import Launcher
 
 
-__all__ = ['ScienceSetup', 'TechSetup', 'Benchmark']
+__all__ = ["ScienceSetup", "TechSetup", "Benchmark"]
+
 
 class ScienceSetup(SerialisationMixin):
     """
@@ -42,18 +43,20 @@ class ScienceSetup(SerialisationMixin):
     Additional technical details that don't alter results (debug flags, additional
     environment variables, etc.) should be specified in :class:`TechSetup`, instead.
     """
+
     #: The application that gets benchmarked (unless overriden by :class:`TechSetup`).
     application: Application
 
     #: Data handlers that are executed only once, during the initial setup
     #: of the run directory.
-    data_handlers_init:  List[DataHandler] = Field(default_factory=list)
+    data_handlers_init: List[DataHandler] = Field(default_factory=list)
 
     #: Data handlers that are executed every time the benchmark is run.
-    data_handlers_runtime:  List[DataHandler] = Field(default_factory=list)
+    data_handlers_runtime: List[DataHandler] = Field(default_factory=list)
 
     #: Environment handlers that are used when the benchmark is run.
-    env_handlers:  List[EnvHandler] = Field(default_factory=list)
+    env_handlers: List[EnvHandler] = Field(default_factory=list)
+
 
 class TechSetup(SerialisationMixin):
     """
@@ -70,13 +73,14 @@ class TechSetup(SerialisationMixin):
 
     #: Data handlers that are executed only once, during the initial setup
     #: of the run directory.
-    data_handlers_init:  List[DataHandler] = Field(default_factory=list)
+    data_handlers_init: List[DataHandler] = Field(default_factory=list)
 
     #: Data handlers that are executed every time the benchmark is run.
-    data_handlers_runtime:  List[DataHandler] = Field(default_factory=list)
+    data_handlers_runtime: List[DataHandler] = Field(default_factory=list)
 
     #: Environment handlers that are used for the initial data setup.
-    env_handlers:  List[EnvHandler] = Field(default_factory=list)
+    env_handlers: List[EnvHandler] = Field(default_factory=list)
+
 
 class BenchmarkSummary(SerialisationMixin):
     """
@@ -110,10 +114,7 @@ class Benchmark(SerialisationMixin):
     #: Additional technical details that don't alter the results.
     tech: Optional[TechSetup] = None
 
-    def setup_rundir(self,
-        run_dir: Path,
-        force: bool = False
-    ):
+    def setup_rundir(self, run_dir: Path, force: bool = False):
         """
         Setup the run directory.
 
@@ -143,13 +144,13 @@ class Benchmark(SerialisationMixin):
         for handler in handlers:
             handler.execute(run_dir)
 
-
-    def run(self,
+    def run(
+        self,
         run_dir: Path,
         job: Job,
         arch: Optional[Arch] = None,
         launcher: Optional[Launcher] = None,
-        launcher_flags: Optional[List[str]] = None
+        launcher_flags: Optional[List[str]] = None,
     ) -> BenchmarkSummary:
         """
         Run the benchmark.
@@ -174,7 +175,9 @@ class Benchmark(SerialisationMixin):
             of the benchmark.
         """
 
-        env_pipeline = DefaultEnvPipeline(handlers=self.science.env_handlers, env_initial=os.environ)
+        env_pipeline = DefaultEnvPipeline(
+            handlers=self.science.env_handlers, env_initial=os.environ
+        )
         if self.tech:
             env_pipeline.add(self.tech.env_handlers)
 
@@ -211,7 +214,9 @@ class Benchmark(SerialisationMixin):
 
         env_pipeline.add(application.get_env_handlers(run_dir, job))
 
-        launch = launcher.prepare(run_dir, job, cmd, library_paths, env_pipeline, launcher_flags)
+        launch = launcher.prepare(
+            run_dir, job, cmd, library_paths, env_pipeline, launcher_flags
+        )
 
         start = time()
         result = launch.launch()
@@ -221,7 +226,5 @@ class Benchmark(SerialisationMixin):
             raise RuntimeError("Launching the executable failed!")
 
         return BenchmarkSummary(
-            stdout=result.stdout,
-            stderr=result.stderr,
-            walltime=elapsed
+            stdout=result.stdout, stderr=result.stderr, walltime=elapsed
         )

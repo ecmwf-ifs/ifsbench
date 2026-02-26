@@ -11,12 +11,15 @@ Architecture specifications
 from abc import ABC, abstractmethod
 from typing import List
 
-from ifsbench.serialisation_mixin import SubclassableSerialisationMixin, SerialisationMixin
+from ifsbench.serialisation_mixin import (
+    SubclassableSerialisationMixin,
+    SerialisationMixin,
+)
 from ifsbench.env import EnvHandler
 from ifsbench.job import CpuConfiguration, Job
 from ifsbench.launch.launcher import Launcher
 
-__all__ = ['Arch', 'DefaultArch']
+__all__ = ["Arch", "DefaultArch"]
 
 
 class ArchResult(SerialisationMixin):
@@ -69,7 +72,6 @@ class Arch(ABC, SubclassableSerialisationMixin):
         List[str]
             The additional default launcher flags.
         """
-
 
     @abstractmethod
     def get_cpu_configuration(self) -> CpuConfiguration:

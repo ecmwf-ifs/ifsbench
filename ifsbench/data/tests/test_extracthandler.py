@@ -19,14 +19,16 @@ from ifsbench.data import ExtractHandler
 
 
 @pytest.mark.parametrize(
-    'archive_path,archive_valid',
-    [('somewhere/archive.tar', True), (None, False), (2, False)],
+    "archive_path,archive_valid",
+    [("somewhere/archive.tar", True), (None, False), (2, False)],
 )
 @pytest.mark.parametrize(
-    'target_dir, target_valid',
-    [('somewhere/archive.tar', True), (None, True), (2, False)],
+    "target_dir, target_valid",
+    [("somewhere/archive.tar", True), (None, True), (2, False)],
 )
-def test_extracthandler_from_config(archive_path, archive_valid, target_dir, target_valid):
+def test_extracthandler_from_config(
+    archive_path, archive_valid, target_dir, target_valid
+):
     """
     Initialise the ExtractHandler using the from_config function and make
     sure that only correct values are accepted.
@@ -35,20 +37,21 @@ def test_extracthandler_from_config(archive_path, archive_valid, target_dir, tar
         context = nullcontext()
     else:
         context = pytest.raises(Exception)
-    config = {'archive_path': archive_path}
+    config = {"archive_path": archive_path}
     if target_dir:
-        config['target_dir'] = target_dir
+        config["target_dir"] = target_dir
 
     with context:
         ExtractHandler.from_config(config)
 
+
 @pytest.mark.parametrize(
-    'archive_path,archive_valid',
-    [('somewhere/archive.tar', True), (None, False), (2, False)],
+    "archive_path,archive_valid",
+    [("somewhere/archive.tar", True), (None, False), (2, False)],
 )
 @pytest.mark.parametrize(
-    'target_dir, target_valid',
-    [('somewhere/archive.tar', True), (None, True), (2, False)],
+    "target_dir, target_valid",
+    [("somewhere/archive.tar", True), (None, True), (2, False)],
 )
 def test_extracthandler_init(archive_path, archive_valid, target_dir, target_valid):
     """
@@ -59,27 +62,27 @@ def test_extracthandler_init(archive_path, archive_valid, target_dir, target_val
         context = nullcontext()
     else:
         context = pytest.raises(Exception)
-    config = {'archive_path': archive_path}
+    config = {"archive_path": archive_path}
     if target_dir:
-        config['target_dir'] = target_dir
+        config["target_dir"] = target_dir
 
     with context:
         ExtractHandler(**config)
 
 
 @pytest.mark.parametrize(
-    'target_dir',
-    ['somewhere/archive.tar', None],
+    "target_dir",
+    ["somewhere/archive.tar", None],
 )
 def test_extracthandler_model_dump(target_dir):
     """
     Initialise the ExtractHandler and make sure that only correct values are accepted.
     """
-    archive_path = 'somewhere/archive.tar'
+    archive_path = "somewhere/archive.tar"
 
-    config = {'archive_path': archive_path}
+    config = {"archive_path": archive_path}
     if target_dir:
-        config['target_dir'] = target_dir
+        config["target_dir"] = target_dir
 
     eh = ExtractHandler.from_config(config)
     config_dump = eh.dump_config()
@@ -88,34 +91,34 @@ def test_extracthandler_model_dump(target_dir):
     assert config_dump == expected
 
 
-@pytest.fixture(name='archive')
+@pytest.fixture(name="archive")
 def fixture_archive():
     paths = [
-        'data1/file1.txt',
-        'data1/file2.txt',
-        'data2/file1.txt',
-        'data2/file2.txt',
+        "data1/file1.txt",
+        "data1/file2.txt",
+        "data2/file1.txt",
+        "data2/file2.txt",
     ]
 
     return paths
 
 
 @pytest.mark.parametrize(
-    'archive_path',
+    "archive_path",
     [
-        'somewhere/archive',
+        "somewhere/archive",
     ],
 )
-@pytest.mark.parametrize('archive_relative', [True, False])
-@pytest.mark.parametrize('archive_type', ['zip', 'tar', 'gztar'])
+@pytest.mark.parametrize("archive_relative", [True, False])
+@pytest.mark.parametrize("archive_type", ["zip", "tar", "gztar"])
 @pytest.mark.parametrize(
-    'target_dir',
+    "target_dir",
     [
-        'somewhere/extract',
+        "somewhere/extract",
         None,
     ],
 )
-@pytest.mark.parametrize('target_relative', [True, False])
+@pytest.mark.parametrize("target_relative", [True, False])
 def test_extracthandler_execute(
     tmp_path,
     archive,
@@ -174,7 +177,7 @@ def test_extracthandler_execute(
 
     # Build the archive that we will unpack by using pack_path as a directory
     # that we will compress. Simply touch each file in fixture_archive.
-    pack_path = tmp_path / 'pack'
+    pack_path = tmp_path / "pack"
     for path in archive:
         (pack_path / path).parent.mkdir(parents=True, exist_ok=True)
         (pack_path / path).touch()
@@ -189,9 +192,9 @@ def test_extracthandler_execute(
         archive_path = Path(archive_path).relative_to(tmp_path)
 
     # Actually extract the archive.
-    config = {'archive_path': archive_path}
+    config = {"archive_path": archive_path}
     if target_dir:
-        config['target_dir'] = target_dir
+        config["target_dir"] = target_dir
 
     handler = ExtractHandler.from_config(config)
     handler.execute(tmp_path)

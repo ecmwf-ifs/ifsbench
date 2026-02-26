@@ -13,10 +13,13 @@ from typing import Dict, List, Optional, Union
 from pydantic import Field, model_validator
 from typing_extensions import Self
 
-from ifsbench.serialisation_mixin import SubclassableSerialisationMixin, SerialisationMixin
+from ifsbench.serialisation_mixin import (
+    SubclassableSerialisationMixin,
+    SerialisationMixin,
+)
 from ifsbench.logging import debug
 
-__all__ = ['EnvHandler', 'EnvOperation', 'EnvPipeline']
+__all__ = ["EnvHandler", "EnvOperation", "EnvPipeline"]
 
 
 class EnvOperation(str, Enum):
@@ -27,19 +30,19 @@ class EnvOperation(str, Enum):
     """
 
     #: Set a given environment variable.
-    SET = 'set'
+    SET = "set"
 
     #: Append to a given environment variable.
-    APPEND = 'append'
+    APPEND = "append"
 
     #: Prepend to a given environment variable.
-    PREPEND = 'prepend'
+    PREPEND = "prepend"
 
     #: Delete/unset a given environment variable.
-    DELETE = 'delete'
+    DELETE = "delete"
 
     #: Clear the whole environment.
-    CLEAR = 'clear'
+    CLEAR = "clear"
 
 
 class EnvHandler(SerialisationMixin):
@@ -67,7 +70,7 @@ class EnvHandler(SerialisationMixin):
     key: Optional[str] = None
     value: Optional[str] = None
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_value_for_mode(self) -> Self:
         if self.key is None and self.mode != EnvOperation.CLEAR:
             raise ValueError(f"The key must be specified for operation {self.mode}!")
@@ -113,7 +116,7 @@ class EnvHandler(SerialisationMixin):
                 del env[self.key]
 
         elif self.mode == EnvOperation.CLEAR:
-            debug('Clear whole environment.')
+            debug("Clear whole environment.")
             env.clear()
 
 

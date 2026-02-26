@@ -20,7 +20,8 @@ from typing import List
 from ifsbench.logging import debug, info
 
 
-__all__ = ['ExecuteResult', 'execute', 'auto_post_mortem_debugger']
+__all__ = ["ExecuteResult", "execute", "auto_post_mortem_debugger"]
+
 
 @dataclass
 class ExecuteResult:
@@ -36,6 +37,7 @@ class ExecuteResult:
 
     #: The return code of the execution.
     exit_code: int
+
 
 def execute(command: List[str], **kwargs) -> ExecuteResult:
     """
@@ -57,13 +59,12 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     ExecuteResult:
         The results of the execution (stdout, stderr, exit code)
     """
-    cwd = kwargs.pop('cwd', None)
-    env = kwargs.pop('env', None)
-    dryrun = kwargs.pop('dryrun', False)
-    logfile = kwargs.pop('logfile', None)
+    cwd = kwargs.pop("cwd", None)
+    env = kwargs.pop("env", None)
+    dryrun = kwargs.pop("dryrun", False)
+    logfile = kwargs.pop("logfile", None)
 
-
-    debug(f'[ifsbench] User env:\n{pformat(env, indent=2)}')
+    debug(f"[ifsbench] User env:\n{pformat(env, indent=2)}")
     if env is not None:
         # Inject user-defined environment
         run_env = environ.copy()
@@ -74,28 +75,29 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     else:
         run_env = None
 
-
     # Log the command we're about to execute
     cwd = getcwd() if cwd is None else str(cwd)
-    debug('[ifsbench] Run directory: ' + cwd)
-    info('[ifsbench] Executing: ' + ' '.join(command))
+    debug("[ifsbench] Run directory: " + cwd)
+    info("[ifsbench] Executing: " + " ".join(command))
 
     if dryrun:
         # Only print the environment when in dryrun mode.
-        info('[ifsbench] Environment: ' + str(run_env))
-        return ExecuteResult(
-            stdout="",
-            stderr="",
-            exit_code=0
-        )
+        info("[ifsbench] Environment: " + str(run_env))
+        return ExecuteResult(stdout="", stderr="", exit_code=0)
 
     cmd_args = {
-        'cwd': cwd, 'env': run_env, 'text': True, 'stdout': PIPE, 'stderr': PIPE
+        "cwd": cwd,
+        "env": run_env,
+        "text": True,
+        "stdout": PIPE,
+        "stderr": PIPE,
     }
 
     if logfile:
         # If we're file-logging, intercept via pipe
-        _log_file = Path(logfile).open('w', encoding='utf-8') # pylint: disable=consider-using-with
+        _log_file = Path(logfile).open(  # pylint: disable=consider-using-with
+            "w", encoding="utf-8"
+        )
     else:
         _log_file = None
 
@@ -152,10 +154,9 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
             _log_file.close()
 
     return ExecuteResult(
-        stdout=stdout.getvalue(),
-        stderr=stderr.getvalue(),
-        exit_code=ret
+        stdout=stdout.getvalue(), stderr=stderr.getvalue(), exit_code=ret
     )
+
 
 def as_tuple(item, dtype=None, length=None):
     """
@@ -177,10 +178,11 @@ def as_tuple(item, dtype=None, length=None):
         except (TypeError, NotImplementedError):
             t = (item,) * (length or 1)
     if length and not len(t) == length:
-        raise ValueError(f'Tuple needs to be of length {length: d}')
+        raise ValueError(f"Tuple needs to be of length {length: d}")
     if dtype and not all(isinstance(i, dtype) for i in t):
-        raise TypeError(f'Items need to be of type {dtype}')
+        raise TypeError(f"Items need to be of type {dtype}")
     return t
+
 
 def auto_post_mortem_debugger(type, value, tb):  # pylint: disable=redefined-builtin
     """
@@ -191,16 +193,19 @@ def auto_post_mortem_debugger(type, value, tb):  # pylint: disable=redefined-bui
     Adapted from
     https://code.activestate.com/recipes/65287-automatically-start-the-debugger-on-an-exception/
     """
-    is_interactive = hasattr(sys, 'ps1')
-    no_tty = not sys.stderr.isatty() or not sys.stdin.isatty() or not sys.stdout.isatty()
+    is_interactive = hasattr(sys, "ps1")
+    no_tty = (
+        not sys.stderr.isatty() or not sys.stdin.isatty() or not sys.stdout.isatty()
+    )
     if is_interactive or no_tty or type == SyntaxError:
         # we are in interactive mode or we don't have a tty-like
         # device, so we call the default hook
         sys.__excepthook__(type, value, tb)
     else:
-        import traceback # pylint: disable=import-outside-toplevel
-        import pdb # pylint: disable=import-outside-toplevel
+        import traceback  # pylint: disable=import-outside-toplevel
+        import pdb  # pylint: disable=import-outside-toplevel
+
         # we are NOT in interactive mode, print the exception...
         traceback.print_exception(type, value, tb)
         # ...then start the debugger in post-mortem mode.
-        pdb.post_mortem(tb)   # pylint: disable=no-member
+        pdb.post_mortem(tb)  # pylint: disable=no-member

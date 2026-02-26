@@ -20,49 +20,53 @@ def test_execute():
     Test some aspects of the execute() utility.
     """
     # Very trivial executables with success/error exit codes
-    assert execute('true').exit_code == 0
-    assert execute('false').exit_code == 1
+    assert execute("true").exit_code == 0
+    assert execute("false").exit_code == 1
 
-    with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
+    with tempfile.TemporaryDirectory(prefix="ifsbench") as tmp_dir:
         # basic logfile capture validation
-        logfile = Path(tmp_dir)/'test_execute.log'
-        result = execute(['echo', 'foo', 'bar'], logfile=logfile)
-        assert logfile.read_text() == 'foo bar\n'
-        assert result.stdout == 'foo bar\n'
+        logfile = Path(tmp_dir) / "test_execute.log"
+        result = execute(["echo", "foo", "bar"], logfile=logfile)
+        assert logfile.read_text() == "foo bar\n"
+        assert result.stdout == "foo bar\n"
 
         # verify env
-        execute(['env'], logfile=logfile, env={'FOO': 'bar', 'BAR': 'foo'})
-        with logfile.open('r') as f:
+        execute(["env"], logfile=logfile, env={"FOO": "bar", "BAR": "foo"})
+        with logfile.open("r") as f:
             env_str = f.read()
-            assert 'FOO=bar' in env_str
-            assert 'BAR=foo' in env_str
+            assert "FOO=bar" in env_str
+            assert "BAR=foo" in env_str
 
         # no output executable
-        execute(['true'], logfile=logfile)
-        assert logfile.read_text() == ''
+        execute(["true"], logfile=logfile)
+        assert logfile.read_text() == ""
 
         # Output a lot of lines
-        text = 'abc\n' * 100
-        execute(['echo', text], logfile=logfile)
-        assert logfile.read_text() == text + '\n'
+        text = "abc\n" * 100
+        execute(["echo", text], logfile=logfile)
+        assert logfile.read_text() == text + "\n"
 
         # Write to stderr
-        result = execute([sys.executable, '-c', 'import sys; print(\'foo bar\', file=sys.stderr)'], logfile=logfile)
-        assert logfile.read_text() == 'foo bar\n'
-        assert result.stdout == ''
-        assert result.stderr == 'foo bar\n'
+        result = execute(
+            [sys.executable, "-c", "import sys; print('foo bar', file=sys.stderr)"],
+            logfile=logfile,
+        )
+        assert logfile.read_text() == "foo bar\n"
+        assert result.stdout == ""
+        assert result.stderr == "foo bar\n"
+
 
 def test_execute_dryrun():
     """
     Test the execute function in dryrun mode..
     """
     # Very trivial executables with success/error exit codes
-    assert execute('true', dryrun=True).exit_code == 0
-    assert execute('false', dryrun=True).exit_code == 0
+    assert execute("true", dryrun=True).exit_code == 0
+    assert execute("false", dryrun=True).exit_code == 0
 
-    with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
+    with tempfile.TemporaryDirectory(prefix="ifsbench") as tmp_dir:
         # basic logfile capture validation
-        logfile = Path(tmp_dir)/'test_execute.log'
-        result = execute(['echo', 'foo', 'bar'], dryrun=True, logfile=logfile)
+        logfile = Path(tmp_dir) / "test_execute.log"
+        result = execute(["echo", "foo", "bar"], dryrun=True, logfile=logfile)
         assert not logfile.exists()
-        assert result.stdout == ''
+        assert result.stdout == ""

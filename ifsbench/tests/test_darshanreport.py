@@ -12,7 +12,7 @@ import pytest
 from ifsbench import DarshanReport, read_files_from_darshan, write_files_from_darshan
 
 
-@pytest.fixture(scope='module', name='here')
+@pytest.fixture(scope="module", name="here")
 def fixture_here():
     """Parent directory for tests"""
     return Path(__file__).parent
@@ -20,26 +20,26 @@ def fixture_here():
 
 def test_darshanreport_from_parser_log(here):
     """Verify that darshan-parser log is read correctly."""
-    report = DarshanReport(here/'darshan.log')
+    report = DarshanReport(here / "darshan.log")
 
     # Records loaded and available?
     assert len(report.records) == 3
-    for module, count in {'POSIX': 16362, 'STDIO': 8904, 'LUSTRE': 1322}.items():
+    for module, count in {"POSIX": 16362, "STDIO": 8904, "LUSTRE": 1322}.items():
         assert isinstance(report.records[module], pd.DataFrame)
         assert isinstance(report.name_records[module], dict)
         assert len(report.records[module]) == count
 
     # Anything else raises an exception?
     with pytest.raises(KeyError):
-        _ = report.records['foo']
+        _ = report.records["foo"]
     with pytest.raises(KeyError):
-        _ = report.name_records['foo']
+        _ = report.name_records["foo"]
 
 
 def test_darshanreport_read_files(here):
     """Verify that list of read files is obtained correctly from
     Darshan report."""
-    report = DarshanReport(here/'darshan.log')
+    report = DarshanReport(here / "darshan.log")
     read_files = read_files_from_darshan(report)
     assert isinstance(read_files, set)
     assert len(read_files) == 33
@@ -48,7 +48,7 @@ def test_darshanreport_read_files(here):
 def test_darshanreport_write_files(here):
     """Verify that list of write files is obtained correctly from
     Darshan report."""
-    report = DarshanReport(here/'darshan.log')
+    report = DarshanReport(here / "darshan.log")
     write_files = write_files_from_darshan(report)
     assert isinstance(write_files, set)
     assert len(write_files) == 38

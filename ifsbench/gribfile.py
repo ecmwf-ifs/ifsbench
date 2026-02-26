@@ -25,8 +25,8 @@ try:
     from pkg_resources import packaging
 
     # pylint: disable=no-member
-    if packaging.version.parse(eccodes.__version__) < packaging.version.parse('2.33.0'):
-        raise ImportError('eccodes version too low.')
+    if packaging.version.parse(eccodes.__version__) < packaging.version.parse("2.33.0"):
+        raise ImportError("eccodes version too low.")
     # pylint: enable=no-member
     ECCODES_AVAILABLE = True
 except (RuntimeError, ImportError):
@@ -56,10 +56,10 @@ if not PYGRIB_AVAILABLE:
 
 
 __all__ = [
-    'GribFileReader',
-    'NoGribModification',
-    'UniformGribNoiseFromMetadata',
-    'modify_grib_file',
+    "GribFileReader",
+    "NoGribModification",
+    "UniformGribNoiseFromMetadata",
+    "modify_grib_file",
 ]
 
 
@@ -79,9 +79,11 @@ class GribFileReader(DataFileReader):
         Returns: List of datasets containing the data from the file.
         """
         if not CFGRIB_AVAILABLE:
-            raise RuntimeError(f'Cannot read grib file {input_path}. cfgrib is not installed.')
+            raise RuntimeError(
+                f"Cannot read grib file {input_path}. cfgrib is not installed."
+            )
         # pylint: disable=possibly-used-before-assignment
-        return cfgrib.open_datasets(input_path, backend_kwargs={'indexpath': ''})
+        return cfgrib.open_datasets(input_path, backend_kwargs={"indexpath": ""})
 
 
 class GribModification(ABC):
@@ -90,11 +92,14 @@ class GribModification(ABC):
     def __init__(self):
         if not PYGRIB_AVAILABLE:
             raise RuntimeError(
-                'Cannot modify GRIB files - pygrib or eccodes not available.'
+                "Cannot modify GRIB files - pygrib or eccodes not available."
             )
+
     # pylint: disable=possibly-used-before-assignment
     @abstractmethod
-    def modify_message(self, grb: gribmessage) -> gribmessage: # pylint: disable=possibly-used-before-assignment
+    def modify_message(
+        self, grb: gribmessage
+    ) -> gribmessage:  # pylint: disable=possibly-used-before-assignment
         """Modifies the data in that GRIB message."""
         raise NotImplementedError()
 
@@ -120,20 +125,20 @@ class UniformGribNoiseFromMetadata(GribModification):
         self._noise_scale = noise_scale
 
     def modify_message(self, grb: gribmessage) -> gribmessage:
-        if not grb.has_key('bitsPerValue') or grb['bitsPerValue'] == 0:
+        if not grb.has_key("bitsPerValue") or grb["bitsPerValue"] == 0:
             # bitsPerValue == 0 indicates a constant value.
             warning(
-                'Not modifying parameter %s: bitsPerValue is 0, constant value.',
-                grb['shortName'],
+                "Not modifying parameter %s: bitsPerValue is 0, constant value.",
+                grb["shortName"],
             )
             return grb
         if not grb.has_key(self._noise_param) or grb[self._noise_param] == 0:
             error(
-                'Cannot modify parameter %s: no value for %s which is used as a basis for the noise level.',
-                grb['shortName'],
+                "Cannot modify parameter %s: no value for %s which is used as a basis for the noise level.",
+                grb["shortName"],
                 self._noise_param,
             )
-            raise ValueError('Missing noise parameter {self._noise_param}')
+            raise ValueError("Missing noise parameter {self._noise_param}")
         grb.expand_grid(False)
         data_values = grb.values
         noise_max = grb[self._noise_param] * self._noise_scale
@@ -141,7 +146,7 @@ class UniformGribNoiseFromMetadata(GribModification):
             -noise_max, noise_max, data_values.shape
         )
         # TODO(ecm6397) Add checks for units `(Code table 4.xxx)` and `%`.
-        if grb.has_key('units') and grb['units'] == '(0 - 1)':
+        if grb.has_key("units") and grb["units"] == "(0 - 1)":
             # Fractional parameters (e.g. cc) have to have values between 0 and 1.
             np.clip(data_mod, 0.0, 1.0, out=data_mod)
         grb.values = data_mod
@@ -153,8 +158,8 @@ def _handle_grib_message(
     base_modification: GribModification,
     parameter_config: Optional[Dict[str, GribModification]] = None,
 ) -> gribmessage:
-    if parameter_config and grb['shortName'] in parameter_config:
-        return parameter_config[grb['shortName']].modify_message(grb)
+    if parameter_config and grb["shortName"] in parameter_config:
+        return parameter_config[grb["shortName"]].modify_message(grb)
 
     return base_modification.modify_message(grb)
 
@@ -188,15 +193,15 @@ def modify_grib_file(
     """
     if not PYGRIB_AVAILABLE:
         raise RuntimeError(
-            'Cannot modify GRIB files - pygrib or eccodes not available.'
+            "Cannot modify GRIB files - pygrib or eccodes not available."
         )
     if not overwrite_existing and os.path.exists(output_path):
         error(
-            'Output %s already exists and overwrite_existing is set to False.',
+            "Output %s already exists and overwrite_existing is set to False.",
             output_path,
         )
         return
-    with open(output_path, 'wb') as outfile:
+    with open(output_path, "wb") as outfile:
         # pylint: disable=possibly-used-before-assignment
         grbs = pgopen(input_path)
         for grb in grbs:

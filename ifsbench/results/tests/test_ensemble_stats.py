@@ -14,8 +14,8 @@ import pandas as pd
 from ifsbench.results import EnsembleStats
 
 
-INDEX = ['Step 0', 'Step 1']
-COLUMNS = ['2m temperature', 'pressure']
+INDEX = ["Step 0", "Step 1"]
+COLUMNS = ["2m temperature", "pressure"]
 
 
 def build_frames() -> List[pd.DataFrame]:
@@ -66,28 +66,27 @@ def test_from_config_invalid_fails():
     with pytest.raises(ValueError):
         EnsembleStats.from_config(
             {
-                'parrot': 'dead',
+                "parrot": "dead",
             }
         )
-
 
 
 def test_calc_stats_min():
     in_data = build_frames()
     es = EnsembleStats(frames=in_data)
 
-    result = es.calc_stats('min')
+    result = es.calc_stats("min")
 
     assert len(result) == 1
-    assert 'min' in result
+    assert "min" in result
     expected = pd.DataFrame([[293, 1008], [291, 1005]], index=INDEX, columns=COLUMNS)
-    pd.testing.assert_frame_equal(result['min'], expected)
+    pd.testing.assert_frame_equal(result["min"], expected)
 
 
 def test_calc_stats_list():
     in_data = build_frames()
     es = EnsembleStats(frames=in_data)
-    stats = ['min', 'p10', 'mean', 'P50', 'p90', 'max', 'std']
+    stats = ["min", "p10", "mean", "P50", "p90", "max", "std"]
 
     ensemble_stats = es.calc_stats(stats)
 
@@ -110,13 +109,13 @@ def test_calc_stats_list():
         [[1.22474, 2.2360679], [1.299038, 1.500]], index=INDEX, columns=COLUMNS
     )
     expected = {
-        'min': df_min,
-        'p10': df_p10,
-        'mean': df_mean,
-        'P50': df_p50,
-        'p90': df_p90,
-        'max': df_max,
-        'std': df_std,
+        "min": df_min,
+        "p10": df_p10,
+        "mean": df_mean,
+        "P50": df_p50,
+        "p90": df_p90,
+        "max": df_max,
+        "std": df_std,
     }
 
     assert len(ensemble_stats) == len(expected)
@@ -129,9 +128,9 @@ def test_calc_stats_unsupported_fails():
     es = EnsembleStats(frames=build_frames())
 
     with pytest.raises(ValueError) as exceptinfo:
-        es.calc_stats('parrot')
+        es.calc_stats("parrot")
 
-    expected = 'Unknown stat: parrot. Supported'
+    expected = "Unknown stat: parrot. Supported"
     assert expected in str(exceptinfo.value)
 
 
@@ -139,7 +138,7 @@ def test_calc_stats_percentile_over_100_fails():
     es = EnsembleStats(frames=build_frames())
 
     with pytest.raises(ValueError) as exceptinfo:
-        es.calc_stats('p101')
+        es.calc_stats("p101")
 
-    expected = 'Percentile has to be in [0, 100], got 101.'
+    expected = "Percentile has to be in [0, 100], got 101."
     assert str(exceptinfo.value) == expected

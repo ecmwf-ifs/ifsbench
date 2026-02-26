@@ -14,12 +14,13 @@ import pandas as pd
 from ifsbench.serialisation_mixin import SerialisationMixin
 from ifsbench.pydantic_utils import PydanticDataFrame
 
-__all__ = ['AVAILABLE_BASIC_STATS', 'EnsembleStats']
+__all__ = ["AVAILABLE_BASIC_STATS", "EnsembleStats"]
 
 
 # Statistics keywords available when calling calc_stats. In addition
 # percentiles are supported with format '[p,P](\d{1,2})'.
-AVAILABLE_BASIC_STATS = ['min', 'max', 'mean', 'median', 'sum', 'std']
+AVAILABLE_BASIC_STATS = ["min", "max", "mean", "median", "sum", "std"]
+
 
 class EnsembleStats(SerialisationMixin):
     """Reads, writes, summarises results across ensemble members."""
@@ -62,21 +63,21 @@ class EnsembleStats(SerialisationMixin):
             stats = [stats]
         to_request = []
         for stat in stats:
-            percentile_check = re.match(r'[p,P](\d{1,3})$', stat)
+            percentile_check = re.match(r"[p,P](\d{1,3})$", stat)
             if percentile_check:
                 ptile_value = int(percentile_check.group(1))
                 if ptile_value > 100:
                     raise ValueError(
-                        f'Percentile has to be in [0, 100], got {ptile_value}.'
+                        f"Percentile has to be in [0, 100], got {ptile_value}."
                     )
                 to_request.append(_percentile(stat, ptile_value))
-            elif stat == 'std':
+            elif stat == "std":
                 to_request.append(std)
             elif stat in AVAILABLE_BASIC_STATS:
                 to_request.append(stat)
             else:
                 raise ValueError(
-                    f'Unknown stat: {stat}. Supported: {AVAILABLE_BASIC_STATS} and percentiles (e.g. p85).'
+                    f"Unknown stat: {stat}. Supported: {AVAILABLE_BASIC_STATS} and percentiles (e.g. p85)."
                 )
         df = self.group.agg(to_request)
         return {stat: df.xs(stat, level=1, axis=1) for stat in stats}

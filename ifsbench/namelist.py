@@ -14,7 +14,7 @@ from pathlib import Path
 import f90nml
 
 
-__all__ = ['IFSNamelist', 'SanitiseMode', 'sanitise_namelist', 'namelist_diff']
+__all__ = ["IFSNamelist", "SanitiseMode", "sanitise_namelist", "namelist_diff"]
 
 
 class IFSNamelist:
@@ -36,9 +36,9 @@ class IFSNamelist:
           * ``f90nml`` - no sanitising at all
     """
 
-    def __init__(self, template=None, namelist=None, mode='auto'):
+    def __init__(self, template=None, namelist=None, mode="auto"):
         self.mode = mode
-        assert mode in ['auto', 'legacy', 'f90nml']
+        assert mode in ["auto", "legacy", "f90nml"]
         self.nml = f90nml.Namelist()
         self.nml.uppercase = True
         self.nml.end_comma = True
@@ -73,7 +73,7 @@ class IFSNamelist:
         """
         Add contents of another namelist from file
         """
-        if self.mode == 'f90nml':
+        if self.mode == "f90nml":
             other_nml = f90nml.read(filepath)
         else:
             other_nml = sanitise_namelist(f90nml.read(filepath), mode=self.mode)
@@ -82,28 +82,30 @@ class IFSNamelist:
     def write(self, filepath, force=True):
         self.nml.write(filepath, force=force)
 
+
 class SanitiseMode(str, Enum):
     """
     Specify, how duplicated entries in a namelist should be sanitised.
     """
 
     #: For multiply defined namelist groups, retain only the first.
-    FIRST = 'first'
+    FIRST = "first"
 
     #: For multiply defined namelist groups, retain only the last.
-    LAST = 'last'
+    LAST = "last"
 
     #: For multiply defined namelist groups, merge variable definitions from
     #: all groups. Conflicts are resolved by using the first occurence of a
     #: variable.
-    MERGE_FIRST = 'merge_first'
+    MERGE_FIRST = "merge_first"
 
     #: For multiply defined namelist groups, merge variable definitions from
     #: all groups. Conflicts are resolved by using the last occurence of a
     #: variable.
-    MERGE_LAST = 'merge_last'
+    MERGE_LAST = "merge_last"
 
-def sanitise_namelist(nml, merge_strategy='first', mode='auto'):
+
+def sanitise_namelist(nml, merge_strategy="first", mode="auto"):
     """
     Sanitise a given namelist
 
@@ -144,9 +146,11 @@ def sanitise_namelist(nml, merge_strategy='first', mode='auto'):
         if len(values) == 1:
             nml[key] = values[0]
         else:
-            if mode == 'auto':
+            if mode == "auto":
                 unique_keys = {
-                    _key for _values in values for _key, val in _values.items()
+                    _key
+                    for _values in values
+                    for _key, val in _values.items()
                     if isinstance(val, f90nml.Namelist)
                 }
                 if len(unique_keys) == 1:
@@ -168,7 +172,7 @@ def sanitise_namelist(nml, merge_strategy='first', mode='auto'):
                     merged.patch(f90nml.Namelist({key: _values}))
                 nml[key] = merged[key]
             else:
-                raise ValueError(f'Invalid merge strategy: {merge_strategy}')
+                raise ValueError(f"Invalid merge strategy: {merge_strategy}")
     return nml
 
 

@@ -12,7 +12,7 @@ Utilities for working with file system paths
 from enum import Enum, auto
 import re
 
-__all__ = ['SpecialRelativePath']
+__all__ = ["SpecialRelativePath"]
 
 
 class SpecialRelativePath:
@@ -77,7 +77,7 @@ class SpecialRelativePath:
         pattern = r"^(?P<parent>.*?\/)?(?P<name>"
         if match in (cls.NameMatch.RIGHT_ALIGNED, cls.NameMatch.FREE):
             pattern += r"(?P<pre>[^\/]*?)"
-        pattern += fr"(?P<match>{filename})"
+        pattern += rf"(?P<match>{filename})"
         if match in (cls.NameMatch.LEFT_ALIGNED, cls.NameMatch.FREE):
             pattern += r"(?P<post>[^\/]*?)"
         pattern += r")$"
@@ -107,7 +107,7 @@ class SpecialRelativePath:
         pattern = r"^(?P<parent>.*?\/)?(?P<name>"
         if match in (cls.NameMatch.RIGHT_ALIGNED, cls.NameMatch.FREE):
             pattern += r"(?P<pre>[^\/]*?)"
-        pattern += fr"(?P<match>{dirname})"
+        pattern += rf"(?P<match>{dirname})"
         if match in (cls.NameMatch.LEFT_ALIGNED, cls.NameMatch.FREE):
             pattern += r"(?P<post>[^\/]*?)"
         pattern += r")(?P<child>\/.*?)$"

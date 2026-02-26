@@ -21,18 +21,18 @@ from ifsbench import (
 )
 
 
-@pytest.fixture(name='here')
+@pytest.fixture(name="here")
 def fixture_here():
     """Return the full path of the test directory"""
-    return Path(__file__).parent.resolve() / 'gribfiles'
+    return Path(__file__).parent.resolve() / "gribfiles"
 
 
 @pytest.mark.skipif(
     not gribfile.CFGRIB_AVAILABLE,
-    reason='could not import cfgrib, likely missing eccodes.',
+    reason="could not import cfgrib, likely missing eccodes.",
 )
 def test_gribfilereader_read_data(here):
-    input_path = here / 'model_output_data_pl.grb2'
+    input_path = here / "model_output_data_pl.grb2"
 
     gf = GribFileReader()
     dss = gf.read_data(input_path)
@@ -41,16 +41,16 @@ def test_gribfilereader_read_data(here):
 
     ds = dss[0]
     assert sorted(list(ds.coords)) == sorted(
-        ['isobaricInhPa', 'latitude', 'longitude', 'step', 'time', 'valid_time']
+        ["isobaricInhPa", "latitude", "longitude", "step", "time", "valid_time"]
     )
 
 
 @pytest.mark.skipif(
     not gribfile.CFGRIB_AVAILABLE,
-    reason='could not import cfgrib, likely missing eccodes.',
+    reason="could not import cfgrib, likely missing eccodes.",
 )
 def test_gribfilereader_read_data_multiple_datasets(here):
-    input_path = here / 'model_output_data_rad.grb2'
+    input_path = here / "model_output_data_rad.grb2"
 
     gf = GribFileReader()
     dss = gf.read_data(input_path)
@@ -59,18 +59,18 @@ def test_gribfilereader_read_data_multiple_datasets(here):
 
     ds = dss[0]
     assert sorted(list(ds.coords)) == sorted(
-        ['latitude', 'longitude', 'step', 'time', 'valid_time', 'nominalTop']
+        ["latitude", "longitude", "step", "time", "valid_time", "nominalTop"]
     )
 
 
 def _read_grib(input_path: str, short_name: str) -> xr.Dataset:
     ds = xr.open_dataset(
         input_path,
-        engine='cfgrib',
+        engine="cfgrib",
         backend_kwargs={
-            'filter_by_keys': {'shortName': short_name},
-            'indexpath': '',
-            'read_keys': ['packingError'],
+            "filter_by_keys": {"shortName": short_name},
+            "indexpath": "",
+            "read_keys": ["packingError"],
         },
     )
     return ds
@@ -78,17 +78,17 @@ def _read_grib(input_path: str, short_name: str) -> xr.Dataset:
 
 @pytest.mark.skipif(
     not gribfile.PYGRIB_AVAILABLE or not gribfile.CFGRIB_AVAILABLE,
-    reason='could not import pygrib or cfgrib, likely missing eccodes.',
+    reason="could not import pygrib or cfgrib, likely missing eccodes.",
 )
 def test_modify_grib_file(here, tmp_path):
     noise_scale = 1.0001
-    input_path = here / 'model_input_data_stl.grb'
-    output_path = tmp_path / 'out.grib'
-    params = ['stl1', 'stl2']
+    input_path = here / "model_input_data_stl.grb"
+    output_path = tmp_path / "out.grib"
+    params = ["stl1", "stl2"]
 
     no_noise = NoGribModification()
     uniform_noise = UniformGribNoiseFromMetadata(
-        noise_param='packingError', noise_scale=noise_scale
+        noise_param="packingError", noise_scale=noise_scale
     )
     noise_config = dict.fromkeys(params, uniform_noise)
 
@@ -106,7 +106,7 @@ def test_modify_grib_file(here, tmp_path):
     ds_comp = ds_mod - ds_ref
     comp_max = np.nanmax(ds_comp[param])
     comp_min = np.nanmin(ds_comp[param])
-    packing_error = ds_ref[param].attrs['GRIB_packingError']
+    packing_error = ds_ref[param].attrs["GRIB_packingError"]
 
     assert abs(comp_max) > 0
     assert abs(comp_min) > 0
@@ -114,7 +114,7 @@ def test_modify_grib_file(here, tmp_path):
     assert abs(comp_min) <= 2 * packing_error * noise_scale
 
     # confirm that stl3 has not been modified
-    param = 'stl3'
+    param = "stl3"
     ds_ref = _read_grib(input_path, param)
     ds_mod = _read_grib(output_path, param)
     ds_comp = ds_mod - ds_ref
@@ -127,16 +127,16 @@ def test_modify_grib_file(here, tmp_path):
 
 @pytest.mark.skipif(
     not gribfile.PYGRIB_AVAILABLE or not gribfile.CFGRIB_AVAILABLE,
-    reason='could not import pygrib or cfgrib, likely missing eccodes.',
+    reason="could not import pygrib or cfgrib, likely missing eccodes.",
 )
 def test_modify_grib_fractionparam(here, tmp_path):
     noise_scale = 1.001
-    input_path = here / 'model_input_data_fractionparam.grb'
-    output_path = tmp_path / 'out.grib'
-    params = ['cc', 'crwc']
+    input_path = here / "model_input_data_fractionparam.grb"
+    output_path = tmp_path / "out.grib"
+    params = ["cc", "crwc"]
 
     uniform_noise = UniformGribNoiseFromMetadata(
-        noise_param='packingError', noise_scale=noise_scale
+        noise_param="packingError", noise_scale=noise_scale
     )
 
     modify_grib_file(str(input_path), output_path, base_modification=uniform_noise)
@@ -148,7 +148,7 @@ def test_modify_grib_fractionparam(here, tmp_path):
     ds_comp = ds_mod - ds_ref
     comp_max = np.nanmax(ds_comp[param])
     comp_min = np.nanmin(ds_comp[param])
-    packing_error = ds_ref[param].attrs['GRIB_packingError']
+    packing_error = ds_ref[param].attrs["GRIB_packingError"]
 
     assert abs(comp_max) > 0
     assert abs(comp_min) > 0
@@ -172,16 +172,16 @@ def test_modify_grib_fractionparam(here, tmp_path):
 
 @pytest.mark.skipif(
     not gribfile.PYGRIB_AVAILABLE or not gribfile.CFGRIB_AVAILABLE,
-    reason='could not import pygrib or cfgrib, likely missing eccodes.',
+    reason="could not import pygrib or cfgrib, likely missing eccodes.",
 )
 def test_modify_grib_output_exists(here, tmp_path):
-    input_path = here / 'model_input_data_stl.grb'
-    output_path = tmp_path / 'out.grib'
+    input_path = here / "model_input_data_stl.grb"
+    output_path = tmp_path / "out.grib"
 
     no_noise = NoGribModification()
 
     # Create the output and set its mtime and atime to the past.
-    with output_path.open(mode='w'):
+    with output_path.open(mode="w"):
         pass
     os.utime(output_path, ns=(1000, 1000))
 
@@ -196,16 +196,16 @@ def test_modify_grib_output_exists(here, tmp_path):
 
 @pytest.mark.skipif(
     not gribfile.PYGRIB_AVAILABLE or not gribfile.CFGRIB_AVAILABLE,
-    reason='could not import pygrib or cfgrib, likely missing eccodes.',
+    reason="could not import pygrib or cfgrib, likely missing eccodes.",
 )
 def test_modify_grib_output_exists_allow_overwrite(here, tmp_path):
-    input_path = here / 'model_input_data_stl.grb'
-    output_path = tmp_path / 'out.grib'
+    input_path = here / "model_input_data_stl.grb"
+    output_path = tmp_path / "out.grib"
 
     no_noise = NoGribModification()
 
     # Create the output and set its mtime and atime to the past.
-    with output_path.open(mode='w'):
+    with output_path.open(mode="w"):
         pass
     os.utime(output_path, ns=(1000, 1000))
 

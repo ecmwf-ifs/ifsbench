@@ -12,19 +12,20 @@ import pytest
 from ifsbench import NetcdfFileReader
 
 
-@pytest.fixture(name='netcdf_location')
+@pytest.fixture(name="netcdf_location")
 def fixture_netcdf_location():
     """Return the full path of the test directory"""
-    return Path(__file__).parent.resolve() / 'netcdf_files'
+    return Path(__file__).parent.resolve() / "netcdf_files"
 
-@pytest.fixture(name='grib_location')
+
+@pytest.fixture(name="grib_location")
 def fixture_grib_location():
     """Return the full path of the test directory"""
-    return Path(__file__).parent.resolve() / 'gribfiles'
+    return Path(__file__).parent.resolve() / "gribfiles"
 
 
 def test_netcdffilereader_read_data(netcdf_location):
-    input_path = netcdf_location / 'o_fix.nc'
+    input_path = netcdf_location / "o_fix.nc"
 
     fr = NetcdfFileReader()
     dss = fr.read_data(input_path=input_path)
@@ -33,16 +34,16 @@ def test_netcdffilereader_read_data(netcdf_location):
 
     ds = dss[0]
     assert sorted(list(ds.coords)) == sorted(
-        ['lat', 'lon', 'nlevs', 'tile', 'vtype', 'nlevsn']
+        ["lat", "lon", "nlevs", "tile", "vtype", "nlevsn"]
     )
-    assert sorted(list(ds.data_vars)) == sorted(['SoilThick', 'SoilSat'])
+    assert sorted(list(ds.data_vars)) == sorted(["SoilThick", "SoilSat"])
 
 
 def test_netcdffilereader_read_data_wrong_filetype_fails(grib_location):
-    input_path = grib_location / 'model_output_data_spectral.grb2'
+    input_path = grib_location / "model_output_data_spectral.grb2"
 
     fr = NetcdfFileReader()
     with pytest.raises(OSError) as exceptinfo:
         fr.read_data(input_path=input_path)
 
-    assert 'NetCDF: Unknown file format' in str(exceptinfo.value)
+    assert "NetCDF: Unknown file format" in str(exceptinfo.value)

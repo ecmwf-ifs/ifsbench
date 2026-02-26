@@ -13,8 +13,20 @@ import logging
 import sys
 
 
-__all__ = ['debug', 'header', 'info', 'warning', 'success', 'error',
-	   'logger', 'colors', 'DEBUG', 'INFO', 'WARNING', 'ERROR']
+__all__ = [
+    "debug",
+    "header",
+    "info",
+    "warning",
+    "success",
+    "error",
+    "logger",
+    "colors",
+    "DEBUG",
+    "INFO",
+    "WARNING",
+    "ERROR",
+]
 
 
 class colors:
@@ -52,26 +64,26 @@ class colors:
         """
         Enable color formatting
         """
-        colors.HEADER = '\033[95m%s\033[0m'
-        colors.OKBLUE = '\033[94m%s\033[0m'
-        colors.OKGREEN = '\033[92m%s\033[0m'
-        colors.WARNING = '\033[93m%s\033[0m'
-        colors.FAIL = '\033[91m%s\033[0m'
-        colors.BOLD = '\033[1m%s\033[0m'
-        colors.UNDERLINE = '\033[4m%s\033[0m'
+        colors.HEADER = "\033[95m%s\033[0m"
+        colors.OKBLUE = "\033[94m%s\033[0m"
+        colors.OKGREEN = "\033[92m%s\033[0m"
+        colors.WARNING = "\033[93m%s\033[0m"
+        colors.FAIL = "\033[91m%s\033[0m"
+        colors.BOLD = "\033[1m%s\033[0m"
+        colors.UNDERLINE = "\033[4m%s\033[0m"
 
     @staticmethod
     def disable():
         """
         Disable color formatting
         """
-        colors.HEADER = '%s'
-        colors.OKBLUE = '%s'
-        colors.OKGREEN = '%s'
-        colors.WARNING = '%s'
-        colors.FAIL = '%s'
-        colors.BOLD = '%s'
-        colors.UNDERLINE = '%s'
+        colors.HEADER = "%s"
+        colors.OKBLUE = "%s"
+        colors.OKGREEN = "%s"
+        colors.WARNING = "%s"
+        colors.FAIL = "%s"
+        colors.BOLD = "%s"
+        colors.UNDERLINE = "%s"
 
 
 # Set colours on true terminals
@@ -81,7 +93,7 @@ else:
     colors.disable()
 
 
-logger = logging.getLogger('ifsbench')
+logger = logging.getLogger("ifsbench")
 _ch = logging.StreamHandler()
 logger.addHandler(_ch)
 logger.setLevel(logging.INFO)
@@ -90,6 +102,7 @@ INFO = logging.INFO
 DEBUG = logging.DEBUG
 WARNING = logging.WARNING
 ERROR = logging.ERROR
+
 
 def debug(msg, *args, **kwargs):
     msg = colors.OKBLUE % msg

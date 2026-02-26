@@ -15,22 +15,22 @@ from ifsbench.data import RenameHandler, RenameMode
 
 
 @pytest.mark.parametrize(
-    'pattern,repl,mode',
+    "pattern,repl,mode",
     [
         (
-            r'file',
-            'data',
+            r"file",
+            "data",
             RenameMode.MOVE,
         ),
         (
-            r'data[^/]*/',
-            '',
+            r"data[^/]*/",
+            "",
             RenameMode.SYMLINK,
         ),
     ],
 )
 def test_renamehandler_from_config_dump_config(pattern, repl, mode):
-    config_in = {'pattern': pattern, 'repl': repl, 'mode': mode}
+    config_in = {"pattern": pattern, "repl": repl, "mode": mode}
 
     rh = RenameHandler.from_config(config_in)
 
@@ -41,68 +41,68 @@ def test_renamehandler_from_config_dump_config(pattern, repl, mode):
 
 
 @pytest.mark.parametrize(
-    'pattern,repl,mode,files_in,files_out',
+    "pattern,repl,mode,files_in,files_out",
     [
         (
-            r'file',
-            'data',
+            r"file",
+            "data",
             RenameMode.MOVE,
-            ['data/data.txt', 'data1/data1.txt'],
-            ['data/data.txt', 'data1/data1.txt'],
+            ["data/data.txt", "data1/data1.txt"],
+            ["data/data.txt", "data1/data1.txt"],
         ),
         (
-            r'(?P<name>data[^/]*.txt)',
-            r'new_dir/\g<name>',
+            r"(?P<name>data[^/]*.txt)",
+            r"new_dir/\g<name>",
             RenameMode.COPY,
-            ['data/data.txt', 'data1/data1.txt'],
+            ["data/data.txt", "data1/data1.txt"],
             [
-                'data/data.txt',
-                'data1/new_dir/data1.txt',
-                'data/data.txt',
-                'data1/new_dir/data1.txt',
+                "data/data.txt",
+                "data1/new_dir/data1.txt",
+                "data/data.txt",
+                "data1/new_dir/data1.txt",
             ],
         ),
         (
-            r'data[^/]*/',
-            '',
+            r"data[^/]*/",
+            "",
             RenameMode.SYMLINK,
-            ['data/data.txt', 'data1/data1.txt', 'data2/data1.txt'],
+            ["data/data.txt", "data1/data1.txt", "data2/data1.txt"],
             None,
         ),
         (
-            r'(?P<name>data[^/]*.txt)',
-            r'newdir/\g<name>',
+            r"(?P<name>data[^/]*.txt)",
+            r"newdir/\g<name>",
             RenameMode.SYMLINK,
-            ['data/data.txt', 'data1/data1.txt', 'data2/data1.txt'],
+            ["data/data.txt", "data1/data1.txt", "data2/data1.txt"],
             [
-                'data/data.txt',
-                'data1/data1.txt',
-                'data2/data1.txt',
-                'data/newdir/data.txt',
-                'data1/newdir/data1.txt',
-                'data2/newdir/data1.txt',
+                "data/data.txt",
+                "data1/data1.txt",
+                "data2/data1.txt",
+                "data/newdir/data.txt",
+                "data1/newdir/data1.txt",
+                "data2/newdir/data1.txt",
             ],
         ),
         (
-            r'data[^/]*/',
-            '',
+            r"data[^/]*/",
+            "",
             RenameMode.MOVE,
-            ['data/data.txt', 'data1/data1.txt', 'data1/data2.txt'],
-            ['data.txt', 'data1.txt', 'data2.txt'],
+            ["data/data.txt", "data1/data1.txt", "data1/data2.txt"],
+            ["data.txt", "data1.txt", "data2.txt"],
         ),
         (
-            r'data[12]/',
-            'data/',
+            r"data[12]/",
+            "data/",
             RenameMode.MOVE,
-            ['data/data.txt', 'data1/data.txt', 'data1/data2.txt'],
-            ['data/data.txt', 'data/data2.txt'],
+            ["data/data.txt", "data1/data.txt", "data1/data2.txt"],
+            ["data/data.txt", "data/data2.txt"],
         ),
         (
-            r'replacement$',
-            'dummypath',
+            r"replacement$",
+            "dummypath",
             RenameMode.COPY,
-            ['dummypath/somedata.tar.gz', 'replacement'],
-            ['dummypath', 'replacement'],
+            ["dummypath/somedata.tar.gz", "replacement"],
+            ["dummypath", "replacement"],
         ),
     ],
 )
@@ -151,7 +151,7 @@ def test_renamehandler_from_filename(
 
     # Count the number of files in the working directory and make sure that
     # this number is equal to len(file_out)
-    n_out = len([f for f in tmp_path.rglob('*') if not f.is_dir()])
+    n_out = len([f for f in tmp_path.rglob("*") if not f.is_dir()])
     assert n_out == len(files_out)
 
     for f in files_out:
@@ -163,16 +163,16 @@ def test_renamehandler_symlink(tmp_path):
     Test that a RenameHandler deals with symlinks correctly.
     """
 
-    (tmp_path/'subdir').mkdir(parents=True, exist_ok=True)
-    (tmp_path/'subdir/file.txt').touch()
-    (tmp_path/'subdir/symlink').symlink_to(tmp_path/'subdir/file.txt')
+    (tmp_path / "subdir").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "subdir/file.txt").touch()
+    (tmp_path / "subdir/symlink").symlink_to(tmp_path / "subdir/file.txt")
 
-    handler = RenameHandler(pattern='file', repl='dir', mode=RenameMode.SYMLINK)
+    handler = RenameHandler(pattern="file", repl="dir", mode=RenameMode.SYMLINK)
 
     handler.execute(tmp_path)
 
-    assert (tmp_path/'subdir/dir.txt').exists()
-    assert (tmp_path/'subdir/file.txt').exists()
-    assert (tmp_path/'subdir/symlink').exists()
+    assert (tmp_path / "subdir/dir.txt").exists()
+    assert (tmp_path / "subdir/file.txt").exists()
+    assert (tmp_path / "subdir/symlink").exists()
 
-    assert (tmp_path/'subdir/symlink').resolve() == tmp_path/'subdir/file.txt'
+    assert (tmp_path / "subdir/symlink").resolve() == tmp_path / "subdir/file.txt"

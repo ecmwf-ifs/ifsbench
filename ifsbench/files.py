@@ -19,7 +19,7 @@ from ifsbench.logging import header, success, warning
 from ifsbench.util import execute, as_tuple
 
 
-__all__ = ['InputFile', 'ExperimentFiles']
+__all__ = ["InputFile", "ExperimentFiles"]
 
 
 class InputFile:
@@ -38,7 +38,7 @@ class InputFile:
 
     def __init__(self, path, src_dir=None, compute_metadata=True):
         if src_dir is None:
-            src_dir = '/'
+            src_dir = "/"
         self._src_dir = Path(src_dir)
         self._path = Path(path).relative_to(self.src_dir)
         self._original_path = Path(path)
@@ -66,28 +66,28 @@ class InputFile:
         """
         path, meta = data.popitem()
         assert not data
-        obj = cls(meta['fullpath'], src_dir=src_dir, compute_metadata=verify_checksum)
+        obj = cls(meta["fullpath"], src_dir=src_dir, compute_metadata=verify_checksum)
         if verify_checksum:
-            if meta['sha256sum'] != obj.checksum:
-                raise ValueError(f'Checksum for {path} does not match')
+            if meta["sha256sum"] != obj.checksum:
+                raise ValueError(f"Checksum for {path} does not match")
         else:
-            obj.checksum = meta.get('sha256sum')
-            obj.size = meta.get('size')
+            obj.checksum = meta.get("sha256sum")
+            obj.size = meta.get("size")
         return obj
 
     def to_dict(self):
         """Create a `dict` representation of the meta data for this file"""
-        data = {'fullpath': str(self.fullpath)}
+        data = {"fullpath": str(self.fullpath)}
         if self.checksum:
-            data['sha256sum'] = self.checksum
+            data["sha256sum"] = self.checksum
         if self.size:
-            data['size'] = self.size
+            data["size"] = self.size
         return {str(self.path): data}
 
     @property
     def fullpath(self):
         """The full path of the file"""
-        return self.src_dir/self._path
+        return self.src_dir / self._path
 
     @property
     def original_path(self):
@@ -119,10 +119,10 @@ class InputFile:
 
         # Use 4MB chunks for reading the file (reading it completely into
         # memory will be a bad idea for large GRIB files).
-        chunk_size = 4*1024*1024
+        chunk_size = 4 * 1024 * 1024
         sha = sha256()
 
-        with filepath.open('rb') as f:
+        with filepath.open("rb") as f:
             chunk = f.read(chunk_size)
             while chunk:
                 sha.update(chunk)
@@ -190,7 +190,7 @@ class ExperimentFiles:
         verify_checksum : bool, optional
             Verify checksum of all files.
         """
-        with Path(input_path).open(encoding='utf-8') as f:
+        with Path(input_path).open(encoding="utf-8") as f:
             return cls.from_dict(yaml.safe_load(f), verify_checksum=verify_checksum)
 
     @classmethod
@@ -210,8 +210,11 @@ class ExperimentFiles:
         src_dir = list(src_dir_files.keys())
         obj = cls(exp_id, src_dir=src_dir)
         obj._files = {  # pylint: disable=protected-access
-            InputFile.from_dict({p: f}, src_dir=src_dir, verify_checksum=verify_checksum)
-            for src_dir, files in src_dir_files.items() for p, f in files.items()
+            InputFile.from_dict(
+                {p: f}, src_dir=src_dir, verify_checksum=verify_checksum
+            )
+            for src_dir, files in src_dir_files.items()
+            for p, f in files.items()
         }
         return obj
 
@@ -224,7 +227,7 @@ class ExperimentFiles:
         output_path : str or :any:`pathlib.Path`
             File name for the YAML file.
         """
-        with Path(output_path).open('w', encoding='utf-8') as f:
+        with Path(output_path).open("w", encoding="utf-8") as f:
             yaml.safe_dump(self.to_dict(), f, sort_keys=False)
 
     def to_dict(self):
@@ -261,14 +264,18 @@ class ExperimentFiles:
         candidates = [
             (path, src_dir)
             for src_dir in self.src_dir
-            for path in glob.iglob(str(src_dir/'**'/input_file.path.name), recursive=True)
+            for path in glob.iglob(
+                str(src_dir / "**" / input_file.path.name), recursive=True
+            )
         ]
 
         # Sort the candidates by the overlap (judged from the end) in an attempt to
         # minimize the number of files to try
         def _score_overlap_from_behind(string):
             try:
-                return [i == j for i, j in zip(reversed(str(input_file)), reversed(string))].index(False)
+                return [
+                    i == j for i, j in zip(reversed(str(input_file)), reversed(string))
+                ].index(False)
             except ValueError:
                 return min(len(input_file), len(string))
 
@@ -283,8 +290,12 @@ class ExperimentFiles:
                 return candidate_file
 
         if verify_checksum:
-            raise ValueError(f'Input file {input_file.path} not found relative to source directories')
-        warning('Input file %s not found relative to source directories', input_file.path)
+            raise ValueError(
+                f"Input file {input_file.path} not found relative to source directories"
+            )
+        warning(
+            "Input file %s not found relative to source directories", input_file.path
+        )
         return input_file
 
     def add_file(self, *filepath, compute_metadata=True):
@@ -296,7 +307,9 @@ class ExperimentFiles:
         filepath : (list of) str or :any:`pathlib.Path`
             One or multiple file paths to add.
         """
-        filepath = [InputFile(path, compute_metadata=compute_metadata) for path in filepath]
+        filepath = [
+            InputFile(path, compute_metadata=compute_metadata) for path in filepath
+        ]
         self.add_input_file(*filepath, verify_checksum=compute_metadata)
 
     def add_input_file(self, *input_file, verify_checksum=True):
@@ -310,10 +323,12 @@ class ExperimentFiles:
         """
         for f in input_file:
             try:
-                new_file = self._input_file_in_src_dir(f, verify_checksum=verify_checksum)
+                new_file = self._input_file_in_src_dir(
+                    f, verify_checksum=verify_checksum
+                )
                 self._files.add(new_file)
             except ValueError:
-                warning('Skipping input file %s', f.path)
+                warning("Skipping input file %s", f.path)
 
     def update_srcdir(self, src_dir, update_files=True, with_ifsdata=False):
         """
@@ -339,7 +354,9 @@ class ExperimentFiles:
                 old_files = self.exp_files
                 new_files = self.ifsdata_files
             while old_files:
-                new_file = self._input_file_in_src_dir(old_files.pop(), verify_checksum=True)
+                new_file = self._input_file_in_src_dir(
+                    old_files.pop(), verify_checksum=True
+                )
                 new_files.add(new_file)
             self._files = new_files
 
@@ -355,14 +372,14 @@ class ExperimentFiles:
         """
         The set of experiment-specific :any:`InputFile`
         """
-        return {f for f in self._files if '/ifsdata/' not in str(f.fullpath)}
+        return {f for f in self._files if "/ifsdata/" not in str(f.fullpath)}
 
     @property
     def ifsdata_files(self):
         """
         The set of static ifsdata files used by the experiment
         """
-        return {f for f in self._files if '/ifsdata/' in str(f.fullpath)}
+        return {f for f in self._files if "/ifsdata/" in str(f.fullpath)}
 
     @staticmethod
     def _create_tarball(files, output_basename, basedir=None):
@@ -378,14 +395,14 @@ class ExperimentFiles:
         basedir : str, optional
             If given, :attr:`files` are interpreted as relative to this.
         """
-        output_file = Path(output_basename).with_suffix('.tar.gz')
-        header('Creating tarball %s...', str(output_file))
-        cmd = ['tar', 'cvzhf', str(output_file)]
+        output_file = Path(output_basename).with_suffix(".tar.gz")
+        header("Creating tarball %s...", str(output_file))
+        cmd = ["tar", "cvzhf", str(output_file)]
         if basedir:
-            cmd += ['-C', str(basedir)]
+            cmd += ["-C", str(basedir)]
         cmd += files
         execute(cmd)
-        success('Finished creating tarball')
+        success("Finished creating tarball")
 
     def to_tarball(self, output_dir, with_ifsdata=False):
         """
@@ -405,7 +422,7 @@ class ExperimentFiles:
         for f in self.exp_files:
             exp_files[f.src_dir] += [str(f.path)]
         for src_dir, files in exp_files.items():
-            output_basename = output_dir/(src_dir.name or 'other')
+            output_basename = output_dir / (src_dir.name or "other")
             self._create_tarball(files, output_basename, basedir=src_dir)
 
         if with_ifsdata:
@@ -413,7 +430,7 @@ class ExperimentFiles:
             if ifsdata_files:
                 basedir = ifsdata_files[0].src_dir
                 files = [str(f.path) for f in ifsdata_files]
-                output_basename = output_dir/'ifsdata'
+                output_basename = output_dir / "ifsdata"
                 self._create_tarball(files, output_basename, basedir=basedir)
 
     @staticmethod
@@ -429,14 +446,21 @@ class ExperimentFiles:
             Output directory for extracted files.
         """
         filepath = Path(filepath).resolve()
-        header('Extracting tarball %s', str(filepath))
-        cmd = ['tar', 'xvzf', str(filepath)]
+        header("Extracting tarball %s", str(filepath))
+        cmd = ["tar", "xvzf", str(filepath)]
         execute(cmd, cwd=str(output_dir))
-        success('Finished extracting tarball')
+        success("Finished extracting tarball")
 
     @classmethod
-    def from_tarball(cls, summary_file, input_dir, output_dir, ifsdata_dir=None,
-                     with_ifsdata=False, verify_checksum=True):
+    def from_tarball(
+        cls,
+        summary_file,
+        input_dir,
+        output_dir,
+        ifsdata_dir=None,
+        with_ifsdata=False,
+        verify_checksum=True,
+    ):
         """
         Create :any:`ExperimentFiles` from a summary file and unpack corresponding tarballs
         containing the files
@@ -464,33 +488,49 @@ class ExperimentFiles:
         input_dir = [Path(path).resolve() for path in as_tuple(input_dir)]
         tarballs = set()
         for f in obj.exp_files:
-            tarball_name = f'{f.src_dir.name}.tar.gz'
-            candidates = [path for src_dir in input_dir
-                          for path in glob.iglob(str(src_dir/'**'/tarball_name), recursive=True)]
+            tarball_name = f"{f.src_dir.name}.tar.gz"
+            candidates = [
+                path
+                for src_dir in input_dir
+                for path in glob.iglob(
+                    str(src_dir / "**" / tarball_name), recursive=True
+                )
+            ]
             if not candidates:
-                raise ValueError(f'Archive {tarball_name} not found in input directories')
+                raise ValueError(
+                    f"Archive {tarball_name} not found in input directories"
+                )
             if len(candidates) > 1:
-                warning('Found multiple candidates for %s, using the first: %s',
-                        tarball_name, ', '.join(candidates))
+                warning(
+                    "Found multiple candidates for %s, using the first: %s",
+                    tarball_name,
+                    ", ".join(candidates),
+                )
             tarballs.add(candidates[0])
 
         # Add ifsdata tarball
         ifsdata_tarball = None
         if with_ifsdata:
             if tarballs:
-                candidates = list({Path(path).with_name('ifsdata.tar.gz') for path in tarballs})
+                candidates = list(
+                    {Path(path).with_name("ifsdata.tar.gz") for path in tarballs}
+                )
             else:
-                candidates = [Path(path)/'ifsdata.tar.gz' for path in input_dir]
+                candidates = [Path(path) / "ifsdata.tar.gz" for path in input_dir]
             candidates = [str(path) for path in candidates if path.exists()]
             if not candidates:
-                raise ValueError('ifsdata.tar.gz not found in any experiment tarball directory')
+                raise ValueError(
+                    "ifsdata.tar.gz not found in any experiment tarball directory"
+                )
             if len(candidates) > 1:
-                warning('Found multiple candidates for ifsdata.tar.gz, using the first: %s',
-                        ', '.join(candidates))
+                warning(
+                    "Found multiple candidates for ifsdata.tar.gz, using the first: %s",
+                    ", ".join(candidates),
+                )
             ifsdata_tarball = candidates[0]
 
         # Extract all tarballs
-        output_dir = (Path(output_dir)/obj.exp_id).resolve()
+        output_dir = (Path(output_dir) / obj.exp_id).resolve()
         if tarballs:
             output_dir.mkdir(exist_ok=True)
             for tarball in tarballs:
@@ -509,13 +549,16 @@ class ExperimentFiles:
             src_dir = [output_dir]
             if ifsdata_dir is not None:
                 src_dir += [ifsdata_dir]
-            obj.update_srcdir(src_dir, update_files=True,
-                              with_ifsdata=with_ifsdata or ifsdata_dir is not None)
+            obj.update_srcdir(
+                src_dir,
+                update_files=True,
+                with_ifsdata=with_ifsdata or ifsdata_dir is not None,
+            )
 
         # Save (updated) YAML file in output_dir
         if tarballs:
-            obj.to_yaml(output_dir/summary_file.name)
+            obj.to_yaml(output_dir / summary_file.name)
         elif ifsdata_tarball is not None:
-            obj.to_yaml(ifsdata_dir/summary_file.name)
+            obj.to_yaml(ifsdata_dir / summary_file.name)
 
         return obj

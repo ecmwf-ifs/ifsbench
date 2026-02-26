@@ -10,7 +10,7 @@ from typing import List
 
 import xarray as xr
 
-__all__ = ['DataFileReader']
+__all__ = ["DataFileReader"]
 
 
 class DataFileReader(ABC):

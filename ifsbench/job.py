@@ -13,7 +13,7 @@ from enum import Enum
 
 from ifsbench.serialisation_mixin import SerialisationMixin
 
-__all__ = ['CpuBinding', 'CpuDistribution', 'CpuConfiguration', 'Job']
+__all__ = ["CpuBinding", "CpuDistribution", "CpuConfiguration", "Job"]
 
 
 class CpuConfiguration(SerialisationMixin):
@@ -59,19 +59,19 @@ class CpuBinding(str, Enum):
     command should provide the appropriate options
     """
 
-    BIND_NONE = 'none'
+    BIND_NONE = "none"
     """Disable all binding specification"""
 
-    BIND_SOCKETS = 'sockets'
+    BIND_SOCKETS = "sockets"
     """Bind tasks to sockets"""
 
-    BIND_CORES = 'cores'
+    BIND_CORES = "cores"
     """Bind tasks to cores"""
 
-    BIND_THREADS = 'threads'
+    BIND_THREADS = "threads"
     """Bind tasks to hardware threads"""
 
-    BIND_USER = 'user'
+    BIND_USER = "user"
     """Indicate that a different user-specified strategy should be used"""
 
 
@@ -81,16 +81,16 @@ class CpuDistribution(str, Enum):
     command should provide the appropriate options
     """
 
-    DISTRIBUTE_DEFAULT = 'default'
+    DISTRIBUTE_DEFAULT = "default"
     """Use the default distribution strategy"""
 
-    DISTRIBUTE_BLOCK = 'block'
+    DISTRIBUTE_BLOCK = "block"
     """Allocate ranks/threads consecutively"""
 
-    DISTRIBUTE_CYCLIC = 'cyclic'
+    DISTRIBUTE_CYCLIC = "cyclic"
     """Allocate ranks/threads in a round-robin fashion"""
 
-    DISTRIBUTE_USER = 'user'
+    DISTRIBUTE_USER = "user"
     """Indicate that a different user-specified strategy should be used"""
 
 
@@ -194,7 +194,7 @@ class Job(SerialisationMixin):
                 self.tasks_per_node = cpu_configuration.cores_per_node // cpus_per_task
             else:
                 raise ValueError(
-                    'The number of tasks per node could not be determined!'
+                    "The number of tasks per node could not be determined!"
                 )
 
             # If GPUs are used, make sure that tasks_per_node is compatible with
@@ -206,14 +206,13 @@ class Job(SerialisationMixin):
                 )
 
             if self.tasks_per_node <= 0:
-                raise ValueError('Failed to determine the number of tasks per node!')
-
+                raise ValueError("Failed to determine the number of tasks per node!")
 
         if self.nodes is None:
             threads_per_node = self.tasks_per_node * threads_per_core * cpus_per_task
 
             if not self.tasks:
-                raise ValueError('The number of nodes could not be determined!')
+                raise ValueError("The number of nodes could not be determined!")
 
             self.nodes = (
                 self.tasks * cpus_per_task + threads_per_node - 1
@@ -223,5 +222,7 @@ class Job(SerialisationMixin):
             self.tasks = self.nodes * self.tasks_per_node
 
         if gpus_per_node > cpu_configuration.gpus_per_node:
-            raise ValueError('The number of requested GPUs per node is '
-                             'higher than the available number of GPUs per node.')
+            raise ValueError(
+                "The number of requested GPUs per node is "
+                "higher than the available number of GPUs per node."
+            )

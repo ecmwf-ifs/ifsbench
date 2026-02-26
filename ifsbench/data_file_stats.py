@@ -19,21 +19,21 @@ from ifsbench.gribfile import GribFileReader
 
 
 __all__ = [
-    'DataFileType',
-    'DataFileStats',
+    "DataFileType",
+    "DataFileStats",
 ]
 
 # Dimensions over which to calculate statistics. Other dimensions will be kept separate.
-_DEFAULT_STAT_DIMS = set(['values', 'latitudes', 'longitudes'])
+_DEFAULT_STAT_DIMS = set(["values", "latitudes", "longitudes"])
 
 # Statistics to calculate, has to be implemented in _calc_stat.
 # Percentiles have to be given in a form that matches r'[p,P](\d{1,2})$'.
-_DEFAULT_STAT_NAMES = ['mean', 'min', 'max', 'p5', 'p10', 'p90', 'p95']
+_DEFAULT_STAT_NAMES = ["mean", "min", "max", "p5", "p10", "p90", "p95"]
 
 # Dimension name to add to statistics datasets and use for merging.
 # This will be the column name in the dataframe with values from
 # _STAT_NAMES
-_STAT_DIM_NAME = 'stat'
+_STAT_DIM_NAME = "stat"
 
 
 class DataFileType(str, Enum):
@@ -42,8 +42,8 @@ class DataFileType(str, Enum):
     Used to specify file type if automatic check is not possible.
     """
 
-    GRIB = 'grib'
-    NETCDF = 'netcdf'
+    GRIB = "grib"
+    NETCDF = "netcdf"
 
 
 _reader_from_file_type = {
@@ -94,15 +94,15 @@ class DataFileStats(SerialisationMixin):
         reader_type = _reader_from_file_type[self.filetype] if self.filetype else None
 
         if not reader_type:
-            with open(self.input_path, 'rb') as f:
+            with open(self.input_path, "rb") as f:
                 header = f.read(4)
-            if b'GRIB' in header:
+            if b"GRIB" in header:
                 reader_type = GribFileReader
-            elif b'CDF' in header or b'HDF' in header:
+            elif b"CDF" in header or b"HDF" in header:
                 reader_type = NetcdfFileReader
             else:
                 raise ValueError(
-                    f'Unable to determine data file type for {self.input_path}'
+                    f"Unable to determine data file type for {self.input_path}"
                 )
 
         dss = reader_type().read_data(self.input_path)
@@ -121,24 +121,24 @@ class DataFileStats(SerialisationMixin):
         cls, ds: xr.Dataset, stat_name: str, stat_dims: List[str]
     ) -> xr.Dataset:
         """Creates datasets containing the statistical value specified by stat_name."""
-        if stat_name == 'mean':
+        if stat_name == "mean":
             return ds.mean(dim=stat_dims)
-        if stat_name == 'min':
+        if stat_name == "min":
             return ds.min(dim=stat_dims)
-        if stat_name == 'max':
+        if stat_name == "max":
             return ds.max(dim=stat_dims)
 
-        percentile_check = re.match(r'[p,P](\d{1,2})$', stat_name)
+        percentile_check = re.match(r"[p,P](\d{1,2})$", stat_name)
         if percentile_check:
             percentile = int(percentile_check.group(1))
             ds_stat = ds.quantile(percentile / 100.0, dim=stat_dims)
             # `quantile` removes dimensionless coordinates and adds a new coordinate 'quantiles'.
             # This has to be undone to match the other stats datasets.
-            ds_stat = ds_stat.drop_vars('quantile').assign_coords(ds.coords)
+            ds_stat = ds_stat.drop_vars("quantile").assign_coords(ds.coords)
             dims_to_drop = list(set(ds_stat.sizes.keys()) & set(stat_dims))
             return ds_stat.drop_dims(dims_to_drop)
 
-        raise ValueError(f'Unknown stat requested: {stat_name}')
+        raise ValueError(f"Unknown stat requested: {stat_name}")
 
     @classmethod
     def _create_stat_ds(

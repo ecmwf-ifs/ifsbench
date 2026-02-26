@@ -14,7 +14,7 @@ from ifsbench.data import DataHandler
 from ifsbench.env import EnvHandler
 from ifsbench.job import Job
 
-__all__ = ['Application', 'DefaultApplication']
+__all__ = ["Application", "DefaultApplication"]
 
 
 class Application(ABC, SubclassableSerialisationMixin):
