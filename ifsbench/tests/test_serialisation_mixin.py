@@ -13,7 +13,6 @@ from pydantic import ValidationError
 
 from ifsbench import SerialisationMixin, SubclassableSerialisationMixin, CLASSNAME
 
-
 class TestImpl(SerialisationMixin):
     field_str: str
     field_int: int
@@ -98,6 +97,12 @@ def test_dumb_config_with_class_succeeds():
     expected[CLASSNAME] = 'TestImpl'
     assert ti.dump_config(with_class=True) == expected
 
+class SecondBaseClass(SubclassableSerialisationMixin):
+    str_value: str
+
+
+class SecondChildClass(SecondBaseClass):
+    bool_value: bool
 
 class TestBase(SubclassableSerialisationMixin):
     float_value: float
@@ -109,10 +114,12 @@ class TestChild1(TestBase):
 class TestChild2(TestBase):
     first_int: int
     second_int: int
-
+    child: SecondBaseClass
 
 class TestCombine(SerialisationMixin):
     child: TestBase
+
+
 
 def test_subclass_serialisation():
     """
@@ -131,7 +138,8 @@ def test_subclass_serialisation():
         }
     }
 
-    obj = TestCombine(child=TestChild2(first_int=5, second_int=6, float_value=2.1))
+    obj = TestCombine(child=TestChild2(first_int=5, second_int=6, float_value=2.1,
+      child=SecondChildClass(bool_value=False, str_value='hello')))
 
     config = obj.dump_config()
 
@@ -140,6 +148,7 @@ def test_subclass_serialisation():
             'class_name': 'TestChild2',
             'first_int': 5,
             'second_int': 6,
-            'float_value': 2.1
+            'float_value': 2.1,
+            'child': {'class_name': 'SecondChildClass', 'bool_value': False, 'str_value': 'hello'}
         }
     }
