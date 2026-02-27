@@ -26,7 +26,7 @@ RESERVED_NAMES = [
 ]
 
 
-class SerialisationMixin(BaseModel, use_enum_values=True):
+class SerialisationMixin(BaseModel, use_enum_values=True, validate_assignment=True):
     """
     Mixin class that enables automatic serialisation features for this class.
 
@@ -47,7 +47,8 @@ class SerialisationMixin(BaseModel, use_enum_values=True):
         Returns:
             class instance
         """
-        return cls(**config)
+        adapter = TypeAdapter(cls)
+        return adapter.validate_python(config)
 
     def dump_config(
         self, with_class: bool = False
@@ -86,6 +87,20 @@ class SerialisationMixin(BaseModel, use_enum_values=True):
         allowed_type = TypeAdapter(Dict[str, Allowed])
 
         return allowed_type.validate_python(config)
+
+    # Pylint complains that this is overriding the pydantic copy function. As
+    # the pydantic copy function is deprecated (and might get removed in the
+    # future) we define our own copy version here.
+    # pylint: disable=W0221
+    def copy(self, deep: bool=False) -> 'SerialisationMixin':
+        """
+        Create a copy of this object.
+
+        Args:
+            deep: If True, create a deep copy.
+        """
+
+        return self.model_copy(deep=deep)
 
 class SubclassableSerialisationMixin(SerialisationMixin):
     """
@@ -151,25 +166,32 @@ class SubclassableSerialisationMixin(SerialisationMixin):
         # (self). As the model_dump function eventually invokes this function
         # again, we have to make sure that we are not stuck in an endless
         # recursion.
-        # To avoid this, we add a flag to the info.context object.
+        # To avoid this, we register if we started a recursion for this object,
+        # using the info.context object.
 
-
-        # Check if we are in a recursive call to this function. If we are, just
-        # use the default serialisation handler (which this function wraps) to
-        # do the serialisation.
-        if info.context:
-            recursive = info.context.get('recursive', False)
-
-            if recursive:
-                return handler(self)
-
-        # If we are not recursive yet, add the 'recursive' flag to the context.
-        if info.context == dict:
+        if isinstance(info.context, dict):
             context = dict(info.context)
         else:
             context = {}
 
-        context['recursive'] = True
+        if 'recursive' not in context:
+            context['recursive'] = {}
+
+        # We use the ID of self to detect if we've called this recursively or not.
+        me = id(self)
+
+        # Check if we are in a recursive call to this function. If we are, just
+        # use the default serialisation handler (which this function wraps) to
+        # do the serialisation.
+        recursive = context['recursive'].get(me, False)
+
+        if recursive:
+            # We exit the recursion here by calling the handler directly. Delete
+            # the recursive flag here, otherwise this may cause issues later.
+            del context['recursive'][me]
+            return handler(self)
+
+        context['recursive'][me] = True
 
         # Convert options into a dictionary so we can pass it to model_dump.
         # Unfortunately, the info object has no routine for this inbuilt and

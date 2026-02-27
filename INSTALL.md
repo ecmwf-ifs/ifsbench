@@ -79,6 +79,19 @@ make install
 The ecbuild installation method creates a virtual environment in the build
 directory.
 
+### Offline installation
+
+An offline installation of ifsbench requires the Python dependencies to be prepopulated. This can be done via the 
+provided `populate` script, e.g.:
+
+```
+IFSBENCH_WHEEL_ARCH=manylinux_2_17_x86_64 IFSBENCH_WHEEL_PYTHON_VERSION=310 ./populate
+```
+
+The above will download python wheels compatible with most linux systems and for python version 3.10 to `<source-dir>/artifacts.`.
+If those environment variables are ommitted then the wheels are download for the system used to run the populate script. A normal
+CMake/ecbuild installation can now be carried out, with one additional argument: `-DARTIFACTS_DIR=<path-to-artifacts-dir>`.
+
 ## Installation as part of an ecbundle bundle
 
 ifsbench being installable by CMake/ecbuild makes it easy to integrate with

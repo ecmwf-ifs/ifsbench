@@ -85,6 +85,9 @@ if( IFSBENCH_INSTALL_OPTIONS )
     set( _INSTALL_OPTIONS "[${_INSTALL_OPT_STR}]" )
 endif()
 
+if( DEFINED ARTIFACTS_DIR )
+    list( APPEND PIP_OPTIONS "--no-index;--find-links=${ARTIFACTS_DIR}" )
+endif()
 add_custom_target( ifsbench ALL ${Python3_EXECUTABLE} -m pip install ${PIP_OPTIONS} ${CMAKE_CURRENT_SOURCE_DIR}${_INSTALL_OPTIONS} )
 
 add_executable( ifs-bench.py IMPORTED GLOBAL )
