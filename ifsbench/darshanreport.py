@@ -8,6 +8,7 @@
 """
 Darshan report parsing utilities.
 """
+
 import io
 import mmap
 from contextlib import contextmanager
@@ -65,21 +66,22 @@ def open_darshan_logfile(filepath):
         if not is_parser_log:
             tmp_dir = tempfile.TemporaryDirectory(prefix='ifsbench')
 
-            logpath = Path(tmp_dir.name)/(filepath.stem + '.log')
+            logpath = Path(tmp_dir.name) / (filepath.stem + '.log')
             try:
                 with logpath.open('w', encoding='utf-8') as logfile:
                     execute(['darshan-parser', str(filepath)], stdout=logfile)
             except CalledProcessError as e:
                 if logpath.stat().st_size > 0:
-                    warning((
-                        'darshan-parser exited with non-zero exit code. '
-                        'Continue with potentially incomplete file...'
-                    ))
+                    warning(
+                        (
+                            'darshan-parser exited with non-zero exit code. '
+                            'Continue with potentially incomplete file...'
+                        )
+                    )
                 else:
-                    error((
-                        'darshan-parser exited with non-zero exit code. '
-                        'No output file produced.'
-                    ))
+                    error(
+                        ('darshan-parser exited with non-zero exit code. No output file produced.')
+                    )
                     raise e
 
             filepath = logpath
@@ -136,7 +138,7 @@ class DarshanReport:
         # Get log version
         ptr = report.find(b'darshan log version:')
         line_start = report.find(b'\n', ptr)
-        self.version = report[ptr + len(b'darshan log version:'):line_start].strip()
+        self.version = report[ptr + len(b'darshan log version:') : line_start].strip()
 
         # Find output regions
         start_regions = report.find(b'log file regions')
@@ -149,7 +151,7 @@ class DarshanReport:
         ptr = report.find(b' module data', end)
         while ptr != -1:
             start = report.rfind(b'\n#', 0, ptr)
-            module_name = report[start+2:ptr].strip().decode()
+            module_name = report[start + 2 : ptr].strip().decode()
             table_start = report.find(b'#<module>', ptr)
             end = report.find(b'\n\n', table_start)
             modules += [(module_name, start, table_start, end)]

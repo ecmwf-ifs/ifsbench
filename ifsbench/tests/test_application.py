@@ -37,9 +37,7 @@ from ifsbench import DefaultApplication, Job, EnvHandler, EnvOperation
         (Job(nodes=12), ['ls', '-l'], [], [EnvHandler(mode=EnvOperation.CLEAR)], []),
     ],
 )
-def test_default_application(
-    tmp_path, job, command, data_handlers, env_handlers, library_paths
-):
+def test_default_application(tmp_path, job, command, data_handlers, env_handlers, library_paths):
     config = {'command': command}
     if data_handlers is not None:
         config['data_handlers'] = data_handlers
@@ -66,8 +64,6 @@ def test_default_application(
     if data_handlers:
         data_out = application.get_data_handlers(tmp_path, job)
         assert len(data_out) == len(data_handlers)
-        assert [type(x).__name__ for x in data_out] == [
-            dh['class_name'] for dh in data_handlers
-        ]
+        assert [type(x).__name__ for x in data_out] == [dh['class_name'] for dh in data_handlers]
     else:
         assert len(application.get_data_handlers(tmp_path, job)) == 0

@@ -14,7 +14,7 @@ import urllib.request
 from ifsbench.data.datahandler import absolutise_path, DataHandler
 from ifsbench.logging import debug, info, warning
 
-__all__ = ["FetchHandler"]
+__all__ = ['FetchHandler']
 
 
 class FetchHandler(DataHandler):
@@ -49,14 +49,14 @@ class FetchHandler(DataHandler):
         if target_path.exists():
             target_path.unlink()
 
-        debug(f"Download file from {self.source_url} to {target_path}.")
+        debug(f'Download file from {self.source_url} to {target_path}.')
 
         try:
             with urllib.request.urlopen(self.source_url) as source, target_path.open(
-                "wb"
+                'wb'
             ) as target:
                 shutil.copyfileobj(source, target)
         except urllib.error.URLError as ue:
-            warning(f"Fetching file failed: {ue}")
+            warning(f'Fetching file failed: {ue}')
             if not self.ignore_errors:
                 raise RuntimeError(str(ue)) from ue

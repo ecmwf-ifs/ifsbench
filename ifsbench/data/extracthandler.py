@@ -12,7 +12,7 @@ from typing import Optional, Union
 from ifsbench.data.datahandler import absolutise_path, DataHandler
 from ifsbench.logging import debug
 
-__all__ = ["ExtractHandler"]
+__all__ = ['ExtractHandler']
 
 
 class ExtractHandler(DataHandler):
@@ -43,5 +43,5 @@ class ExtractHandler(DataHandler):
         else:
             target_dir = pathlib.Path(wdir)
 
-        debug(f"Unpack archive {str(archive_path)} to {str(target_dir)}.")
+        debug(f'Unpack archive {str(archive_path)} to {str(target_dir)}.')
         shutil.unpack_archive(archive_path, target_dir)

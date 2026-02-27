@@ -70,13 +70,11 @@ class EnvHandler(SerialisationMixin):
     @model_validator(mode='after')
     def validate_value_for_mode(self) -> Self:
         if self.key is None and self.mode != EnvOperation.CLEAR:
-            raise ValueError(f"The key must be specified for operation {self.mode}!")
+            raise ValueError(f'The key must be specified for operation {self.mode}!')
 
         if self.value is None:
             if self.mode in (EnvOperation.APPEND, EnvOperation.PREPEND):
-                raise ValueError(
-                    f"The value must be specified for operation {self.mode}!"
-                )
+                raise ValueError(f'The value must be specified for operation {self.mode}!')
         return self
 
     def execute(self, env: Dict[str, str]) -> None:
@@ -90,7 +88,7 @@ class EnvHandler(SerialisationMixin):
         """
 
         if self.mode == EnvOperation.SET:
-            debug(f"Set environment entry {self.key} = {self.value}.")
+            debug(f'Set environment entry {self.key} = {self.value}.')
             env[self.key] = self.value
         elif self.mode == EnvOperation.APPEND:
             if env.get(self.key, None) is not None:
@@ -98,18 +96,18 @@ class EnvHandler(SerialisationMixin):
             else:
                 env[self.key] = self.value
 
-            debug(f"Append {self.value} to environment variable {self.key}.")
+            debug(f'Append {self.value} to environment variable {self.key}.')
         elif self.mode == EnvOperation.PREPEND:
             if env.get(self.key, None) is not None:
                 env[self.key] = self.value + os.pathsep + env[self.key]
             else:
                 env[self.key] = self.value
 
-            debug(f"Prepend {self.value} to environment variable {self.key}.")
+            debug(f'Prepend {self.value} to environment variable {self.key}.')
 
         elif self.mode == EnvOperation.DELETE:
             if self.key in env:
-                debug(f"Delete environment variable {str(self.key)}.")
+                debug(f'Delete environment variable {str(self.key)}.')
                 del env[self.key]
 
         elif self.mode == EnvOperation.CLEAR:

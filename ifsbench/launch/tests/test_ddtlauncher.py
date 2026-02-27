@@ -22,29 +22,29 @@ from ifsbench import (
 )
 
 
-@pytest.fixture(name="test_env")
+@pytest.fixture(name='test_env')
 def fixture_test_env():
     return DefaultEnvPipeline(
         handlers=[
-            EnvHandler(mode=EnvOperation.SET, key="SOME_VALUE", value="5"),
-            EnvHandler(mode=EnvOperation.SET, key="OTHER_VALUE", value="6"),
-            EnvHandler(mode=EnvOperation.DELETE, key="SOME_VALUE"),
+            EnvHandler(mode=EnvOperation.SET, key='SOME_VALUE', value='5'),
+            EnvHandler(mode=EnvOperation.SET, key='OTHER_VALUE', value='6'),
+            EnvHandler(mode=EnvOperation.DELETE, key='SOME_VALUE'),
         ]
     )
 
 
-@pytest.fixture(name="test_env_none")
+@pytest.fixture(name='test_env_none')
 def fixture_test_env_none():
     return None
 
 
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [[], ["--cuda"]])
-@pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
-@pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [[], ['--cuda']])
+@pytest.mark.parametrize('base_launcher', [SrunLauncher(), DirectLauncher()])
+@pytest.mark.parametrize('base_launcher_flags', [[], ['--do-something']])
 def test_ddtlauncher_run_dir(
     tmp_path,
     cmd,
@@ -84,13 +84,13 @@ def test_ddtlauncher_run_dir(
     assert result.run_dir == base_launch_data.run_dir
 
 
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [[], ["--cuda"]])
-@pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
-@pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [[], ['--cuda']])
+@pytest.mark.parametrize('base_launcher', [SrunLauncher(), DirectLauncher()])
+@pytest.mark.parametrize('base_launcher_flags', [[], ['--do-something']])
 def test_ddtlauncher_env(
     tmp_path,
     cmd,
@@ -130,13 +130,13 @@ def test_ddtlauncher_env(
     assert result.env == base_launch_data.env
 
 
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
-@pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
-@pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [None, [], ['--cuda']])
+@pytest.mark.parametrize('base_launcher', [SrunLauncher(), DirectLauncher()])
+@pytest.mark.parametrize('base_launcher_flags', [[], ['--do-something']])
 def test_ddtlauncher_cmd(
     tmp_path,
     cmd,
@@ -177,6 +177,6 @@ def test_ddtlauncher_cmd(
     )
 
     if not custom_flags:
-        assert ["ddt"] + ["--"] + base_launch_data.cmd == result.cmd
+        assert ['ddt'] + ['--'] + base_launch_data.cmd == result.cmd
     else:
-        assert ["ddt"] + custom_flags + ["--"] + base_launch_data.cmd == result.cmd
+        assert ['ddt'] + custom_flags + ['--'] + base_launch_data.cmd == result.cmd

@@ -25,31 +25,31 @@ from ifsbench import (
 )
 
 
-@pytest.fixture(name="test_env")
+@pytest.fixture(name='test_env')
 def fixture_test_env():
     return DefaultEnvPipeline(
         handlers=[
-            EnvHandler(mode=EnvOperation.SET, key="SOME_VALUE", value="5"),
-            EnvHandler(mode=EnvOperation.SET, key="OTHER_VALUE", value="6"),
-            EnvHandler(mode=EnvOperation.DELETE, key="SOME_VALUE"),
-            EnvHandler(mode=EnvOperation.SET, key="NOT_V@LID", value="!!"),
-            EnvHandler(mode=EnvOperation.SET, key="ESCAPE_HELL", value="echo \"Something\", '22'"),
+            EnvHandler(mode=EnvOperation.SET, key='SOME_VALUE', value='5'),
+            EnvHandler(mode=EnvOperation.SET, key='OTHER_VALUE', value='6'),
+            EnvHandler(mode=EnvOperation.DELETE, key='SOME_VALUE'),
+            EnvHandler(mode=EnvOperation.SET, key='NOT_V@LID', value='!!'),
+            EnvHandler(mode=EnvOperation.SET, key='ESCAPE_HELL', value='echo "Something", \'22\''),
         ]
     )
 
 
-@pytest.fixture(name="test_env_none")
+@pytest.fixture(name='test_env_none')
 def fixture_test_env_none():
     return None
 
 
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
-@pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
-@pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [None, [], ['--cuda']])
+@pytest.mark.parametrize('base_launcher', [SrunLauncher(), DirectLauncher()])
+@pytest.mark.parametrize('base_launcher_flags', [[], ['--do-something']])
 def test_bashlauncher_run_dir(
     tmp_path,
     cmd,
@@ -92,13 +92,13 @@ def test_bashlauncher_run_dir(
     assert result.run_dir == result.run_dir
 
 
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
-@pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
-@pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [None, [], ['--cuda']])
+@pytest.mark.parametrize('base_launcher', [SrunLauncher(), DirectLauncher()])
+@pytest.mark.parametrize('base_launcher_flags', [[], ['--do-something']])
 def test_bashlauncher_env(
     tmp_path,
     cmd,
@@ -142,13 +142,13 @@ def test_bashlauncher_env(
     assert result.env == {}
 
 
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
-@pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
-@pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [None, [], ['--cuda']])
+@pytest.mark.parametrize('base_launcher', [SrunLauncher(), DirectLauncher()])
+@pytest.mark.parametrize('base_launcher_flags', [[], ['--do-something']])
 def test_bashlauncher_cmd(
     tmp_path,
     cmd,
@@ -191,26 +191,26 @@ def test_bashlauncher_cmd(
     # The command is expected to be /bin/bash script_path.
     assert len(result.cmd) == 2
 
-    assert result.cmd[0] == "/bin/bash"
+    assert result.cmd[0] == '/bin/bash'
 
     # We check the script_path now. The directory of the script must be equal
     # to run_dir/bash_scripts.
     script_path = Path(result.cmd[1])
 
-    assert script_path.parent == tmp_path / "bash_scripts"
+    assert script_path.parent == tmp_path / 'bash_scripts'
 
     # The script name itself is of the format command_date.sh. We don't check
     # the date exactly here, just the format.
-    assert re.match(cmd[0] + "_[0-9-:]*.sh", script_path.name)
+    assert re.match(cmd[0] + '_[0-9-:]*.sh', script_path.name)
 
 
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["/some/path/something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
-@pytest.mark.parametrize("base_launcher", [SrunLauncher(), DirectLauncher()])
-@pytest.mark.parametrize("base_launcher_flags", [[], ["--do-something"]])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['/some/path/something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [None, [], ['--cuda']])
+@pytest.mark.parametrize('base_launcher', [SrunLauncher(), DirectLauncher()])
+@pytest.mark.parametrize('base_launcher_flags', [[], ['--do-something']])
 def test_bashlauncher_script(
     tmp_path,
     cmd,
@@ -253,7 +253,7 @@ def test_bashlauncher_script(
     script_path = Path(result.cmd[1])
 
     cmd_short = cmd[0].split('/')[-1]
-    assert str(script_path).startswith(str(tmp_path/'bash_scripts'/cmd_short))
+    assert str(script_path).startswith(str(tmp_path / 'bash_scripts' / cmd_short))
 
     # There are essentially only three things we have to check
     # * The header/hashbang.
@@ -265,7 +265,7 @@ def test_bashlauncher_script(
     cmd_line = None
     run_dir = None
 
-    with script_path.open("r", encoding="utf-8") as f:
+    with script_path.open('r', encoding='utf-8') as f:
         header = f.readline()
 
         lines = f.readlines()
@@ -279,15 +279,15 @@ def test_bashlauncher_script(
             if line.startswith('#'):
                 continue
 
-            if line.startswith("export"):
+            if line.startswith('export'):
                 env_lines.append(line.strip())
-            elif line.startswith("cd"):
+            elif line.startswith('cd'):
                 run_dir = line.split('"')[1]
             else:
                 cmd_line = line
                 break
 
-    assert "#! /bin/bash".strip() == header.strip()
+    assert '#! /bin/bash'.strip() == header.strip()
 
     ref_env = []
 
@@ -308,7 +308,7 @@ def test_bashlauncher_script(
     assert tmp_path == Path(run_dir)
 
     # pylint: disable=R1713
-    ref_cmd_line = ""
+    ref_cmd_line = ''
     for c in base_launch_data.cmd:
         ref_cmd_line += f'"{c}" '
 
