@@ -121,7 +121,7 @@ def fixture_test_run_setup():
         command=[
             sys.executable,
             '-c',
-            'from pathlib import Path; Path(\'test.txt\').touch()',
+            "from pathlib import Path; Path('test.txt').touch()",
         ]
     )
 
@@ -130,9 +130,7 @@ def fixture_test_run_setup():
         env_handlers=env_handlers,
     )
 
-    tech = TechSetup(
-        env_handlers=[EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')]
-    )
+    tech = TechSetup(env_handlers=[EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')])
 
     return science, tech
 

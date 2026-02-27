@@ -14,28 +14,28 @@ import pytest
 from ifsbench import Job, DirectLauncher, EnvHandler, EnvOperation, DefaultEnvPipeline
 
 
-@pytest.fixture(name="test_env")
+@pytest.fixture(name='test_env')
 def fixture_test_env():
     return DefaultEnvPipeline(
         handlers=[
-            EnvHandler(mode=EnvOperation.SET, key="SOME_VALUE", value="5"),
-            EnvHandler(mode=EnvOperation.SET, key="OTHER_VALUE", value="6"),
-            EnvHandler(mode=EnvOperation.DELETE, key="SOME_VALUE"),
+            EnvHandler(mode=EnvOperation.SET, key='SOME_VALUE', value='5'),
+            EnvHandler(mode=EnvOperation.SET, key='OTHER_VALUE', value='6'),
+            EnvHandler(mode=EnvOperation.DELETE, key='SOME_VALUE'),
         ]
     )
 
 
-@pytest.fixture(name="test_env_none")
+@pytest.fixture(name='test_env_none')
 def fixture_test_env_none():
     return None
 
 
-@pytest.mark.parametrize("executable", [None, "", "mpirun"])
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
+@pytest.mark.parametrize('executable', [None, '', 'mpirun'])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [None, [], ['--cuda']])
 def test_directlauncher_run_dir(
     tmp_path,
     executable,
@@ -67,12 +67,12 @@ def test_directlauncher_run_dir(
     assert result.run_dir == tmp_path
 
 
-@pytest.mark.parametrize("executable", [None, "", "mpirun"])
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
+@pytest.mark.parametrize('executable', [None, '', 'mpirun'])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [None, [], ['--cuda']])
 def test_directlauncher_env(
     tmp_path,
     executable,
@@ -98,7 +98,7 @@ def test_directlauncher_env(
     if library_paths:
         for path in library_paths:
             ref_pipeline.add(
-                EnvHandler(mode=EnvOperation.APPEND, key="LD_LIBRARY_PATH", value=path)
+                EnvHandler(mode=EnvOperation.APPEND, key='LD_LIBRARY_PATH', value=path)
             )
 
     launcher = DirectLauncher(executable=executable)
@@ -115,12 +115,12 @@ def test_directlauncher_env(
     assert result.env == ref_pipeline.execute()
 
 
-@pytest.mark.parametrize("executable", [None, "", "mpirun"])
-@pytest.mark.parametrize("cmd", [["ls", "-l"], ["something"]])
-@pytest.mark.parametrize("job", [Job(tasks=64), Job()])
-@pytest.mark.parametrize("library_paths", [None, [], ["/library/path/something"]])
-@pytest.mark.parametrize("env_pipeline_name", ["test_env_none", "test_env"])
-@pytest.mark.parametrize("custom_flags", [None, [], ["--cuda"]])
+@pytest.mark.parametrize('executable', [None, '', 'mpirun'])
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('custom_flags', [None, [], ['--cuda']])
 def test_directlauncher_cmd(
     tmp_path,
     executable,

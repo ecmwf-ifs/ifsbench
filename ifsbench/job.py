@@ -187,15 +187,11 @@ class Job(SerialisationMixin):
             # values.
 
             if self.tasks_per_socket:
-                self.tasks_per_node = (
-                    self.tasks_per_socket * cpu_configuration.sockets_per_node
-                )
+                self.tasks_per_node = self.tasks_per_socket * cpu_configuration.sockets_per_node
             elif self.tasks:
                 self.tasks_per_node = cpu_configuration.cores_per_node // cpus_per_task
             else:
-                raise ValueError(
-                    'The number of tasks per node could not be determined!'
-                )
+                raise ValueError('The number of tasks per node could not be determined!')
 
             # If GPUs are used, make sure that tasks_per_node is compatible with
             # the number of available GPUs.
@@ -208,20 +204,19 @@ class Job(SerialisationMixin):
             if self.tasks_per_node <= 0:
                 raise ValueError('Failed to determine the number of tasks per node!')
 
-
         if self.nodes is None:
             threads_per_node = self.tasks_per_node * threads_per_core * cpus_per_task
 
             if not self.tasks:
                 raise ValueError('The number of nodes could not be determined!')
 
-            self.nodes = (
-                self.tasks * cpus_per_task + threads_per_node - 1
-            ) // threads_per_node
+            self.nodes = (self.tasks * cpus_per_task + threads_per_node - 1) // threads_per_node
 
         if self.tasks is None:
             self.tasks = self.nodes * self.tasks_per_node
 
         if gpus_per_node > cpu_configuration.gpus_per_node:
-            raise ValueError('The number of requested GPUs per node is '
-                             'higher than the available number of GPUs per node.')
+            raise ValueError(
+                'The number of requested GPUs per node is '
+                'higher than the available number of GPUs per node.'
+            )

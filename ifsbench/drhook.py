@@ -26,15 +26,15 @@ class DrHook(Enum):
     PROF = 1
 
     __env_map__ = {
-        OFF : {
+        OFF: {
             'DR_HOOK': '0',
         },
-        PROF : {
+        PROF: {
             'DR_HOOK': '1',
             'DR_HOOK_IGNORE_SIGNALS': '0',
             # 'DR_HOOK_USE_LOCKFILE': '0',
             'DR_HOOK_OPT': 'prof',
-        }
+        },
     }
 
     @property
@@ -46,17 +46,24 @@ class DrHookRecord:
     """
     Class to encapsulate a DrHook performance record for a single benchmark run.
     """
+
     sre_number = r'[\w\-\+\.]+'
     sre_tag = r'[\w\(\)\*_-@]+'
 
     re_program = re.compile(r"program='(?P<program>.*)'")
-    re_walltime = re.compile(fr'Wall-time is (?P<walltime>{sre_number}) sec on proc#{sre_number} '
-                             fr'\((?P<nprocs>{sre_number}) procs, (?P<threads>{sre_number}) threads\)')
-    re_memory = re.compile(fr'Memory usage : {sre_number} MB (heap), {sre_number} MB (rss), '
-                           fr'{sre_number} MB (stack), {sre_number} MB (vmpeak), {sre_number} (paging)')
-    re_row = re.compile(fr'(?P<id>{sre_number}) +(?P<percent>{sre_number}) +(?P<cumul>{sre_number}) +'
-                        fr'(?P<self>{sre_number}) +(?P<total>{sre_number}) +(?P<calls>{sre_number}) +'
-                        fr'{sre_number} +{sre_number} +(?P<routine>.*)')
+    re_walltime = re.compile(
+        rf'Wall-time is (?P<walltime>{sre_number}) sec on proc#{sre_number} '
+        rf'\((?P<nprocs>{sre_number}) procs, (?P<threads>{sre_number}) threads\)'
+    )
+    re_memory = re.compile(
+        rf'Memory usage : {sre_number} MB (heap), {sre_number} MB (rss), '
+        rf'{sre_number} MB (stack), {sre_number} MB (vmpeak), {sre_number} (paging)'
+    )
+    re_row = re.compile(
+        rf'(?P<id>{sre_number}) +(?P<percent>{sre_number}) +(?P<cumul>{sre_number}) +'
+        rf'(?P<self>{sre_number}) +(?P<total>{sre_number}) +(?P<calls>{sre_number}) +'
+        rf'{sre_number} +{sre_number} +(?P<routine>.*)'
+    )
 
     def __init__(self, data, metadata):
         self.data = data
@@ -75,7 +82,7 @@ class DrHookRecord:
         """
         Pretty-print content of the merged DrHook results.
         """
-        s =  f'The name of the executable : {self.metadata["program"]}\n'
+        s = f'The name of the executable : {self.metadata["program"]}\n'
         s += f'Number of MPI-tasks        : {self.metadata["nprocs"]}\n'
         s += f'Number of OpenMP-threads   : {self.metadata["threads"]}\n'
         s += f'Wall-times over {self.metadata["nprocs"]:.3f} MPI-tasks (secs) : '
@@ -106,8 +113,10 @@ class DrHookRecord:
         """
         Load DrHook output from dumped dictionaries into :any:`pandas.DataFrame`
         """
-        return DrHookRecord(data=pd.DataFrame.from_dict(data, orient=orient),
-                            metadata=pd.DataFrame.from_dict(metadata, orient=orient))
+        return DrHookRecord(
+            data=pd.DataFrame.from_dict(data, orient=orient),
+            metadata=pd.DataFrame.from_dict(metadata, orient=orient),
+        )
 
     @classmethod
     def from_raw(cls, filepath, batch_size=20):
@@ -133,10 +142,11 @@ class DrHookRecord:
         """
         Parse the raw DrHook (per-process) profile files into a :any:`pandas.DataFrame`.
         """
+
         def batch(iterable, batch_size=1):
             length = len(iterable)
             for i_batch in range(0, length, batch_size):
-                yield iterable[i_batch:min(i_batch + batch_size, length)]
+                yield iterable[i_batch : min(i_batch + batch_size, length)]
 
         debug(f'Parsing DrHook profile: {filepath} with batch size {batch_size}')
 

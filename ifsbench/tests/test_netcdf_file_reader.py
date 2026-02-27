@@ -17,6 +17,7 @@ def fixture_netcdf_location():
     """Return the full path of the test directory"""
     return Path(__file__).parent.resolve() / 'netcdf_files'
 
+
 @pytest.fixture(name='grib_location')
 def fixture_grib_location():
     """Return the full path of the test directory"""
@@ -32,9 +33,7 @@ def test_netcdffilereader_read_data(netcdf_location):
     assert len(dss) == 1
 
     ds = dss[0]
-    assert sorted(list(ds.coords)) == sorted(
-        ['lat', 'lon', 'nlevs', 'tile', 'vtype', 'nlevsn']
-    )
+    assert sorted(list(ds.coords)) == sorted(['lat', 'lon', 'nlevs', 'tile', 'vtype', 'nlevsn'])
     assert sorted(list(ds.data_vars)) == sorted(['SoilThick', 'SoilSat'])
 
 

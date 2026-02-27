@@ -16,7 +16,7 @@ import pytest
 from ifsbench.launch import LaunchData
 
 
-@pytest.fixture(name="python_exec")
+@pytest.fixture(name='python_exec')
 def fixture_python():
     """
     Return the currently used Python executable.
@@ -25,20 +25,20 @@ def fixture_python():
 
 
 @pytest.mark.parametrize(
-    "flags, env, files",
+    'flags, env, files',
     [
         (
-            ["-c", "from pathlib import Path; Path('test.txt').touch()"],
+            ['-c', "from pathlib import Path; Path('test.txt').touch()"],
             {},
-            ["test.txt"],
+            ['test.txt'],
         ),
         (
             [
-                "-c",
+                '-c',
                 "import os; from pathlib import Path; Path(os.environ['TARGET_FILE']).touch()",
             ],
-            {"TARGET_FILE": "env_file.txt"},
-            ["env_file.txt"],
+            {'TARGET_FILE': 'env_file.txt'},
+            ['env_file.txt'],
         ),
     ],
 )

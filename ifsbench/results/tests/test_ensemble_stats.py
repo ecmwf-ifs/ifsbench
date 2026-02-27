@@ -71,7 +71,6 @@ def test_from_config_invalid_fails():
         )
 
 
-
 def test_calc_stats_min():
     in_data = build_frames()
     es = EnsembleStats(frames=in_data)
@@ -93,22 +92,12 @@ def test_calc_stats_list():
 
     # Expected frames per stat
     df_min = pd.DataFrame([[293, 1008], [291, 1005]], index=INDEX, columns=COLUMNS)
-    df_p10 = pd.DataFrame(
-        [[293.6, 1008.6], [291.3, 1005.9]], index=INDEX, columns=COLUMNS
-    )
-    df_mean = pd.DataFrame(
-        [[295.0, 1011], [292.75, 1007.5]], index=INDEX, columns=COLUMNS
-    )
-    df_p50 = pd.DataFrame(
-        [[295.5, 1011.0], [293, 1008.0]], index=INDEX, columns=COLUMNS
-    )
-    df_p90 = pd.DataFrame(
-        [[296.0, 1013.4], [294.0, 1008.7]], index=INDEX, columns=COLUMNS
-    )
+    df_p10 = pd.DataFrame([[293.6, 1008.6], [291.3, 1005.9]], index=INDEX, columns=COLUMNS)
+    df_mean = pd.DataFrame([[295.0, 1011], [292.75, 1007.5]], index=INDEX, columns=COLUMNS)
+    df_p50 = pd.DataFrame([[295.5, 1011.0], [293, 1008.0]], index=INDEX, columns=COLUMNS)
+    df_p90 = pd.DataFrame([[296.0, 1013.4], [294.0, 1008.7]], index=INDEX, columns=COLUMNS)
     df_max = pd.DataFrame([[296, 1014], [294, 1009]], index=INDEX, columns=COLUMNS)
-    df_std = pd.DataFrame(
-        [[1.22474, 2.2360679], [1.299038, 1.500]], index=INDEX, columns=COLUMNS
-    )
+    df_std = pd.DataFrame([[1.22474, 2.2360679], [1.299038, 1.500]], index=INDEX, columns=COLUMNS)
     expected = {
         'min': df_min,
         'p10': df_p10,

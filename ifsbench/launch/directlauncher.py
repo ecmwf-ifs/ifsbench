@@ -39,9 +39,7 @@ class DirectLauncher(Launcher):
         if library_paths:
             for path in library_paths:
                 env_pipeline.add(
-                    EnvHandler(
-                        mode=EnvOperation.APPEND, key="LD_LIBRARY_PATH", value=str(path)
-                    )
+                    EnvHandler(mode=EnvOperation.APPEND, key='LD_LIBRARY_PATH', value=str(path))
                 )
 
         if self.executable:

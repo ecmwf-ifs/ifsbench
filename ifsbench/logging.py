@@ -13,8 +13,20 @@ import logging
 import sys
 
 
-__all__ = ['debug', 'header', 'info', 'warning', 'success', 'error',
-	   'logger', 'colors', 'DEBUG', 'INFO', 'WARNING', 'ERROR']
+__all__ = [
+    'debug',
+    'header',
+    'info',
+    'warning',
+    'success',
+    'error',
+    'logger',
+    'colors',
+    'DEBUG',
+    'INFO',
+    'WARNING',
+    'ERROR',
+]
 
 
 class colors:
@@ -90,6 +102,7 @@ INFO = logging.INFO
 DEBUG = logging.DEBUG
 WARNING = logging.WARNING
 ERROR = logging.ERROR
+
 
 def debug(msg, *args, **kwargs):
     msg = colors.OKBLUE % msg

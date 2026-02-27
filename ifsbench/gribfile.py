@@ -64,7 +64,6 @@ __all__ = [
 
 
 class GribFileReader(DataFileReader):
-
     @classmethod
     def read_data(cls, input_path: str) -> List[xr.Dataset]:
         """Reads GRIB file and returns data as dataframe.
@@ -89,12 +88,11 @@ class GribModification(ABC):
 
     def __init__(self):
         if not PYGRIB_AVAILABLE:
-            raise RuntimeError(
-                'Cannot modify GRIB files - pygrib or eccodes not available.'
-            )
+            raise RuntimeError('Cannot modify GRIB files - pygrib or eccodes not available.')
+
     # pylint: disable=possibly-used-before-assignment
     @abstractmethod
-    def modify_message(self, grb: gribmessage) -> gribmessage: # pylint: disable=possibly-used-before-assignment
+    def modify_message(self, grb: gribmessage) -> gribmessage:  # pylint: disable=possibly-used-before-assignment
         """Modifies the data in that GRIB message."""
         raise NotImplementedError()
 
@@ -137,9 +135,7 @@ class UniformGribNoiseFromMetadata(GribModification):
         grb.expand_grid(False)
         data_values = grb.values
         noise_max = grb[self._noise_param] * self._noise_scale
-        data_mod = data_values + np.random.uniform(
-            -noise_max, noise_max, data_values.shape
-        )
+        data_mod = data_values + np.random.uniform(-noise_max, noise_max, data_values.shape)
         # TODO(ecm6397) Add checks for units `(Code table 4.xxx)` and `%`.
         if grb.has_key('units') and grb['units'] == '(0 - 1)':
             # Fractional parameters (e.g. cc) have to have values between 0 and 1.
@@ -187,9 +183,7 @@ def modify_grib_file(
         if output_path file exists, delete it. If False and file exists, exit.
     """
     if not PYGRIB_AVAILABLE:
-        raise RuntimeError(
-            'Cannot modify GRIB files - pygrib or eccodes not available.'
-        )
+        raise RuntimeError('Cannot modify GRIB files - pygrib or eccodes not available.')
     if not overwrite_existing and os.path.exists(output_path):
         error(
             'Output %s already exists and overwrite_existing is set to False.',

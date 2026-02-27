@@ -8,6 +8,7 @@
 """
 Test the common CLI options and utilities provided by ifsbench
 """
+
 from pathlib import Path
 import re
 
@@ -28,6 +29,7 @@ def fixture_runopts_cmd():
     """
     Instantiate a helper command that prints :any:`RunOptions`
     """
+
     @cli.command('runopts-cmd')
     @run_options
     def _runopts_cmd(runopts):
@@ -49,6 +51,7 @@ def fixture_refopts_cmd():
     """
     Instantiate a helper command that prints :any:`ReferenceOptions`
     """
+
     @cli.command('refopts-cmd')
     @reference_options
     def _refopts_cmd(refopts):
@@ -70,71 +73,90 @@ def parse_output(string):
 
 
 @pytest.mark.usefixtures('runopts_cmd')
-@pytest.mark.parametrize('options,expected', [
-    ([], {
-        'nproc': '1',
-        'nthread': '1',
-        'hyperthread': '1',
-        'nproc_io': '0',
-        'arch': 'None',
-        'launch_cmd': 'None',
-        'launch_options': 'None',
-        'forecast_length': 'None',
-        'nproma': 'None',
-    }),
-    ([
-        '--nproc=32', '--nthread=4', '--hyperthread=2',
-        '--nproc-io=2', '--arch=foobar',
-        '--launch-options="--mem=120G -q np -p par"',
-        '--forecast-length=h24', '--nproma=32'
-    ], {
-        'nproc': '32',
-        'nthread': '4',
-        'hyperthread': '2',
-        'nproc_io': '2',
-        'arch': 'foobar',
-        'launch_cmd': 'None',
-        'launch_options': '"--mem=120G -q np -p par"',
-        'forecast_length': 'h24',
-        'nproma': '32',
-    }),
-    (['--launch-cmd="srun -n 12"'],
-     {
-        'nproc': '1',
-        'nthread': '1',
-        'hyperthread': '1',
-        'nproc_io': '0',
-        'arch': 'None',
-        'launch_cmd': '"srun -n 12"',
-        'launch_options': 'None',
-        'forecast_length': 'None',
-        'nproma': 'None',
-    }),
-    (['-l"srun -n 12"', '-a', 'foobar'],
-     {
-        'nproc': '1',
-        'nthread': '1',
-        'hyperthread': '1',
-        'nproc_io': '0',
-        'arch': 'foobar',
-        'launch_cmd': '"srun -n 12"',
-        'launch_options': 'None',
-        'forecast_length': 'None',
-        'nproma': 'None',
-    }),
-    (['-n4', '-c2', '-a blub', '--fclen=d10', '--nproma=-24'],
-     {
-        'nproc': '4',
-        'nthread': '2',
-        'hyperthread': '1',
-        'nproc_io': '0',
-        'arch': ' blub',
-        'launch_cmd': 'None',
-        'launch_options': 'None',
-        'forecast_length': 'd10',
-        'nproma': '-24'
-    }),
-])
+@pytest.mark.parametrize(
+    'options,expected',
+    [
+        (
+            [],
+            {
+                'nproc': '1',
+                'nthread': '1',
+                'hyperthread': '1',
+                'nproc_io': '0',
+                'arch': 'None',
+                'launch_cmd': 'None',
+                'launch_options': 'None',
+                'forecast_length': 'None',
+                'nproma': 'None',
+            },
+        ),
+        (
+            [
+                '--nproc=32',
+                '--nthread=4',
+                '--hyperthread=2',
+                '--nproc-io=2',
+                '--arch=foobar',
+                '--launch-options="--mem=120G -q np -p par"',
+                '--forecast-length=h24',
+                '--nproma=32',
+            ],
+            {
+                'nproc': '32',
+                'nthread': '4',
+                'hyperthread': '2',
+                'nproc_io': '2',
+                'arch': 'foobar',
+                'launch_cmd': 'None',
+                'launch_options': '"--mem=120G -q np -p par"',
+                'forecast_length': 'h24',
+                'nproma': '32',
+            },
+        ),
+        (
+            ['--launch-cmd="srun -n 12"'],
+            {
+                'nproc': '1',
+                'nthread': '1',
+                'hyperthread': '1',
+                'nproc_io': '0',
+                'arch': 'None',
+                'launch_cmd': '"srun -n 12"',
+                'launch_options': 'None',
+                'forecast_length': 'None',
+                'nproma': 'None',
+            },
+        ),
+        (
+            ['-l"srun -n 12"', '-a', 'foobar'],
+            {
+                'nproc': '1',
+                'nthread': '1',
+                'hyperthread': '1',
+                'nproc_io': '0',
+                'arch': 'foobar',
+                'launch_cmd': '"srun -n 12"',
+                'launch_options': 'None',
+                'forecast_length': 'None',
+                'nproma': 'None',
+            },
+        ),
+        (
+            ['-n4', '-c2', '-a blub', '--fclen=d10', '--nproma=-24'],
+            {
+                'nproc': '4',
+                'nthread': '2',
+                'hyperthread': '1',
+                'nproc_io': '0',
+                'arch': ' blub',
+                'launch_cmd': 'None',
+                'launch_options': 'None',
+                'forecast_length': 'd10',
+                'nproma': '-24',
+            },
+        ),
+    ],
+)
 def test_run_options(runner, options, expected):
     """
     Verify that the :any:`run_options` decorator works as expected
@@ -146,29 +168,43 @@ def test_run_options(runner, options, expected):
 
 
 @pytest.mark.usefixtures('refopts_cmd')
-@pytest.mark.parametrize('options,expected', [
-    ([], {
-        'path': 'None',
-        'validate': 'True',
-        'update': 'False',
-        'comment': 'None',
-    }),
-    ([f'--reference={Path(__file__).resolve}', '--validate', '--update-reference'], {
-        'path': str(Path(__file__).resolve),
-        'validate': 'True',
-        'update': 'True',
-        'comment': 'None',
-    }),
-    ([
-        f'-r{Path(__file__).resolve}', '--no-validate', '--update-reference',
-        '--comment="Some funny text"'
-     ], {
-        'path': str(Path(__file__).resolve),
-        'validate': 'False',
-        'update': 'True',
-        'comment': '"Some funny text"',
-    }),
-])
+@pytest.mark.parametrize(
+    'options,expected',
+    [
+        (
+            [],
+            {
+                'path': 'None',
+                'validate': 'True',
+                'update': 'False',
+                'comment': 'None',
+            },
+        ),
+        (
+            [f'--reference={Path(__file__).resolve}', '--validate', '--update-reference'],
+            {
+                'path': str(Path(__file__).resolve),
+                'validate': 'True',
+                'update': 'True',
+                'comment': 'None',
+            },
+        ),
+        (
+            [
+                f'-r{Path(__file__).resolve}',
+                '--no-validate',
+                '--update-reference',
+                '--comment="Some funny text"',
+            ],
+            {
+                'path': str(Path(__file__).resolve),
+                'validate': 'False',
+                'update': 'True',
+                'comment': '"Some funny text"',
+            },
+        ),
+    ],
+)
 def test_reference_options(runner, options, expected):
     """
     Verify that the :any:`reference_options` decorator works as expected

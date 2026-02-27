@@ -18,7 +18,7 @@ from pydantic import computed_field
 from ifsbench.data.datahandler import DataHandler
 from ifsbench.logging import debug
 
-__all__ = ["RenameHandler", "RenameMode"]
+__all__ = ['RenameHandler', 'RenameMode']
 
 
 class RenameMode(str, Enum):
@@ -27,13 +27,13 @@ class RenameMode(str, Enum):
     """
 
     #: Copy the file from its current place to the new location.
-    COPY = "copy"
+    COPY = 'copy'
 
     #: Create a symlink in the new location, pointing to its current location.
-    SYMLINK = "symlink"
+    SYMLINK = 'symlink'
 
     #: Move the file from its current place to the new location.
-    MOVE = "move"
+    MOVE = 'move'
 
 
 class RenameHandler(DataHandler):
@@ -70,7 +70,7 @@ class RenameHandler(DataHandler):
         # modified.
         path_mapping = {}
 
-        for f in wdir.rglob("*"):
+        for f in wdir.rglob('*'):
             if f.is_dir():
                 continue
 
@@ -84,7 +84,7 @@ class RenameHandler(DataHandler):
         # the same file. Crash if this is the case.
         if len(set(path_mapping.keys())) != len(set(path_mapping.values())):
             raise RuntimeError(
-                "Renaming would cause two different files to be given the same name!"
+                'Renaming would cause two different files to be given the same name!'
             )
 
         for source, dest in path_mapping.items():
@@ -98,7 +98,7 @@ class RenameHandler(DataHandler):
             # Delete whatever resides at dest at the moment (whether it's a
             # file or a directory).
             if dest.exists():
-                debug(f"Delete existing file/directory {dest} before renaming.")
+                debug(f'Delete existing file/directory {dest} before renaming.')
                 try:
                     shutil.rmtree(dest)
                 except NotADirectoryError:
@@ -107,14 +107,14 @@ class RenameHandler(DataHandler):
             dest.parent.mkdir(parents=True, exist_ok=True)
 
             if self.mode == RenameMode.COPY:
-                debug(f"Copy {source} to {dest}.")
+                debug(f'Copy {source} to {dest}.')
 
                 shutil.copy(source, dest)
             elif self.mode == RenameMode.SYMLINK:
-                debug(f"Symlink {source} to {dest}.")
+                debug(f'Symlink {source} to {dest}.')
 
                 dest.symlink_to(source)
             elif self.mode == RenameMode.MOVE:
-                debug(f"Move {source} to {dest}.")
+                debug(f'Move {source} to {dest}.')
 
                 source.rename(dest)

@@ -101,25 +101,20 @@ class DataFileStats(SerialisationMixin):
             elif b'CDF' in header or b'HDF' in header:
                 reader_type = NetcdfFileReader
             else:
-                raise ValueError(
-                    f'Unable to determine data file type for {self.input_path}'
-                )
+                raise ValueError(f'Unable to determine data file type for {self.input_path}')
 
         dss = reader_type().read_data(self.input_path)
         for ds in dss:
             _stat_dims = list(set(ds.sizes.keys()) & self.stat_dims)
             stats_dss = [
-                self._create_stat_ds(ds, stat_name, _stat_dims)
-                for stat_name in self.stat_names
+                self._create_stat_ds(ds, stat_name, _stat_dims) for stat_name in self.stat_names
             ]
             ds_stats = xr.concat(stats_dss, dim=_STAT_DIM_NAME)
             self._stats.append(ds_stats.to_dataframe())
         return self._stats
 
     @classmethod
-    def _calc_stat(
-        cls, ds: xr.Dataset, stat_name: str, stat_dims: List[str]
-    ) -> xr.Dataset:
+    def _calc_stat(cls, ds: xr.Dataset, stat_name: str, stat_dims: List[str]) -> xr.Dataset:
         """Creates datasets containing the statistical value specified by stat_name."""
         if stat_name == 'mean':
             return ds.mean(dim=stat_dims)
@@ -141,10 +136,6 @@ class DataFileStats(SerialisationMixin):
         raise ValueError(f'Unknown stat requested: {stat_name}')
 
     @classmethod
-    def _create_stat_ds(
-        cls, ds: xr.Dataset, stat_name: str, stat_dims: List[str]
-    ) -> xr.Dataset:
+    def _create_stat_ds(cls, ds: xr.Dataset, stat_name: str, stat_dims: List[str]) -> xr.Dataset:
         ds_stat = cls._calc_stat(ds, stat_name, stat_dims)
-        return ds_stat.assign_coords({_STAT_DIM_NAME: stat_name}).expand_dims(
-            _STAT_DIM_NAME
-        )
+        return ds_stat.assign_coords({_STAT_DIM_NAME: stat_name}).expand_dims(_STAT_DIM_NAME)
