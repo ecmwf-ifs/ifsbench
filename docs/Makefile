@@ -20,10 +20,10 @@ apidoc:
 	@$(SPHINXAPIDOC) -o "$(SOURCEDIR)" -e --no-toc -f ../ifsbench
 
 # Check docstrings for Sphinx compatibility
-# This target builds documentation with nitpicky mode enabled and reports all warnings
+# This target builds documentation with nitpicky mode (configured in conf.py) and reports all warnings
 checkdocstrings: apidoc
 	@echo "Checking docstrings for Sphinx compatibility..."
-	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" -n --keep-going $(SPHINXOPTS) $(O) 2>&1 | tee checkdocstrings.log; \
+	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" --keep-going $(SPHINXOPTS) $(O) 2>&1 | tee checkdocstrings.log; \
 	echo ""; \
 	echo "Docstring check complete. See checkdocstrings.log for details."; \
 	if grep -q "WARNING:" checkdocstrings.log; then \

@@ -142,7 +142,8 @@ nitpick_ignore = [
     ('py:data', 'ifsdata_dir'),
 ]
 
-# Convert nitpick_ignore to the new format for Sphinx 3.0+
+# Regex-based patterns for nitpick ignore (for future use if needed)
+# Example: [('py:.*', 'module.*')]
 nitpick_ignore_regex = []
 
 # -- Options for HTML output -------------------------------------------------
