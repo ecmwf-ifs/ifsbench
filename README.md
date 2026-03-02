@@ -54,3 +54,24 @@ specified in `.pylintrc`:
 ```
 <build_dir>/ifsbench_env/bin/pylint --rcfile=.pylintrc ifsbench/
 ```
+
+## Documentation and Docstrings
+
+All docstrings should be compatible with Sphinx and follow the NumPy docstring format.
+To check docstring compatibility with Sphinx, run:
+```
+cd docs
+make checkdocstrings
+```
+
+This will build the documentation with nitpicky mode enabled and report any warnings
+about malformed docstrings or missing references. The check uses the Sphinx configuration
+in `docs/source/conf.py` which enables strict checking of all docstrings.
+
+To build the HTML documentation locally:
+```
+cd docs
+make html
+```
+
+The generated documentation will be available in `docs/build/html/`.

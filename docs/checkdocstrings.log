@@ -1,1201 +1,0 @@
-[01mRunning Sphinx v9.1.0[39;49;00m
-[01mloading translations [en]... [39;49;00mdone
-[autosummary] generating autosummary for: ifsbench.application.rst, ifsbench.arch.rst, ifsbench.benchmark.rst, ifsbench.command_line.cli.rst, ifsbench.command_line.click_launcher.rst, ifsbench.command_line.nml_diff.rst, ifsbench.command_line.rst, ifsbench.command_line.tests.rst, ifsbench.command_line.tests.test_cli.rst, ifsbench.command_line.tests.test_click_launcher.rst, ..., ifsbench.tests.test_util.rst, ifsbench.util.rst, ifsbench.validation.frame_close_validation.rst, ifsbench.validation.frame_util.rst, ifsbench.validation.rst, ifsbench.validation.tests.rst, ifsbench.validation.tests.test_frame_close_validation.rst, ifsbench.validation.tests.test_frame_util.rst, ifsbench_api.rst, index.md
-[91mWARNING: Failed to import ifsbench.data.tests.test_fetchhandler.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_fetchhandler'[39;49;00m
-[91mWARNING: Failed to import ifsbench.launch.tests.test_directlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_directlauncher'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.command_line.tests.test_click_launcher.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.command_line.tests' has no attribute 'test_click_launcher'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_files.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_files'[39;49;00m
-[91mWARNING: Failed to import ifsbench.launch.tests.test_mpirunlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_mpirunlauncher'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_darshanreport.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_darshanreport'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_pydantic_dataframe.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_pydantic_dataframe'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_job.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_job'[39;49;00m
-[91mWARNING: Failed to import ifsbench.validation.tests.test_frame_close_validation.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.validation.tests' has no attribute 'test_frame_close_validation'[39;49;00m
-[91mWARNING: Failed to import ifsbench.validation.tests.test_frame_util.
-Possible hints:
-* AttributeError: module 'ifsbench.validation.tests' has no attribute 'test_frame_util'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.launch.tests.test_ddtlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_ddtlauncher'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_application.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_application'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.data.tests.test_renamehandler.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_renamehandler'[39;49;00m
-[91mWARNING: Failed to import ifsbench.launch.tests.test_launcher.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_launcher'[39;49;00m
-[91mWARNING: Failed to import ifsbench.launch.tests.test_launchdata.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_launchdata'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_benchmark.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_benchmark'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_envhandler.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_envhandler'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_drhook.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_drhook'[39;49;00m
-[91mWARNING: Failed to import ifsbench.data.tests.test_namelisthandler.
-Possible hints:
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_namelisthandler'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_gribfile.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_gribfile'[39;49;00m
-[91mWARNING: Failed to import ifsbench.data.tests.test_extracthandler.
-Possible hints:
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_extracthandler'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.launch.tests.test_srunlauncher.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_srunlauncher'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_data_file_stats.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_data_file_stats'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_namelist.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_namelist'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.command_line.tests.test_cli.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.command_line.tests' has no attribute 'test_cli'[39;49;00m
-[91mWARNING: Failed to import ifsbench.launch.tests.test_bashlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_bashlauncher'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_arch.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_arch'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_serialisation_mixin.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_serialisation_mixin'
-* ModuleNotFoundError: No module named 'pytest'[39;49;00m
-[91mWARNING: Failed to import ifsbench.results.tests.test_ensemble_stats.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.results.tests' has no attribute 'test_ensemble_stats'[39;49;00m
-[91mWARNING: Failed to import ifsbench.tests.test_netcdf_file_reader.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_netcdf_file_reader'[39;49;00m
-[autosummary] generating autosummary for: /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.rst
-[autosummary] generating autosummary for: /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.application.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.arch.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.benchmark.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.darshanreport.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data_file_reader.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data_file_stats.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.drhook.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.env.rst, ..., /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.logging.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.namelist.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.netcdf_file_reader.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.paths.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.pydantic_utils.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.results.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.serialisation_mixin.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.util.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.validation.rst
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_application.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_application'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_arch.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_arch'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_benchmark.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_benchmark'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_darshanreport.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_darshanreport'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_data_file_stats.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_data_file_stats'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_drhook.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: 
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_drhook'[39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_envhandler.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_envhandler'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_files.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_files'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_gribfile.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_gribfile'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_job.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_job'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_namelist.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_namelist'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_netcdf_file_reader.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_netcdf_file_reader'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_pydantic_dataframe.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_pydantic_dataframe'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.tests.test_serialisation_mixin.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_serialisation_mixin'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[autosummary] generating autosummary for: /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.cli.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.click_launcher.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.nml_diff.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.tests.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.datahandler.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.extracthandler.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.fetchhandler.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.namelisthandler.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.renamehandler.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.rst, ..., /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.mpirunlauncher.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.srunlauncher.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.results.ensemble_stats.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.results.result_format.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.results.tests.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_util.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.validation.frame_close_validation.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.validation.frame_util.rst, /home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.validation.tests.rst
-[91mWARNING: [autosummary] failed to import ifsbench.command_line.tests.test_cli.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.command_line.tests' has no attribute 'test_cli'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.command_line.tests.test_click_launcher.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.command_line.tests' has no attribute 'test_click_launcher'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.data.tests.test_extracthandler.
-Possible hints:
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_extracthandler'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.data.tests.test_fetchhandler.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_fetchhandler'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.data.tests.test_namelisthandler.
-Possible hints:
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_namelisthandler'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.data.tests.test_renamehandler.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_renamehandler'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.launch.tests.test_bashlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_bashlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.launch.tests.test_ddtlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_ddtlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.launch.tests.test_directlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_directlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.launch.tests.test_launchdata.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_launchdata'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.launch.tests.test_launcher.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_launcher'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.launch.tests.test_mpirunlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_mpirunlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.launch.tests.test_srunlauncher.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_srunlauncher'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.results.tests.test_ensemble_stats.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.results.tests' has no attribute 'test_ensemble_stats'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.validation.tests.test_frame_close_validation.
-Possible hints:
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.validation.tests' has no attribute 'test_frame_close_validation'
-* ImportError: [39;49;00m
-[91mWARNING: [autosummary] failed to import ifsbench.validation.tests.test_frame_util.
-Possible hints:
-* AttributeError: module 'ifsbench.validation.tests' has no attribute 'test_frame_util'
-* ModuleNotFoundError: No module named 'pytest'
-* ImportError: [39;49;00m
-loading intersphinx inventory 'python' from https://docs.python.org/3/objects.inv ...
-loading intersphinx inventory 'pandas' from https://pandas.pydata.org/pandas-docs/dev/objects.inv ...
-loading intersphinx inventory 'f90nml' from https://f90nml.readthedocs.io/en/latest/objects.inv ...
-[91mWARNING: failed to reach any of the inventories with the following issues:
-intersphinx inventory 'https://docs.python.org/3/objects.inv' not fetchable due to <class 'requests.exceptions.ConnectionError'>: HTTPSConnectionPool(host='docs.python.org', port=443): Max retries exceeded with url: /3/objects.inv (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7ff0c3d071d0>: Failed to resolve 'docs.python.org' ([Errno -5] No address associated with hostname)"))[39;49;00m
-[91mWARNING: failed to reach any of the inventories with the following issues:
-intersphinx inventory 'https://pandas.pydata.org/pandas-docs/dev/objects.inv' not fetchable due to <class 'requests.exceptions.ConnectionError'>: HTTPSConnectionPool(host='pandas.pydata.org', port=443): Max retries exceeded with url: /pandas-docs/dev/objects.inv (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7ff0c3273080>: Failed to resolve 'pandas.pydata.org' ([Errno -5] No address associated with hostname)"))[39;49;00m
-[91mWARNING: failed to reach any of the inventories with the following issues:
-intersphinx inventory 'https://f90nml.readthedocs.io/en/latest/objects.inv' not fetchable due to <class 'requests.exceptions.ConnectionError'>: HTTPSConnectionPool(host='f90nml.readthedocs.io', port=443): Max retries exceeded with url: /en/latest/objects.inv (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7ff0c3273770>: Failed to resolve 'f90nml.readthedocs.io' ([Errno -5] No address associated with hostname)"))[39;49;00m
-[01mmyst v5.0.0:[39;49;00m MdParserConfig(commonmark_only=False, gfm_only=False, enable_extensions=set(), disable_syntax=[], all_links_external=False, links_external_new_tab=False, url_schemes=('http', 'https', 'mailto', 'ftp'), ref_domains=None, fence_as_directive=set(), number_code_blocks=[], title_to_header=False, heading_anchors=0, heading_slug_func=None, html_meta={}, footnote_sort=True, footnote_transition=True, words_per_minute=200, substitutions={}, linkify_fuzzy_links=True, dmath_allow_labels=True, dmath_allow_space=True, dmath_allow_digits=True, dmath_double_inline=False, update_mathjax=True, mathjax_classes='tex2jax_process|mathjax_process|math|output_area', enable_checkboxes=False, suppress_warnings=[], highlight_code_blocks=True)
-[01mbuilding [mo]: [39;49;00mtargets for 0 po files that are out of date
-[01mwriting output... [39;49;00m
-[01mbuilding [html]: [39;49;00mtargets for 81 source files that are out of date
-[01mupdating environment: [39;49;00m[new config] 81 added, 0 changed, 0 removed
-[2K[01mreading sources... [39;49;00m[  1%] [35mifsbench[39;49;00m[2K[01mreading sources... [39;49;00m[  2%] [35mifsbench.application[39;49;00m[2K[01mreading sources... [39;49;00m[  4%] [35mifsbench.arch[39;49;00m[2K[01mreading sources... [39;49;00m[  5%] [35mifsbench.benchmark[39;49;00m[2K[01mreading sources... [39;49;00m[  6%] [35mifsbench.command_line[39;49;00m[2K[01mreading sources... [39;49;00m[  7%] [35mifsbench.command_line.cli[39;49;00m[2K[01mreading sources... [39;49;00m[  9%] [35mifsbench.command_line.click_launcher[39;49;00m[2K[01mreading sources... [39;49;00m[ 10%] [35mifsbench.command_line.nml_diff[39;49;00m[2K[01mreading sources... [39;49;00m[ 11%] [35mifsbench.command_line.tests[39;49;00m[2K[01mreading sources... [39;49;00m[ 12%] [35mifsbench.command_line.tests.test_cli[39;49;00m[2K[01mreading sources... [39;49;00m[ 14%] [35mifsbench.command_line.tests.test_click_launcher[39;49;00m[2K[01mreading sources... [39;49;00m[ 15%] [35mifsbench.darshanreport[39;49;00m[2K[01mreading sources... [39;49;00m[ 16%] [35mifsbench.data[39;49;00m[2K[01mreading sources... [39;49;00m[ 17%] [35mifsbench.data.datahandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 19%] [35mifsbench.data.extracthandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 20%] [35mifsbench.data.fetchhandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 21%] [35mifsbench.data.namelisthandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 22%] [35mifsbench.data.renamehandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 23%] [35mifsbench.data.tests[39;49;00m[2K[01mreading sources... [39;49;00m[ 25%] [35mifsbench.data.tests.test_extracthandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 26%] [35mifsbench.data.tests.test_fetchhandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 27%] [35mifsbench.data.tests.test_namelisthandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 28%] [35mifsbench.data.tests.test_renamehandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 30%] [35mifsbench.data_file_reader[39;49;00m[2K[01mreading sources... [39;49;00m[ 31%] [35mifsbench.data_file_stats[39;49;00m[2K[01mreading sources... [39;49;00m[ 32%] [35mifsbench.drhook[39;49;00m[2K[01mreading sources... [39;49;00m[ 33%] [35mifsbench.env[39;49;00m[2K[01mreading sources... [39;49;00m[ 35%] [35mifsbench.files[39;49;00m[2K[01mreading sources... [39;49;00m[ 36%] [35mifsbench.gribfile[39;49;00m[2K[01mreading sources... [39;49;00m[ 37%] [35mifsbench.job[39;49;00m[2K[01mreading sources... [39;49;00m[ 38%] [35mifsbench.launch[39;49;00m[2K[01mreading sources... [39;49;00m[ 40%] [35mifsbench.launch.bashlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 41%] [35mifsbench.launch.ddtlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 42%] [35mifsbench.launch.directlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 43%] [35mifsbench.launch.launcher[39;49;00m[2K[01mreading sources... [39;49;00m[ 44%] [35mifsbench.launch.mpirunlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 46%] [35mifsbench.launch.srunlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 47%] [35mifsbench.launch.tests[39;49;00m[2K[01mreading sources... [39;49;00m[ 48%] [35mifsbench.launch.tests.test_bashlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 49%] [35mifsbench.launch.tests.test_ddtlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 51%] [35mifsbench.launch.tests.test_directlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 52%] [35mifsbench.launch.tests.test_launchdata[39;49;00m[2K[01mreading sources... [39;49;00m[ 53%] [35mifsbench.launch.tests.test_launcher[39;49;00m[2K[01mreading sources... [39;49;00m[ 54%] [35mifsbench.launch.tests.test_mpirunlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 56%] [35mifsbench.launch.tests.test_srunlauncher[39;49;00m[2K[01mreading sources... [39;49;00m[ 57%] [35mifsbench.logging[39;49;00m[2K[01mreading sources... [39;49;00m[ 58%] [35mifsbench.namelist[39;49;00m[2K[01mreading sources... [39;49;00m[ 59%] [35mifsbench.netcdf_file_reader[39;49;00m[2K[01mreading sources... [39;49;00m[ 60%] [35mifsbench.paths[39;49;00m[2K[01mreading sources... [39;49;00m[ 62%] [35mifsbench.pydantic_utils[39;49;00m[2K[01mreading sources... [39;49;00m[ 63%] [35mifsbench.results[39;49;00m[2K[01mreading sources... [39;49;00m[ 64%] [35mifsbench.results.ensemble_stats[39;49;00m[2K[01mreading sources... [39;49;00m[ 65%] [35mifsbench.results.result_format[39;49;00m[2K[01mreading sources... [39;49;00m[ 67%] [35mifsbench.results.tests[39;49;00m[2K[01mreading sources... [39;49;00m[ 68%] [35mifsbench.results.tests.test_ensemble_stats[39;49;00m[2K[01mreading sources... [39;49;00m[ 69%] [35mifsbench.serialisation_mixin[39;49;00m[2K[01mreading sources... [39;49;00m[ 70%] [35mifsbench.tests[39;49;00m[2K[01mreading sources... [39;49;00m[ 72%] [35mifsbench.tests.test_application[39;49;00m[2K[01mreading sources... [39;49;00m[ 73%] [35mifsbench.tests.test_arch[39;49;00m[2K[01mreading sources... [39;49;00m[ 74%] [35mifsbench.tests.test_benchmark[39;49;00m[2K[01mreading sources... [39;49;00m[ 75%] [35mifsbench.tests.test_darshanreport[39;49;00m[2K[01mreading sources... [39;49;00m[ 77%] [35mifsbench.tests.test_data_file_stats[39;49;00m[2K[01mreading sources... [39;49;00m[ 78%] [35mifsbench.tests.test_drhook[39;49;00m[2K[01mreading sources... [39;49;00m[ 79%] [35mifsbench.tests.test_envhandler[39;49;00m[2K[01mreading sources... [39;49;00m[ 80%] [35mifsbench.tests.test_files[39;49;00m[2K[01mreading sources... [39;49;00m[ 81%] [35mifsbench.tests.test_gribfile[39;49;00m[2K[01mreading sources... [39;49;00m[ 83%] [35mifsbench.tests.test_job[39;49;00m[2K[01mreading sources... [39;49;00m[ 84%] [35mifsbench.tests.test_namelist[39;49;00m[2K[01mreading sources... [39;49;00m[ 85%] [35mifsbench.tests.test_netcdf_file_reader[39;49;00m[2K[01mreading sources... [39;49;00m[ 86%] [35mifsbench.tests.test_pydantic_dataframe[39;49;00m[2K[01mreading sources... [39;49;00m[ 88%] [35mifsbench.tests.test_serialisation_mixin[39;49;00m[2K[01mreading sources... [39;49;00m[ 89%] [35mifsbench.tests.test_util[39;49;00m[2K[01mreading sources... [39;49;00m[ 90%] [35mifsbench.util[39;49;00m[2K[01mreading sources... [39;49;00m[ 91%] [35mifsbench.validation[39;49;00m[2K[01mreading sources... [39;49;00m[ 93%] [35mifsbench.validation.frame_close_validation[39;49;00m[2K[01mreading sources... [39;49;00m[ 94%] [35mifsbench.validation.frame_util[39;49;00m[2K[01mreading sources... [39;49;00m[ 95%] [35mifsbench.validation.tests[39;49;00m[2K[01mreading sources... [39;49;00m[ 96%] [35mifsbench.validation.tests.test_frame_close_validation[39;49;00m[2K[01mreading sources... [39;49;00m[ 98%] [35mifsbench.validation.tests.test_frame_util[39;49;00m[2K[01mreading sources... [39;49;00m[ 99%] [35mifsbench_api[39;49;00m[2K[01mreading sources... [39;49;00m[100%] [35mindex[39;49;00m
-[31m/home/runner/work/ifsbench/ifsbench/ifsbench/arch.py:docstring of ifsbench.arch.DefaultArch.set_explicit:3: ERROR: Unexpected indentation. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/ifsbench/arch.py:docstring of ifsbench.arch.DefaultArch.set_explicit:6: WARNING: Block quote ends without a blank line; unexpected unindent. [docutils][39;49;00m
-[31m/home/runner/work/ifsbench/ifsbench/ifsbench/benchmark.py:docstring of ifsbench.benchmark.ScienceSetup:5: ERROR: Unexpected indentation. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/ifsbench/command_line/click_launcher.py:docstring of ifsbench.command_line.click_launcher.LauncherBuilder:6: WARNING: Definition list ends without a blank line; unexpected unindent. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.tests.rst:9: WARNING: autosummary: failed to import test_cli.
-Possible hints:
-* AttributeError: module 'ifsbench.command_line.tests' has no attribute 'test_cli'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* ModuleNotFoundError: No module named 'test_cli'
-* KeyError: 'test_cli'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.tests.rst:9: WARNING: autosummary: failed to import test_click_launcher.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_click_launcher'
-* AttributeError: module 'ifsbench.command_line.tests' has no attribute 'test_click_launcher'
-* ModuleNotFoundError: No module named 'pytest'
-* KeyError: 'test_click_launcher'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91mWARNING: autodoc: failed to import 'test_cli' from module 'ifsbench.command_line.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/command_line/tests/test_cli.py", line 15, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_click_launcher' from module 'ifsbench.command_line.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/command_line/tests/test_click_launcher.py", line 16, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[31m/home/runner/work/ifsbench/ifsbench/ifsbench/data/datahandler.py:docstring of ifsbench.data.datahandler.absolutise_path:5: ERROR: Unexpected indentation. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/ifsbench/data/datahandler.py:docstring of ifsbench.data.datahandler.absolutise_path:6: WARNING: Block quote ends without a blank line; unexpected unindent. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.rst:9: WARNING: autosummary: failed to import test_extracthandler.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_extracthandler'
-* KeyError: 'test_extracthandler'
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_extracthandler'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.rst:9: WARNING: autosummary: failed to import test_fetchhandler.
-Possible hints:
-* KeyError: 'test_fetchhandler'
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_fetchhandler'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* ModuleNotFoundError: No module named 'test_fetchhandler'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.rst:9: WARNING: autosummary: failed to import test_namelisthandler.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_namelisthandler'
-* KeyError: 'test_namelisthandler'
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_namelisthandler'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.rst:9: WARNING: autosummary: failed to import test_renamehandler.
-Possible hints:
-* KeyError: 'test_renamehandler'
-* ModuleNotFoundError: No module named 'test_renamehandler'
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.data.tests' has no attribute 'test_renamehandler'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91mWARNING: autodoc: failed to import 'test_extracthandler' from module 'ifsbench.data.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/data/tests/test_extracthandler.py", line 16, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_fetchhandler' from module 'ifsbench.data.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/data/tests/test_fetchhandler.py", line 14, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_namelisthandler' from module 'ifsbench.data.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/data/tests/test_namelisthandler.py", line 17, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_renamehandler' from module 'ifsbench.data.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/data/tests/test_renamehandler.py", line 12, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.rst:9: WARNING: autosummary: failed to import test_bashlauncher.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_bashlauncher'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_bashlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* KeyError: 'test_bashlauncher'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.rst:9: WARNING: autosummary: failed to import test_ddtlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_ddtlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* ModuleNotFoundError: No module named 'test_ddtlauncher'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* KeyError: 'test_ddtlauncher'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.rst:9: WARNING: autosummary: failed to import test_directlauncher.
-Possible hints:
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_directlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* ModuleNotFoundError: No module named 'test_directlauncher'
-* KeyError: 'test_directlauncher'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.rst:9: WARNING: autosummary: failed to import test_launchdata.
-Possible hints:
-* KeyError: 'test_launchdata'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_launchdata'
-* ModuleNotFoundError: No module named 'pytest'
-* ModuleNotFoundError: No module named 'test_launchdata'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.rst:9: WARNING: autosummary: failed to import test_launcher.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_launcher'
-* ModuleNotFoundError: No module named 'pytest'
-* KeyError: 'test_launcher'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_launcher'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.rst:9: WARNING: autosummary: failed to import test_mpirunlauncher.
-Possible hints:
-* KeyError: 'test_mpirunlauncher'
-* ModuleNotFoundError: No module named 'test_mpirunlauncher'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_mpirunlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.rst:9: WARNING: autosummary: failed to import test_srunlauncher.
-Possible hints:
-* KeyError: 'test_srunlauncher'
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.launch.tests' has no attribute 'test_srunlauncher'
-* ModuleNotFoundError: No module named 'test_srunlauncher'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91mWARNING: autodoc: failed to import 'test_bashlauncher' from module 'ifsbench.launch.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/launch/tests/test_bashlauncher.py", line 15, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_ddtlauncher' from module 'ifsbench.launch.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/launch/tests/test_ddtlauncher.py", line 12, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_directlauncher' from module 'ifsbench.launch.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/launch/tests/test_directlauncher.py", line 12, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_launchdata' from module 'ifsbench.launch.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/launch/tests/test_launchdata.py", line 14, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_launcher' from module 'ifsbench.launch.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/launch/tests/test_launcher.py", line 15, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_mpirunlauncher' from module 'ifsbench.launch.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/launch/tests/test_mpirunlauncher.py", line 12, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_srunlauncher' from module 'ifsbench.launch.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/launch/tests/test_srunlauncher.py", line 12, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91m<unknown>:1: WARNING: duplicate object description of ifsbench.logging.colors.BOLD, other instance in ifsbench.logging, use :no-index: for one of them[39;49;00m
-[91m<unknown>:1: WARNING: duplicate object description of ifsbench.logging.colors.FAIL, other instance in ifsbench.logging, use :no-index: for one of them[39;49;00m
-[91m<unknown>:1: WARNING: duplicate object description of ifsbench.logging.colors.HEADER, other instance in ifsbench.logging, use :no-index: for one of them[39;49;00m
-[91m<unknown>:1: WARNING: duplicate object description of ifsbench.logging.colors.OKBLUE, other instance in ifsbench.logging, use :no-index: for one of them[39;49;00m
-[91m<unknown>:1: WARNING: duplicate object description of ifsbench.logging.colors.OKGREEN, other instance in ifsbench.logging, use :no-index: for one of them[39;49;00m
-[91m<unknown>:1: WARNING: duplicate object description of ifsbench.logging.colors.UNDERLINE, other instance in ifsbench.logging, use :no-index: for one of them[39;49;00m
-[91m<unknown>:1: WARNING: duplicate object description of ifsbench.logging.colors.WARNING, other instance in ifsbench.logging, use :no-index: for one of them[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.results.tests.rst:9: WARNING: autosummary: failed to import test_ensemble_stats.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_ensemble_stats'
-* KeyError: 'test_ensemble_stats'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* AttributeError: module 'ifsbench.results.tests' has no attribute 'test_ensemble_stats'[39;49;00m
-[91mWARNING: autodoc: failed to import 'test_ensemble_stats' from module 'ifsbench.results.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/results/tests/test_ensemble_stats.py", line 11, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[31m/home/runner/work/ifsbench/ifsbench/ifsbench/serialisation_mixin.py:docstring of ifsbench.serialisation_mixin.SubclassableSerialisationMixin:6: ERROR: Unexpected indentation. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/ifsbench/serialisation_mixin.py:docstring of ifsbench.serialisation_mixin.SubclassableSerialisationMixin:3: WARNING: Inline literal start-string without end-string. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/ifsbench/serialisation_mixin.py:docstring of ifsbench.serialisation_mixin.SubclassableSerialisationMixin:17: WARNING: Definition list ends without a blank line; unexpected unindent. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/ifsbench/serialisation_mixin.py:docstring of ifsbench.serialisation_mixin.SubclassableSerialisationMixin:17: WARNING: Inline literal start-string without end-string. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/ifsbench/serialisation_mixin.py:docstring of ifsbench.serialisation_mixin.SubclassableSerialisationMixin:17: WARNING: Inline interpreted text or phrase reference start-string without end-string. [docutils][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_application.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_application'
-* ModuleNotFoundError: No module named 'pytest'
-* ModuleNotFoundError: No module named 'test_application'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* KeyError: 'test_application'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_arch.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_arch'
-* KeyError: 'test_arch'
-* ModuleNotFoundError: No module named 'pytest'
-* ModuleNotFoundError: No module named 'test_arch'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_benchmark.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_benchmark'
-* ModuleNotFoundError: No module named 'test_benchmark'
-* KeyError: 'test_benchmark'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_darshanreport.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_darshanreport'
-* ModuleNotFoundError: No module named 'test_darshanreport'
-* ModuleNotFoundError: No module named 'pytest'
-* KeyError: 'test_darshanreport'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_data_file_stats.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_data_file_stats'
-* ModuleNotFoundError: No module named 'test_data_file_stats'
-* ModuleNotFoundError: No module named 'pytest'
-* KeyError: 'test_data_file_stats'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_drhook.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_drhook'
-* KeyError: 'test_drhook'
-* ModuleNotFoundError: No module named 'test_drhook'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_envhandler.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_envhandler'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_envhandler'
-* ModuleNotFoundError: No module named 'pytest'
-* KeyError: 'test_envhandler'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_files.
-Possible hints:
-* KeyError: 'test_files'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_files'
-* ModuleNotFoundError: No module named 'pytest'
-* ModuleNotFoundError: No module named 'test_files'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_gribfile.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_gribfile'
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_gribfile'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* KeyError: 'test_gribfile'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_job.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_job'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_job'
-* ModuleNotFoundError: No module named 'pytest'
-* KeyError: 'test_job'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_namelist.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_namelist'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_namelist'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* KeyError: 'test_namelist'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_netcdf_file_reader.
-Possible hints:
-* ModuleNotFoundError: No module named 'test_netcdf_file_reader'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* KeyError: 'test_netcdf_file_reader'
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_netcdf_file_reader'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_pydantic_dataframe.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_pydantic_dataframe'
-* ModuleNotFoundError: No module named 'pytest'
-* ModuleNotFoundError: No module named 'test_pydantic_dataframe'
-* KeyError: 'test_pydantic_dataframe'
-* ValueError: not enough values to unpack (expected 2, got 1)[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.rst:9: WARNING: autosummary: failed to import test_serialisation_mixin.
-Possible hints:
-* AttributeError: module 'ifsbench.tests' has no attribute 'test_serialisation_mixin'
-* ModuleNotFoundError: No module named 'test_serialisation_mixin'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* KeyError: 'test_serialisation_mixin'[39;49;00m
-[91mWARNING: autodoc: failed to import 'test_application' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_application.py", line 14, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_arch' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_arch.py", line 12, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_benchmark' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_benchmark.py", line 16, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_darshanreport' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_darshanreport.py", line 10, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_data_file_stats' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_data_file_stats.py", line 9, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_drhook' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_drhook.py", line 13, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_envhandler' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_envhandler.py", line 15, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_files' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_files.py", line 15, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_gribfile' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_gribfile.py", line 10, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_job' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_job.py", line 12, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_namelist' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_namelist.py", line 15, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_netcdf_file_reader' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_netcdf_file_reader.py", line 10, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_pydantic_dataframe' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_pydantic_dataframe.py", line 16, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_serialisation_mixin' from module 'ifsbench.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/tests/test_serialisation_mixin.py", line 11, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.validation.tests.rst:9: WARNING: autosummary: failed to import test_frame_close_validation.
-Possible hints:
-* KeyError: 'test_frame_close_validation'
-* ModuleNotFoundError: No module named 'pytest'
-* AttributeError: module 'ifsbench.validation.tests' has no attribute 'test_frame_close_validation'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* ModuleNotFoundError: No module named 'test_frame_close_validation'[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.validation.tests.rst:9: WARNING: autosummary: failed to import test_frame_util.
-Possible hints:
-* AttributeError: module 'ifsbench.validation.tests' has no attribute 'test_frame_util'
-* ModuleNotFoundError: No module named 'test_frame_util'
-* ModuleNotFoundError: No module named 'pytest'
-* ValueError: not enough values to unpack (expected 2, got 1)
-* KeyError: 'test_frame_util'[39;49;00m
-[91mWARNING: autodoc: failed to import 'test_frame_close_validation' from module 'ifsbench.validation.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/validation/tests/test_frame_close_validation.py", line 19, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[91mWARNING: autodoc: failed to import 'test_frame_util' from module 'ifsbench.validation.tests'; the following exception was raised:
-Traceback (most recent call last):
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 131, in _import_from_module_and_path
-    module = _import_module(module_name, try_reload=True)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/.local/lib/python3.12/site-packages/sphinx/ext/autodoc/_dynamic/_importer.py", line 221, in _import_module
-    module = importlib.import_module(modname)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/importlib/__init__.py", line 90, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/runner/work/ifsbench/ifsbench/ifsbench/validation/tests/test_frame_util.py", line 13, in <module>
-    import pytest
-ModuleNotFoundError: No module named 'pytest'
- [autodoc.import_object][39;49;00m
-[01mlooking for now-outdated files... [39;49;00mnone found
-[01mpickling environment... [39;49;00mdone
-[01mchecking consistency... [39;49;00m[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.tests.test_cli.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.command_line.tests.test_click_launcher.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.test_extracthandler.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.test_fetchhandler.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.test_namelisthandler.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.data.tests.test_renamehandler.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.test_bashlauncher.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.test_ddtlauncher.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.test_directlauncher.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.test_launchdata.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.test_launcher.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.test_mpirunlauncher.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.launch.tests.test_srunlauncher.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.results.tests.test_ensemble_stats.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_application.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_arch.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_benchmark.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_darshanreport.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_data_file_stats.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_drhook.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_envhandler.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_files.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_gribfile.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_job.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_namelist.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_netcdf_file_reader.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_pydantic_dataframe.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.tests.test_serialisation_mixin.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.validation.tests.test_frame_close_validation.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/docs/source/ifsbench.validation.tests.test_frame_util.rst: WARNING: document isn't included in any toctree [toc.not_included][39;49;00m
-done
-[01mpreparing documents... [39;49;00mdone
-[01mcopying assets... [39;49;00m
-[01mcopying static files... [39;49;00m
-Writing evaluated template result to /home/runner/work/ifsbench/ifsbench/docs/build/html/_static/basic.css
-Writing evaluated template result to /home/runner/work/ifsbench/ifsbench/docs/build/html/_static/language_data.js
-Writing evaluated template result to /home/runner/work/ifsbench/ifsbench/docs/build/html/_static/documentation_options.js
-Writing evaluated template result to /home/runner/work/ifsbench/ifsbench/docs/build/html/_static/js/versions.js
-[01mcopying static files: [39;49;00mdone
-[01mcopying extra files... [39;49;00m
-[01mcopying extra files: [39;49;00mdone
-[01mcopying assets: [39;49;00mdone
-[2K[01mwriting output... [39;49;00m[  1%] [32mifsbench[39;49;00m[2K[01mwriting output... [39;49;00m[  2%] [32mifsbench.application[39;49;00m[2K[01mwriting output... [39;49;00m[  4%] [32mifsbench.arch[39;49;00m[2K[01mwriting output... [39;49;00m[  5%] [32mifsbench.benchmark[39;49;00m[2K[01mwriting output... [39;49;00m[  6%] [32mifsbench.command_line[39;49;00m[2K[01mwriting output... [39;49;00m[  7%] [32mifsbench.command_line.cli[39;49;00m[2K[01mwriting output... [39;49;00m[  9%] [32mifsbench.command_line.click_launcher[39;49;00m[2K[01mwriting output... [39;49;00m[ 10%] [32mifsbench.command_line.nml_diff[39;49;00m[2K[01mwriting output... [39;49;00m[ 11%] [32mifsbench.command_line.tests[39;49;00m[2K[01mwriting output... [39;49;00m[ 12%] [32mifsbench.command_line.tests.test_cli[39;49;00m[2K[01mwriting output... [39;49;00m[ 14%] [32mifsbench.command_line.tests.test_click_launcher[39;49;00m[2K[01mwriting output... [39;49;00m[ 15%] [32mifsbench.darshanreport[39;49;00m[2K[01mwriting output... [39;49;00m[ 16%] [32mifsbench.data[39;49;00m[2K[01mwriting output... [39;49;00m[ 17%] [32mifsbench.data.datahandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 19%] [32mifsbench.data.extracthandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 20%] [32mifsbench.data.fetchhandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 21%] [32mifsbench.data.namelisthandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 22%] [32mifsbench.data.renamehandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 23%] [32mifsbench.data.tests[39;49;00m[2K[01mwriting output... [39;49;00m[ 25%] [32mifsbench.data.tests.test_extracthandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 26%] [32mifsbench.data.tests.test_fetchhandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 27%] [32mifsbench.data.tests.test_namelisthandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 28%] [32mifsbench.data.tests.test_renamehandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 30%] [32mifsbench.data_file_reader[39;49;00m[2K[01mwriting output... [39;49;00m[ 31%] [32mifsbench.data_file_stats[39;49;00m[2K[01mwriting output... [39;49;00m[ 32%] [32mifsbench.drhook[39;49;00m[2K[01mwriting output... [39;49;00m[ 33%] [32mifsbench.env[39;49;00m[2K[01mwriting output... [39;49;00m[ 35%] [32mifsbench.files[39;49;00m[2K[01mwriting output... [39;49;00m[ 36%] [32mifsbench.gribfile[39;49;00m[2K[01mwriting output... [39;49;00m[ 37%] [32mifsbench.job[39;49;00m[2K[01mwriting output... [39;49;00m[ 38%] [32mifsbench.launch[39;49;00m[2K[01mwriting output... [39;49;00m[ 40%] [32mifsbench.launch.bashlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 41%] [32mifsbench.launch.ddtlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 42%] [32mifsbench.launch.directlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 43%] [32mifsbench.launch.launcher[39;49;00m[2K[01mwriting output... [39;49;00m[ 44%] [32mifsbench.launch.mpirunlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 46%] [32mifsbench.launch.srunlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 47%] [32mifsbench.launch.tests[39;49;00m[2K[01mwriting output... [39;49;00m[ 48%] [32mifsbench.launch.tests.test_bashlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 49%] [32mifsbench.launch.tests.test_ddtlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 51%] [32mifsbench.launch.tests.test_directlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 52%] [32mifsbench.launch.tests.test_launchdata[39;49;00m[2K[01mwriting output... [39;49;00m[ 53%] [32mifsbench.launch.tests.test_launcher[39;49;00m[2K[01mwriting output... [39;49;00m[ 54%] [32mifsbench.launch.tests.test_mpirunlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 56%] [32mifsbench.launch.tests.test_srunlauncher[39;49;00m[2K[01mwriting output... [39;49;00m[ 57%] [32mifsbench.logging[39;49;00m[2K[01mwriting output... [39;49;00m[ 58%] [32mifsbench.namelist[39;49;00m[2K[01mwriting output... [39;49;00m[ 59%] [32mifsbench.netcdf_file_reader[39;49;00m[2K[01mwriting output... [39;49;00m[ 60%] [32mifsbench.paths[39;49;00m[2K[01mwriting output... [39;49;00m[ 62%] [32mifsbench.pydantic_utils[39;49;00m[2K[01mwriting output... [39;49;00m[ 63%] [32mifsbench.results[39;49;00m[2K[01mwriting output... [39;49;00m[ 64%] [32mifsbench.results.ensemble_stats[39;49;00m[2K[01mwriting output... [39;49;00m[ 65%] [32mifsbench.results.result_format[39;49;00m[2K[01mwriting output... [39;49;00m[ 67%] [32mifsbench.results.tests[39;49;00m[2K[01mwriting output... [39;49;00m[ 68%] [32mifsbench.results.tests.test_ensemble_stats[39;49;00m[2K[01mwriting output... [39;49;00m[ 69%] [32mifsbench.serialisation_mixin[39;49;00m[2K[01mwriting output... [39;49;00m[ 70%] [32mifsbench.tests[39;49;00m[2K[01mwriting output... [39;49;00m[ 72%] [32mifsbench.tests.test_application[39;49;00m[2K[01mwriting output... [39;49;00m[ 73%] [32mifsbench.tests.test_arch[39;49;00m[2K[01mwriting output... [39;49;00m[ 74%] [32mifsbench.tests.test_benchmark[39;49;00m[2K[01mwriting output... [39;49;00m[ 75%] [32mifsbench.tests.test_darshanreport[39;49;00m[2K[01mwriting output... [39;49;00m[ 77%] [32mifsbench.tests.test_data_file_stats[39;49;00m[2K[01mwriting output... [39;49;00m[ 78%] [32mifsbench.tests.test_drhook[39;49;00m[2K[01mwriting output... [39;49;00m[ 79%] [32mifsbench.tests.test_envhandler[39;49;00m[2K[01mwriting output... [39;49;00m[ 80%] [32mifsbench.tests.test_files[39;49;00m[2K[01mwriting output... [39;49;00m[ 81%] [32mifsbench.tests.test_gribfile[39;49;00m[2K[01mwriting output... [39;49;00m[ 83%] [32mifsbench.tests.test_job[39;49;00m[2K[01mwriting output... [39;49;00m[ 84%] [32mifsbench.tests.test_namelist[39;49;00m[2K[01mwriting output... [39;49;00m[ 85%] [32mifsbench.tests.test_netcdf_file_reader[39;49;00m[2K[01mwriting output... [39;49;00m[ 86%] [32mifsbench.tests.test_pydantic_dataframe[39;49;00m[2K[01mwriting output... [39;49;00m[ 88%] [32mifsbench.tests.test_serialisation_mixin[39;49;00m[2K[01mwriting output... [39;49;00m[ 89%] [32mifsbench.tests.test_util[39;49;00m[2K[01mwriting output... [39;49;00m[ 90%] [32mifsbench.util[39;49;00m[2K[01mwriting output... [39;49;00m[ 91%] [32mifsbench.validation[39;49;00m[2K[01mwriting output... [39;49;00m[ 93%] [32mifsbench.validation.frame_close_validation[39;49;00m[2K[01mwriting output... [39;49;00m[ 94%] [32mifsbench.validation.frame_util[39;49;00m[2K[01mwriting output... [39;49;00m[ 95%] [32mifsbench.validation.tests[39;49;00m[2K[01mwriting output... [39;49;00m[ 96%] [32mifsbench.validation.tests.test_frame_close_validation[39;49;00m[2K[01mwriting output... [39;49;00m[ 98%] [32mifsbench.validation.tests.test_frame_util[39;49;00m[2K[01mwriting output... [39;49;00m[ 99%] [32mifsbench_api[39;49;00m[2K[01mwriting output... [39;49;00m[100%] [32mindex[39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/README.md:38: WARNING: 'myst' cross-reference target not found: 'LICENSE' [myst.xref_missing][39;49;00m
-[91m/home/runner/work/ifsbench/ifsbench/README.md:49: WARNING: 'myst' cross-reference target not found: 'INSTALL.md' [myst.xref_missing][39;49;00m
-[01mgenerating indices... [39;49;00mgenindex py-modindex done
-[01mwriting additional pages... [39;49;00msearch done
-[01mdumping search index in English (code: en)... [39;49;00mdone
-[01mdumping object inventory... [39;49;00mdone
-[01mbuild finished with problems, 173 warnings (with warnings treated as errors).[39;49;00m

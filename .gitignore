@@ -9,3 +9,4 @@ ifsbench.egg-info/*
 
 # Auto-generated docs files
 /docs/source/ifsbench.*
+/docs/checkdocstrings.log
