@@ -8,6 +8,7 @@
 """
 Implementation of launch commands for various MPI launchers
 """
+
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -21,7 +22,7 @@ from ifsbench.job import Job
 from ifsbench.logging import debug, info
 from ifsbench.util import execute, ExecuteResult
 
-__all__ = ["CompositeLauncher", "LaunchData", "Launcher"]
+__all__ = ['CompositeLauncher', 'LaunchData', 'Launcher']
 
 
 @dataclass
@@ -54,11 +55,11 @@ class LaunchData:
             The results of the execution.
         """
 
-        info(f"Launch command {self.cmd} in {self.run_dir}.")
+        info(f'Launch command {self.cmd} in {self.run_dir}.')
 
-        debug("Environment variables:")
+        debug('Environment variables:')
         for key, value in self.env.items():
-            debug(f"\t{key}={value}")
+            debug(f'\t{key}={value}')
 
         return execute(
             command=self.cmd,
@@ -74,7 +75,7 @@ class Launcher(SubclassableSerialisationMixin):
     """
 
     # command line flags to pass to the laucher
-    flags: List["str"] = []
+    flags: List['str'] = []
 
     @abstractmethod
     def prepare(
@@ -114,9 +115,8 @@ class Launcher(SubclassableSerialisationMixin):
 
 
 class LauncherWrapper(SubclassableSerialisationMixin):
-
     # command line flags to pass to the laucher
-    flags: List["str"] = []
+    flags: List['str'] = []
 
     @abstractmethod
     def wrap(
@@ -197,8 +197,6 @@ class CompositeLauncher(Launcher):
             run_dir, job, cmd, library_paths, env_pipeline, self.flags
         )
         for wrapper in self.wrappers:
-            launch_data = wrapper.wrap(
-                launch_data, run_dir, cmd, library_paths, env_pipeline
-            )
+            launch_data = wrapper.wrap(launch_data, run_dir, cmd, library_paths, env_pipeline)
 
         return launch_data

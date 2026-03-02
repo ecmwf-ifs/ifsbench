@@ -8,6 +8,7 @@
 """
 Tests for utility routines
 """
+
 from pathlib import Path
 import sys
 import tempfile
@@ -25,7 +26,7 @@ def test_execute():
 
     with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
         # basic logfile capture validation
-        logfile = Path(tmp_dir)/'test_execute.log'
+        logfile = Path(tmp_dir) / 'test_execute.log'
         result = execute(['echo', 'foo', 'bar'], logfile=logfile)
         assert logfile.read_text() == 'foo bar\n'
         assert result.stdout == 'foo bar\n'
@@ -47,10 +48,13 @@ def test_execute():
         assert logfile.read_text() == text + '\n'
 
         # Write to stderr
-        result = execute([sys.executable, '-c', 'import sys; print(\'foo bar\', file=sys.stderr)'], logfile=logfile)
+        result = execute(
+            [sys.executable, '-c', "import sys; print('foo bar', file=sys.stderr)"], logfile=logfile
+        )
         assert logfile.read_text() == 'foo bar\n'
         assert result.stdout == ''
         assert result.stderr == 'foo bar\n'
+
 
 def test_execute_dryrun():
     """
@@ -62,7 +66,7 @@ def test_execute_dryrun():
 
     with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
         # basic logfile capture validation
-        logfile = Path(tmp_dir)/'test_execute.log'
+        logfile = Path(tmp_dir) / 'test_execute.log'
         result = execute(['echo', 'foo', 'bar'], dryrun=True, logfile=logfile)
         assert not logfile.exists()
         assert result.stdout == ''

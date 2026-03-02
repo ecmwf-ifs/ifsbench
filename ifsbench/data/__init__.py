@@ -5,8 +5,8 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-from ifsbench.data.datahandler import * # noqa
-from ifsbench.data.extracthandler import * # noqa
-from ifsbench.data.fetchhandler import * # noqa
-from ifsbench.data.namelisthandler import * # noqa
-from ifsbench.data.renamehandler import * # noqa
+from ifsbench.data.datahandler import *  # noqa
+from ifsbench.data.extracthandler import *  # noqa
+from ifsbench.data.fetchhandler import *  # noqa
+from ifsbench.data.namelisthandler import *  # noqa
+from ifsbench.data.renamehandler import *  # noqa

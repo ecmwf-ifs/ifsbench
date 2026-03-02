@@ -8,6 +8,7 @@
 """
 Architecture specifications
 """
+
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -70,7 +71,6 @@ class Arch(ABC, SubclassableSerialisationMixin):
             The additional default launcher flags.
         """
 
-
     @abstractmethod
     def get_cpu_configuration(self) -> CpuConfiguration:
         """
@@ -104,7 +104,6 @@ class Arch(ABC, SubclassableSerialisationMixin):
 
 
 class DefaultArch(Arch):
-
     #: The default launcher that is used on this system
     launcher: Launcher
 

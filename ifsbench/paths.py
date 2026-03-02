@@ -74,13 +74,13 @@ class SpecialRelativePath:
         match : :any:`SpecialRelativePath.NameMatch`, optional
             Determines if the file name should be matched exactly
         """
-        pattern = r"^(?P<parent>.*?\/)?(?P<name>"
+        pattern = r'^(?P<parent>.*?\/)?(?P<name>'
         if match in (cls.NameMatch.RIGHT_ALIGNED, cls.NameMatch.FREE):
-            pattern += r"(?P<pre>[^\/]*?)"
-        pattern += fr"(?P<match>{filename})"
+            pattern += r'(?P<pre>[^\/]*?)'
+        pattern += rf'(?P<match>{filename})'
         if match in (cls.NameMatch.LEFT_ALIGNED, cls.NameMatch.FREE):
-            pattern += r"(?P<post>[^\/]*?)"
-        pattern += r")$"
+            pattern += r'(?P<post>[^\/]*?)'
+        pattern += r')$'
         return cls(pattern, repl)
 
     @classmethod
@@ -104,13 +104,13 @@ class SpecialRelativePath:
         match : :any:`SpecialRelativePath.NameMatch`, optional
             Determines if the directory name should be matched exactly
         """
-        pattern = r"^(?P<parent>.*?\/)?(?P<name>"
+        pattern = r'^(?P<parent>.*?\/)?(?P<name>'
         if match in (cls.NameMatch.RIGHT_ALIGNED, cls.NameMatch.FREE):
-            pattern += r"(?P<pre>[^\/]*?)"
-        pattern += fr"(?P<match>{dirname})"
+            pattern += r'(?P<pre>[^\/]*?)'
+        pattern += rf'(?P<match>{dirname})'
         if match in (cls.NameMatch.LEFT_ALIGNED, cls.NameMatch.FREE):
-            pattern += r"(?P<post>[^\/]*?)"
-        pattern += r")(?P<child>\/.*?)$"
+            pattern += r'(?P<post>[^\/]*?)'
+        pattern += r')(?P<child>\/.*?)$'
         return cls(pattern, repl)
 
     def __call__(self, path):

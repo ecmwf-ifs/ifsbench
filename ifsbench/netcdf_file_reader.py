@@ -15,7 +15,6 @@ __all__ = ['NetcdfFileReader']
 
 
 class NetcdfFileReader(DataFileReader):
-
     @classmethod
     def read_data(cls, input_path: str) -> List[xr.Dataset]:
 

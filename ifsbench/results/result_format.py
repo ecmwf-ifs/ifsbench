@@ -10,7 +10,7 @@ from typing import Dict, Optional
 from ifsbench import PydanticDataFrame
 from ifsbench.serialisation_mixin import SerialisationMixin
 
-__all__ = ["ResultData", "ResultInfo"]
+__all__ = ['ResultData', 'ResultInfo']
 
 
 class ResultData(SerialisationMixin):

@@ -11,27 +11,43 @@ Some sanity tests for the :class:`DefaultArch` implementation.
 
 import pytest
 
-from ifsbench import DefaultArch, CpuConfiguration, EnvHandler, EnvOperation, Job, MpirunLauncher, SrunLauncher
+from ifsbench import (
+    DefaultArch,
+    CpuConfiguration,
+    EnvHandler,
+    EnvOperation,
+    Job,
+    MpirunLauncher,
+    SrunLauncher,
+)
 
 _cpu_config_1 = CpuConfiguration(
-    sockets_per_node = 2,
-    cores_per_socket = 64,
-    threads_per_core = 2,
-    gpus_per_node = 0
+    sockets_per_node=2, cores_per_socket=64, threads_per_core=2, gpus_per_node=0
 )
 
 
 _cpu_config_2 = CpuConfiguration(
-    sockets_per_node = 2,
-    cores_per_socket = 56,
-    threads_per_core = 2,
-    gpus_per_node = 8
+    sockets_per_node=2, cores_per_socket=56, threads_per_core=2, gpus_per_node=8
 )
 
-@pytest.mark.parametrize('arch_in,launcher_out', [
-    ({'launcher': SrunLauncher(), 'launcher_flags': [], 'cpu_config': _cpu_config_1}, SrunLauncher()),
-    ({'launcher': MpirunLauncher(), 'launcher_flags': ['--mem=2G'], 'cpu_config': _cpu_config_2}, MpirunLauncher()),
-])
+
+@pytest.mark.parametrize(
+    'arch_in,launcher_out',
+    [
+        (
+            {'launcher': SrunLauncher(), 'launcher_flags': [], 'cpu_config': _cpu_config_1},
+            SrunLauncher(),
+        ),
+        (
+            {
+                'launcher': MpirunLauncher(),
+                'launcher_flags': ['--mem=2G'],
+                'cpu_config': _cpu_config_2,
+            },
+            MpirunLauncher(),
+        ),
+    ],
+)
 def test_defaultarch_get_default_launcher(arch_in, launcher_out):
     """
     Test the :meth:`DefaultArch.get_default_launcher` implementation.
@@ -41,11 +57,20 @@ def test_defaultarch_get_default_launcher(arch_in, launcher_out):
     assert arch.get_default_launcher() == launcher_out
 
 
-@pytest.mark.parametrize('arch_in,flags_out', [
-    ({'launcher': SrunLauncher(), 'launcher_flags': [], 'cpu_config':_cpu_config_1}, []),
-    ({'launcher': MpirunLauncher(), 'launcher_flags': ['--mem=2G'], 'cpu_config': _cpu_config_2},
-        ['--mem=2G']),
-])
+@pytest.mark.parametrize(
+    'arch_in,flags_out',
+    [
+        ({'launcher': SrunLauncher(), 'launcher_flags': [], 'cpu_config': _cpu_config_1}, []),
+        (
+            {
+                'launcher': MpirunLauncher(),
+                'launcher_flags': ['--mem=2G'],
+                'cpu_config': _cpu_config_2,
+            },
+            ['--mem=2G'],
+        ),
+    ],
+)
 def test_defaultarch_get_default_launcher_flags(arch_in, flags_out):
     """
     Test the :meth:`DefaultArch.get_default_launcher_flags` implementation.
@@ -54,10 +79,14 @@ def test_defaultarch_get_default_launcher_flags(arch_in, flags_out):
 
     assert arch.get_default_launcher_flags() == flags_out
 
-@pytest.mark.parametrize('arch_in', [
-    {'launcher': SrunLauncher(), 'launcher_flags': [], 'cpu_config': _cpu_config_1},
-    {'launcher': MpirunLauncher(), 'launcher_flags': ['--mem=2G'], 'cpu_config': _cpu_config_2},
-])
+
+@pytest.mark.parametrize(
+    'arch_in',
+    [
+        {'launcher': SrunLauncher(), 'launcher_flags': [], 'cpu_config': _cpu_config_1},
+        {'launcher': MpirunLauncher(), 'launcher_flags': ['--mem=2G'], 'cpu_config': _cpu_config_2},
+    ],
+)
 def test_defaultarch_get_cpu_configuration(arch_in):
     """
     Test the :meth:`DefaultArch.get_default_launcher_flags` implementation.
@@ -69,39 +98,62 @@ def test_defaultarch_get_cpu_configuration(arch_in):
 
     assert arch.get_cpu_configuration() == ref_config
 
-@pytest.mark.parametrize('arch_in, job_in, job_out, launcher_out', [
-    (
-        {'launcher': {'class_name': 'SrunLauncher'}, 'cpu_config': _cpu_config_1, 'set_explicit': False},
-        {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1},
-        {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1},
-        SrunLauncher()
-    ),
-    (
-        {'launcher': MpirunLauncher(), 'cpu_config': _cpu_config_1, 'set_explicit': True},
-        {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1},
-        {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1, 'nodes': 2, 'tasks_per_node': 32},
-        MpirunLauncher()
-    ),
-    (
-        {'launcher': SrunLauncher(), 'cpu_config': _cpu_config_2, 'set_explicit': False,
-         'env_handler': [EnvHandler(mode=EnvOperation.DELETE, key='SOME_ENV')]},
-        {'tasks': 1},
-        {'tasks': 1},
-        SrunLauncher()
-    ),
-    (
-        {'launcher': MpirunLauncher(), 'cpu_config': _cpu_config_2, 'set_explicit': True},
-        {'tasks': 64, 'gpus_per_node': 16},
-        None,
-        None
-    ),
-    (
-        {'launcher': MpirunLauncher(), 'cpu_config': _cpu_config_2, 'set_explicit': True,
-         'launcher_flags': ['--account=myaccount']},
-        {'tasks': 64, 'gpus_per_node': 32},
-        None,
-        None
-    )])
+
+@pytest.mark.parametrize(
+    'arch_in, job_in, job_out, launcher_out',
+    [
+        (
+            {
+                'launcher': {'class_name': 'SrunLauncher'},
+                'cpu_config': _cpu_config_1,
+                'set_explicit': False,
+            },
+            {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1},
+            {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1},
+            SrunLauncher(),
+        ),
+        (
+            {'launcher': MpirunLauncher(), 'cpu_config': _cpu_config_1, 'set_explicit': True},
+            {'tasks': 64, 'cpus_per_task': 4, 'threads_per_core': 1},
+            {
+                'tasks': 64,
+                'cpus_per_task': 4,
+                'threads_per_core': 1,
+                'nodes': 2,
+                'tasks_per_node': 32,
+            },
+            MpirunLauncher(),
+        ),
+        (
+            {
+                'launcher': SrunLauncher(),
+                'cpu_config': _cpu_config_2,
+                'set_explicit': False,
+                'env_handler': [EnvHandler(mode=EnvOperation.DELETE, key='SOME_ENV')],
+            },
+            {'tasks': 1},
+            {'tasks': 1},
+            SrunLauncher(),
+        ),
+        (
+            {'launcher': MpirunLauncher(), 'cpu_config': _cpu_config_2, 'set_explicit': True},
+            {'tasks': 64, 'gpus_per_node': 16},
+            None,
+            None,
+        ),
+        (
+            {
+                'launcher': MpirunLauncher(),
+                'cpu_config': _cpu_config_2,
+                'set_explicit': True,
+                'launcher_flags': ['--account=myaccount'],
+            },
+            {'tasks': 64, 'gpus_per_node': 32},
+            None,
+            None,
+        ),
+    ],
+)
 def test_defaultarch_process(arch_in, job_in, job_out, launcher_out):
     """
     Test the :meth:`DefaultArch.process_job` implementation by checking that

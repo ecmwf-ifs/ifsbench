@@ -11,7 +11,11 @@ from typing_extensions import Annotated, Literal, TypeAliasType
 
 from pydantic import BaseModel, Field, model_validator, TypeAdapter, model_serializer
 from pydantic.fields import FieldInfo
-from pydantic_core.core_schema import SerializationInfo, SerializerFunctionWrapHandler, ValidatorFunctionWrapHandler
+from pydantic_core.core_schema import (
+    SerializationInfo,
+    SerializerFunctionWrapHandler,
+    ValidatorFunctionWrapHandler,
+)
 
 
 __all__ = ['SubclassableSerialisationMixin', 'SerialisationMixin', 'CLASSNAME', 'RESERVED_NAMES']
@@ -92,7 +96,7 @@ class SerialisationMixin(BaseModel, use_enum_values=True, validate_assignment=Tr
     # the pydantic copy function is deprecated (and might get removed in the
     # future) we define our own copy version here.
     # pylint: disable=W0221
-    def copy(self, deep: bool=False) -> 'SerialisationMixin':
+    def copy(self, deep: bool = False) -> 'SerialisationMixin':
         """
         Create a copy of this object.
 
@@ -102,20 +106,20 @@ class SerialisationMixin(BaseModel, use_enum_values=True, validate_assignment=Tr
 
         return self.model_copy(deep=deep)
 
+
 class SubclassableSerialisationMixin(SerialisationMixin):
     """
     Mixin class that enables automatic serialisation features for subclasses.
 
     This allows us to serialise dataclass hierarchies like
     ```
-    class BaseClass(SubclassableSerialisationMixin):
-        ...
+    class BaseClass(SubclassableSerialisationMixin): ...
 
-    class FirstClass(BaseClass):
-        ...
 
-    class SecondClass(BaseClass):
-        ...
+    class FirstClass(BaseClass): ...
+
+
+    class SecondClass(BaseClass): ...
 
 
     class Accumulator(DataClass):
@@ -125,7 +129,6 @@ class SubclassableSerialisationMixin(SerialisationMixin):
     This is done by automatically adding ``CLASSNAME`` fields to each subclass
     and keeping track of the subclasses.
     """
-
 
     _subclasses: ClassVar[Dict[str, Type[Any]]] = {}
     _discriminating_type_adapter: ClassVar[TypeAdapter]
@@ -150,8 +153,9 @@ class SubclassableSerialisationMixin(SerialisationMixin):
         return None
 
     @model_serializer(mode='wrap')
-    def _serialize_model(self, handler: SerializerFunctionWrapHandler,
-        info: SerializationInfo) -> Any:
+    def _serialize_model(
+        self, handler: SerializerFunctionWrapHandler, info: SerializationInfo
+    ) -> Any:
         """
         Workaround for proper serialisation of subclasses.
 
@@ -200,17 +204,22 @@ class SubclassableSerialisationMixin(SerialisationMixin):
         # exist.
         options = {}
 
-        for key in ['mode', 'by_alias', 'exclude_unset', 'exclude_defaults',
-            'exclude_none', 'exclude_computed_fields', 'round_trip', 'serialize_as_any']:
+        for key in [
+            'mode',
+            'by_alias',
+            'exclude_unset',
+            'exclude_defaults',
+            'exclude_none',
+            'exclude_computed_fields',
+            'round_trip',
+            'serialize_as_any',
+        ]:
             if hasattr(info, key):
                 options[key] = getattr(info, key)
 
         # Call model_dump, using the actual self object and all the options
         # that are stored in info.
-        return self.model_dump(
-            **options,
-            context=context
-        )
+        return self.model_dump(**options, context=context)
 
     @model_validator(mode='wrap')
     @classmethod
@@ -236,8 +245,7 @@ class SubclassableSerialisationMixin(SerialisationMixin):
 
         # Add CLASSNAME field of type Literal[cls.__name__].
         cls.model_fields[CLASSNAME] = FieldInfo(
-            annotation=Literal[cls.__name__],
-            default=cls.__name__
+            annotation=Literal[cls.__name__], default=cls.__name__
         )
 
         # Force a model rebuild to apply the field changes.

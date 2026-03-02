@@ -30,6 +30,7 @@ from pydantic import GetCoreSchemaHandler, AfterValidator, BeforeValidator, Type
 
 __all__ = ['PydanticDataFrame']
 
+
 class _DataFrameAnnotation:
     """
     Annotation class for pandas.DataFrame.
@@ -38,6 +39,7 @@ class _DataFrameAnnotation:
     to add automatic serialisation/validation to support to pandas.DataFrame
     objects.
     """
+
     @classmethod
     def __get_pydantic_core_schema__(
         cls,
@@ -113,9 +115,12 @@ class _DataFrameAnnotation:
             # pandas.Timestamp object to a string. We'll convert the timestamp
             # to its isoformat representation and add _pd_timestamp to it, so
             # we can convert it back to Timestamp object on validation.
-            TimestampType = Annotated[str, BeforeValidator(
-                lambda x: x.isoformat() + '_pd_timestamp' if isinstance(x, Timestamp) else x
-            )]
+            TimestampType = Annotated[
+                str,
+                BeforeValidator(
+                    lambda x: x.isoformat() + '_pd_timestamp' if isinstance(x, Timestamp) else x
+                ),
+            ]
 
             # There is currently (pydantic 2.9.2) a bug which prevents us from just doing
             # the following (https://github.com/pydantic/pydantic/issues/11320):
@@ -151,10 +156,9 @@ class _DataFrameAnnotation:
                     from_dict_schema,
                 ]
             ),
-            serialization=core_schema.plain_serializer_function_ser_schema(
-                serialise_frame
-            ),
+            serialization=core_schema.plain_serializer_function_ser_schema(serialise_frame),
         )
+
 
 #: Annotated wrapper for DataFrame. This can be used to support
 #: pandas.DataFrame objects in a pydantic class with automatic serialisation

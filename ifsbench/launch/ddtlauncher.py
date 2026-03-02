@@ -30,6 +30,6 @@ class DDTLauncher(LauncherWrapper):
 
         launch_data = deepcopy(launch_data)
         # Prepend the launch command with ddt and all ddt flags.
-        launch_data.cmd = ["ddt"] + self.flags + ["--"] + launch_data.cmd
+        launch_data.cmd = ['ddt'] + self.flags + ['--'] + launch_data.cmd
 
         return launch_data

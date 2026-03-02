@@ -21,6 +21,7 @@ __all__ = ['AVAILABLE_BASIC_STATS', 'EnsembleStats']
 # percentiles are supported with format '[p,P](\d{1,2})'.
 AVAILABLE_BASIC_STATS = ['min', 'max', 'mean', 'median', 'sum', 'std']
 
+
 class EnsembleStats(SerialisationMixin):
     """Reads, writes, summarises results across ensemble members."""
 
@@ -66,9 +67,7 @@ class EnsembleStats(SerialisationMixin):
             if percentile_check:
                 ptile_value = int(percentile_check.group(1))
                 if ptile_value > 100:
-                    raise ValueError(
-                        f'Percentile has to be in [0, 100], got {ptile_value}.'
-                    )
+                    raise ValueError(f'Percentile has to be in [0, 100], got {ptile_value}.')
                 to_request.append(_percentile(stat, ptile_value))
             elif stat == 'std':
                 to_request.append(std)

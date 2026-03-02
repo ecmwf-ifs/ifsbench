@@ -8,6 +8,7 @@
 """
 Handling and modifying of Fortran namelists for IFS
 """
+
 from collections import OrderedDict
 from enum import Enum
 from pathlib import Path
@@ -82,6 +83,7 @@ class IFSNamelist:
     def write(self, filepath, force=True):
         self.nml.write(filepath, force=force)
 
+
 class SanitiseMode(str, Enum):
     """
     Specify, how duplicated entries in a namelist should be sanitised.
@@ -102,6 +104,7 @@ class SanitiseMode(str, Enum):
     #: all groups. Conflicts are resolved by using the last occurence of a
     #: variable.
     MERGE_LAST = 'merge_last'
+
 
 def sanitise_namelist(nml, merge_strategy='first', mode='auto'):
     """
@@ -146,7 +149,9 @@ def sanitise_namelist(nml, merge_strategy='first', mode='auto'):
         else:
             if mode == 'auto':
                 unique_keys = {
-                    _key for _values in values for _key, val in _values.items()
+                    _key
+                    for _values in values
+                    for _key, val in _values.items()
                     if isinstance(val, f90nml.Namelist)
                 }
                 if len(unique_keys) == 1:

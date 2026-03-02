@@ -21,18 +21,18 @@ from ifsbench.namelist import SanitiseMode, sanitise_namelist
 
 
 __all__ = [
-    "NamelistOverride",
-    "NamelistHandler",
-    "NamelistOperation",
-    "SanitiseMode",
-    "NamelistSanitiseHandler",
+    'NamelistOverride',
+    'NamelistHandler',
+    'NamelistOperation',
+    'SanitiseMode',
+    'NamelistSanitiseHandler',
 ]
 
 
 class NamelistOperation(str, Enum):
-    SET = "set"
-    APPEND = "append"
-    DELETE = "delete"
+    SET = 'set'
+    APPEND = 'append'
+    DELETE = 'delete'
 
 
 class NamelistOverride(SerialisationMixin):
@@ -61,11 +61,11 @@ class NamelistOverride(SerialisationMixin):
     mode: NamelistOperation
     value: Union[int, float, str, bool, List, None] = None
 
-    @model_validator(mode="after")
+    @model_validator(mode='after')
     def validate_value_for_mode(self) -> Self:
         if self.value is None:
             if self.mode in (NamelistOperation.SET, NamelistOperation.APPEND):
-                raise ValueError("The new value must not be None!")
+                raise ValueError('The new value must not be None!')
         return self
 
     def apply(self, namelist):
@@ -88,16 +88,14 @@ class NamelistOverride(SerialisationMixin):
         key = self.entry
 
         if self.mode == NamelistOperation.SET:
-            debug(
-                f"Set namelist entry {self.namelist}/{self.entry} = {str(self.value)}."
-            )
+            debug(f'Set namelist entry {self.namelist}/{self.entry} = {str(self.value)}.')
             namelist[key] = self.value
         elif self.mode == NamelistOperation.APPEND:
             if key not in namelist:
                 namelist[key] = []
 
-            if not hasattr(namelist[key], "append"):
-                raise ValueError("Values can only be appended to arrays!")
+            if not hasattr(namelist[key], 'append'):
+                raise ValueError('Values can only be appended to arrays!')
 
             # f90nml doesn't seem to do any kind of checking, so we could
             # create arrays in the namelist where the entries have different
@@ -110,18 +108,16 @@ class NamelistOverride(SerialisationMixin):
 
                 if type_list != type_value:
                     raise ValueError(
-                        "The given value must have the same type as existing array entries!"
+                        'The given value must have the same type as existing array entries!'
                     )
 
-            debug(
-                f"Append {str(self.value)} to namelist entry {self.namelist}/{self.entry}."
-            )
+            debug(f'Append {str(self.value)} to namelist entry {self.namelist}/{self.entry}.')
 
             namelist[key].append(self.value)
 
         elif self.mode == NamelistOperation.DELETE:
             if key in namelist:
-                debug(f"Delete namelist entry {self.namelist}/{self.entry}.")
+                debug(f'Delete namelist entry {self.namelist}/{self.entry}.')
                 del namelist[key]
 
 
@@ -159,7 +155,7 @@ class NamelistHandler(DataHandler):
 
         output_path = absolutise_path(wdir, self.output_path)
 
-        debug(f"Modify namelist {input_path}.")
+        debug(f'Modify namelist {input_path}.')
         namelist = f90nml.read(input_path)
 
         namelist.uppercase = True
@@ -207,15 +203,13 @@ class NamelistSanitiseHandler(DataHandler):
 
         output_path = absolutise_path(wdir, self.output_path)
 
-        debug(f"Sanitise namelist {input_path} using sanitise mode {self.mode}.")
+        debug(f'Sanitise namelist {input_path} using sanitise mode {self.mode}.')
 
         namelist = f90nml.read(input_path)
 
         namelist.uppercase = True
         namelist.end_comma = True
 
-        namelist = sanitise_namelist(
-            nml=namelist, merge_strategy=self.mode, mode="auto"
-        )
+        namelist = sanitise_namelist(nml=namelist, merge_strategy=self.mode, mode='auto')
 
         namelist.write(output_path, force=True)

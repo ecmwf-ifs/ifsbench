@@ -59,10 +59,16 @@ def print_diff(diff, indent=0):
 
 @click.group(invoke_without_command=True)
 @click.option('--color/--no-color', type=bool, default=True, help='Use colored output')
-@click.argument('namelist1', required=True,
-                type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True))
-@click.argument('namelist2', required=True,
-                type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True))
+@click.argument(
+    'namelist1',
+    required=True,
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True),
+)
+@click.argument(
+    'namelist2',
+    required=True,
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True),
+)
 def nml_diff(color, namelist1, namelist2):
     """
     Compare two namelist files and print any differences.
