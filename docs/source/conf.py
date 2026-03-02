@@ -80,6 +80,71 @@ exclude_patterns = ['**/tests/']
 # Prefix each section label with the document it is in, followed by a colon
 autosectionlabel_prefix_document = True
 
+# -- Options for nitpicky mode -----------------------------------------------
+
+# Enable nitpicky mode to check all references in docstrings
+nitpicky = True
+
+# Suppress warnings for known external types that don't have proper intersphinx
+nitpick_ignore = [
+    # Python standard library types without proper cross-references
+    ('py:class', 'pathlib.Path'),
+    ('py:class', 'Path'),
+    ('py:class', 're.Pattern'),
+    ('py:class', 're.sub'),
+    ('py:class', 'enum.Enum'),
+    ('py:class', 'abc.ABC'),
+    ('py:class', 'collections.OrderedDict'),
+    ('py:class', 'optional'),  # Generic type hint
+    ('py:class', 'iterable'),  # Generic type hint
+    ('py:class', 'str/path'),  # Informal type annotation
+    ('py:class', 'path to file holding result'),  # Informal type annotation
+    # External library types
+    ('py:class', 'pandas.DataFrame'),
+    ('py:class', 'f90nml.namelist.Namelist'),
+    ('py:class', 'xarray.core.dataset.Dataset'),
+    ('py:class', 'pydantic.main.BaseModel'),
+    # 'any' reference types (for role inference)
+    ('any', 'pathlib.Path'),
+    ('any', 'pandas.DataFrame'),
+    ('any', 'f90nml.namelist.Namelist'),
+    ('any', 're.sub'),
+    ('any', 're.Pattern'),
+    # Internal types that are not properly exposed or are forward references
+    ('py:class', 'ifsbench.pydantic_utils._DataFrameAnnotation'),
+    ('py:class', 'ifsbench.gribfile.GribModification'),
+    ('py:class', 'ifsbench.gribfile.gribmessage'),
+    ('py:class', 'ifsbench.launch.launcher.LauncherWrapper'),
+    ('py:class', 'ifsbench.ExecuteResult'),
+    ('py:class', 'ifsbench.results.ResultData'),
+    ('py:class', 'ifsbench.benchmark.BenchmarkSummary'),
+    ('py:class', 'BenchmarkSummary'),
+    ('py:class', 'ifsbench.arch.ArchResult'),
+    ('py:class', 'ArchResult'),
+    ('py:class', 'DataFielType'),
+    ('py:class', 'ifsbench.env.DefaultEnvPipeline'),
+    ('py:obj', 'ifsbench.gribfile.GribModification'),
+    ('py:obj', 'ifsbench.gribfile.gribmessage'),
+    ('py:obj', 'ifsbench.launch.launcher.LauncherWrapper'),
+    ('py:obj', 'ifsbench.util.as_tuple'),
+    ('py:obj', 'ifsbench.darshanreport.open_darshan_logfile'),
+    ('py:obj', 'ifsbench.arch.ArchResult'),
+    ('py:obj', 'ifsbench.benchmark.BenchmarkSummary'),
+    ('py:obj', 'ifsbench.env.DefaultEnvPipeline'),
+    ('py:meth', 'Arch.process'),
+    # Parameter/attribute names in docstrings
+    ('py:attr', 'nml'),
+    ('py:attr', 'other_nml'),
+    ('py:attr', 'ExperimentFiles.src_dir'),
+    ('py:data', 'repl'),
+    ('py:data', 'parameter_config'),
+    ('py:data', 'output_dir'),
+    ('py:data', 'ifsdata_dir'),
+]
+
+# Convert nitpick_ignore to the new format for Sphinx 3.0+
+nitpick_ignore_regex = []
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
