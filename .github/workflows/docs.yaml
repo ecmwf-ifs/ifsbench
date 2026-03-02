@@ -49,7 +49,7 @@ jobs:
             --space docs \
             --name ifsbench \
             --token="${SITES_TOKEN}" \
-            upload \
+            content upload \
               --force \
               --source "docs/build/html/" \
               --destination / \
