@@ -23,10 +23,10 @@ apidoc:
 # This target builds documentation with nitpicky mode enabled and reports all warnings
 checkdocstrings: apidoc
 	@echo "Checking docstrings for Sphinx compatibility..."
-	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" -n -W --keep-going $(SPHINXOPTS) $(O) 2>&1 | tee checkdocstrings.log || true
-	@echo ""
-	@echo "Docstring check complete. See checkdocstrings.log for details."
-	@if grep -q "WARNING:" checkdocstrings.log; then \
+	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" -n --keep-going $(SPHINXOPTS) $(O) 2>&1 | tee checkdocstrings.log; \
+	echo ""; \
+	echo "Docstring check complete. See checkdocstrings.log for details."; \
+	if grep -q "WARNING:" checkdocstrings.log; then \
 		echo "Found warnings in docstrings. Review the log above."; \
 		exit 1; \
 	else \

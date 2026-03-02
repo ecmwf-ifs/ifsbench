@@ -121,7 +121,7 @@ nitpick_ignore = [
     ('py:class', 'BenchmarkSummary'),
     ('py:class', 'ifsbench.arch.ArchResult'),
     ('py:class', 'ArchResult'),
-    ('py:class', 'DataFielType'),
+    ('py:class', 'DataFieldType'),
     ('py:class', 'ifsbench.env.DefaultEnvPipeline'),
     ('py:obj', 'ifsbench.gribfile.GribModification'),
     ('py:obj', 'ifsbench.gribfile.gribmessage'),
