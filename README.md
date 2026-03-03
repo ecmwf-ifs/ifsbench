@@ -54,3 +54,14 @@ specified in `.pylintrc`:
 ```
 <build_dir>/ifsbench_env/bin/pylint --rcfile=.pylintrc ifsbench/
 ```
+
+`ifsbench` has support for [`pre-commit`](https://pre-commit.com/) to install
+a pre-commit hook that keeps formatting consistent (using `ruff`). To enable this
+run
+```
+# Install pre-commit if it isn't installed.
+pip install pre-commit
+
+cd ifsbench_repository
+pre-commit install
+```
