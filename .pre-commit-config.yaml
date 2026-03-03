@@ -5,4 +5,4 @@ repos:
   hooks:
     # Run the formatter (only on the ifsbench directory).
     - id: ruff-format
-      files: ifsbench
+      files: ^ifsbench/
