@@ -138,9 +138,7 @@ def test_get_stats_grib_two_datasets(grib_location):
     df = dfs[0]
     # shape ((2step x 7 stats), (time, valid_time, nominalTop, ttr))
     assert df.shape == (14, 4)
-    assert sorted(list(df.columns)) == sorted(
-        ['time', 'valid_time', 'ttr', 'nominalTop']
-    )
+    assert sorted(list(df.columns)) == sorted(['time', 'valid_time', 'ttr', 'nominalTop'])
 
     # Sanity check relative values
     ds = df.to_xarray()
@@ -270,9 +268,7 @@ def test_get_stats_netcdf_specify_wrong_filetype_fails(grib_location):
 def test_get_stats_netcdf_gg(netcdf_location):
     input_path = netcdf_location / 'o_gg.nc'
 
-    nf = DataFileStats(
-        input_path=input_path, stat_dims=['lat', 'lon', 'nlevsn', 'tile', 'vtype']
-    )
+    nf = DataFileStats(input_path=input_path, stat_dims=['lat', 'lon', 'nlevsn', 'tile', 'vtype'])
     dfs = nf.get_stats()
 
     assert len(dfs) == 1

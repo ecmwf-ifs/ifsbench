@@ -16,7 +16,13 @@ from io import StringIO
 import f90nml
 import pytest
 
-from ifsbench.data import NamelistHandler, NamelistOverride, NamelistOperation, SanitiseMode, NamelistSanitiseHandler
+from ifsbench.data import (
+    NamelistHandler,
+    NamelistOverride,
+    NamelistOperation,
+    SanitiseMode,
+    NamelistSanitiseHandler,
+)
 
 
 @pytest.fixture(name='initial_namelist')
@@ -431,6 +437,7 @@ def test_namelisthandler_execute(
     else:
         assert Path(output_path).exists()
 
+
 def test_namelisthandler_write_symlink(
     tmp_path,
 ):
@@ -443,24 +450,27 @@ def test_namelisthandler_write_symlink(
 
     namelist['namelist1'] = {'int': 5}
 
-    namelist.write(tmp_path/'namelist')
-    (tmp_path/'sym_namelist').symlink_to(tmp_path/'namelist')
+    namelist.write(tmp_path / 'namelist')
+    (tmp_path / 'sym_namelist').symlink_to(tmp_path / 'namelist')
 
-    override = NamelistOverride(namelist='namelist1', entry='int', value=6, mode=NamelistOperation.SET)
+    override = NamelistOverride(
+        namelist='namelist1', entry='int', value=6, mode=NamelistOperation.SET
+    )
 
     handler = NamelistHandler(
-        input_path=tmp_path/'namelist',
-        output_path=tmp_path/'sym_namelist',
-        overrides=[override]
+        input_path=tmp_path / 'namelist',
+        output_path=tmp_path / 'sym_namelist',
+        overrides=[override],
     )
 
     handler.execute(tmp_path)
 
-    namelist1 = f90nml.read(tmp_path/'namelist')
-    namelist2 = f90nml.read(tmp_path/'sym_namelist')
+    namelist1 = f90nml.read(tmp_path / 'namelist')
+    namelist2 = f90nml.read(tmp_path / 'sym_namelist')
 
     assert namelist1['namelist1']['int'] == 5
     assert namelist2['namelist1']['int'] == 6
+
 
 @pytest.mark.parametrize(
     'input_path,input_valid',
@@ -482,11 +492,16 @@ def test_namelisthandler_write_symlink(
 )
 @pytest.mark.parametrize(
     'mode',
-    [SanitiseMode.FIRST, SanitiseMode.LAST, SanitiseMode.MERGE_FIRST, SanitiseMode.MERGE_LAST, 'something', 5]
+    [
+        SanitiseMode.FIRST,
+        SanitiseMode.LAST,
+        SanitiseMode.MERGE_FIRST,
+        SanitiseMode.MERGE_LAST,
+        'something',
+        5,
+    ],
 )
-def test_namelisthandlersanitise_init(
-    input_path, input_valid, output_path, output_valid, mode
-):
+def test_namelisthandlersanitise_init(input_path, input_valid, output_path, output_valid, mode):
     """
     Initialise the NamelistSanitiseHandler and make sure that only correct values are accepted.
     """
@@ -506,7 +521,7 @@ def test_namelisthandlersanitise_init(
 
 @pytest.mark.parametrize(
     'mode',
-    [SanitiseMode.FIRST, SanitiseMode.LAST, SanitiseMode.MERGE_FIRST, SanitiseMode.MERGE_LAST]
+    [SanitiseMode.FIRST, SanitiseMode.LAST, SanitiseMode.MERGE_FIRST, SanitiseMode.MERGE_LAST],
 )
 def test_namelisthandlersanitise_dump_config(mode):
     """
@@ -550,6 +565,7 @@ def fixture_duplicate_namelist():
 
     return namelist
 
+
 @pytest.mark.parametrize('input_path', ['somewhere/namelist'])
 @pytest.mark.parametrize('input_relative', [True, False])
 @pytest.mark.parametrize(
@@ -564,9 +580,15 @@ def fixture_duplicate_namelist():
     [
         (SanitiseMode.FIRST, {'a': {'foo': 4, 'foobar': 3}, 'b': {'bar': 1, 'foo': 2}}),
         (SanitiseMode.LAST, {'a': {'foo': 1, 'bar': 2}, 'b': {'bar': 1, 'foo': 2}}),
-        (SanitiseMode.MERGE_FIRST, {'a': {'foo': 4, 'foobar': 3, 'bar': 2}, 'b': {'bar': 1, 'foo': 2}}),
-        (SanitiseMode.MERGE_LAST, {'a': {'foo': 1, 'foobar': 3, 'bar': 2}, 'b': {'bar': 1, 'foo': 2}}),
-    ]
+        (
+            SanitiseMode.MERGE_FIRST,
+            {'a': {'foo': 4, 'foobar': 3, 'bar': 2}, 'b': {'bar': 1, 'foo': 2}},
+        ),
+        (
+            SanitiseMode.MERGE_LAST,
+            {'a': {'foo': 1, 'foobar': 3, 'bar': 2}, 'b': {'bar': 1, 'foo': 2}},
+        ),
+    ],
 )
 def test_namelistsanitisehandler_execute(
     tmp_path,
@@ -576,7 +598,7 @@ def test_namelistsanitisehandler_execute(
     output_path,
     output_relative,
     mode,
-    reference
+    reference,
 ):
     """
     Test that the execute function sanitises the namelists correctly.

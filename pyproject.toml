@@ -31,6 +31,7 @@ tests = [
   "pytest",
   "pytest-cov",
   "pylint",
+  "ruff",
 ]
 
 grib = [
@@ -69,3 +70,10 @@ namespaces = false
 
 # Enable SCM versioning
 [tool.setuptools_scm]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.format]
+quote-style = "single"
+docstring-code-format = true

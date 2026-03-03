@@ -12,7 +12,7 @@ from typing import Union
 
 from ifsbench.serialisation_mixin import SubclassableSerialisationMixin
 
-__all__ = ["DataHandler", "absolutise_path"]
+__all__ = ['DataHandler', 'absolutise_path']
 
 
 class DataHandler(SubclassableSerialisationMixin):

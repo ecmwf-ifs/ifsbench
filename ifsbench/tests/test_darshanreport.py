@@ -20,7 +20,7 @@ def fixture_here():
 
 def test_darshanreport_from_parser_log(here):
     """Verify that darshan-parser log is read correctly."""
-    report = DarshanReport(here/'darshan.log')
+    report = DarshanReport(here / 'darshan.log')
 
     # Records loaded and available?
     assert len(report.records) == 3
@@ -39,7 +39,7 @@ def test_darshanreport_from_parser_log(here):
 def test_darshanreport_read_files(here):
     """Verify that list of read files is obtained correctly from
     Darshan report."""
-    report = DarshanReport(here/'darshan.log')
+    report = DarshanReport(here / 'darshan.log')
     read_files = read_files_from_darshan(report)
     assert isinstance(read_files, set)
     assert len(read_files) == 33
@@ -48,7 +48,7 @@ def test_darshanreport_read_files(here):
 def test_darshanreport_write_files(here):
     """Verify that list of write files is obtained correctly from
     Darshan report."""
-    report = DarshanReport(here/'darshan.log')
+    report = DarshanReport(here / 'darshan.log')
     write_files = write_files_from_darshan(report)
     assert isinstance(write_files, set)
     assert len(write_files) == 38

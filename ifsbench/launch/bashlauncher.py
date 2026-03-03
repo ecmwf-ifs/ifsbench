@@ -33,22 +33,22 @@ class BashLauncher(LauncherWrapper):
         # The header
         ###########
         """
-        f.write("\n")
+        f.write('\n')
         f.write('#' * 60)
-        f.write("\n")
+        f.write('\n')
         f.write(f'# {header}')
-        f.write("\n")
+        f.write('\n')
         f.write('#' * 60)
-        f.write("\n")
-        f.write("\n")
+        f.write('\n')
+        f.write('\n')
 
     def _write_bash_file(self, f: TextIO, launch_data: LaunchData):
         """
         Write the content of a LaunchData object to a bash script.
         """
-        f.write("#! /bin/bash\n\n")
+        f.write('#! /bin/bash\n\n')
 
-        self._write_header(f, "Specify environment")
+        self._write_header(f, 'Specify environment')
         env_name_check = re.compile(r'[a-zA-Z_][a-zA-Z_0-9]*')
 
         for key, value in launch_data.env.items():
@@ -66,16 +66,16 @@ class BashLauncher(LauncherWrapper):
             # We set the environment variables inside a "..." block. This means
             # that we have to escape certain special characters (", $, `).
             chars_to_escape = ['$', '"', '`']
-            trans = str.maketrans({char: '\\'+char for char in chars_to_escape})
+            trans = str.maketrans({char: '\\' + char for char in chars_to_escape})
             escaped_value = value.translate(trans)
             f.write(f'export {key}="')
             f.write(escaped_value)
-            f.write("\"\n")
+            f.write('"\n')
 
-        self._write_header(f, "Specify launch command")
+        self._write_header(f, 'Specify launch command')
 
         f.write(f'cd "{launch_data.run_dir}"')
-        f.write("\n")
+        f.write('\n')
         for c in launch_data.cmd:
             f.write(f'"{c}" ')
 
@@ -90,22 +90,20 @@ class BashLauncher(LauncherWrapper):
 
         launch_data = deepcopy(launch_data)
         # Create the directory for the bash scripts.
-        script_dir = run_dir / "bash_scripts"
+        script_dir = run_dir / 'bash_scripts'
 
         script_dir.mkdir(parents=True, exist_ok=True)
 
         # Always use UTC time and format it.
-        time_str = datetime.datetime.now(datetime.timezone.utc).strftime(
-            "%Y-%m-%d:%H-%M-%S-%f"
-        )
+        time_str = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d:%H-%M-%S-%f')
         cmd_str = cmd[0].split('/')[-1]
 
-        script_path = script_dir / f"{cmd_str}_{time_str}.sh"
+        script_path = script_dir / f'{cmd_str}_{time_str}.sh'
 
-        with script_path.open("w", encoding="utf-8") as f:
+        with script_path.open('w', encoding='utf-8') as f:
             self._write_bash_file(f, launch_data)
 
         return LaunchData(
             run_dir=run_dir,
-            cmd=["/bin/bash", str(script_path)],
+            cmd=['/bin/bash', str(script_path)],
         )

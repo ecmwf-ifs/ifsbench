@@ -60,8 +60,7 @@ class LauncherBuilder(SerialisationMixin):
         """
 
         if self.launcher_config:
-
-            with Path(self.launcher_config).open("r", encoding="utf-8") as f:
+            with Path(self.launcher_config).open('r', encoding='utf-8') as f:
                 loaded_yaml = yaml.safe_load(f)
             launcher = Launcher.from_config(loaded_yaml)
             launcher.flags += self.launcher_flags
@@ -88,27 +87,27 @@ def launcher_options(func):
     """
 
     @click.option(
-        "--launcher-config",
+        '--launcher-config',
         type=str,
         default=None,
-        help="yaml file containing launcher configuration",
+        help='yaml file containing launcher configuration',
     )
     @click.option(
-        "--launcher-flags",
-        "-f",
+        '--launcher-flags',
+        '-f',
         default=[],
         multiple=True,
         type=str,
-        help="Additional launcher flags",
+        help='Additional launcher flags',
     )
     @click.pass_context
     @wraps(func)
     def process_launcher(ctx, *args, **kwargs):
         builder = LauncherBuilder()
 
-        builder.launcher_config = kwargs.pop("launcher_config")
+        builder.launcher_config = kwargs.pop('launcher_config')
 
-        builder.launcher_flags = kwargs.pop("launcher_flags")
+        builder.launcher_flags = kwargs.pop('launcher_flags')
 
         return ctx.invoke(func, *args, **kwargs, launcher_builder=builder)
 

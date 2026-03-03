@@ -23,12 +23,24 @@ __all__ = ['cli', 'RunOptions', 'run_options', 'ReferenceOptions', 'reference_op
 
 
 @click.group()
-@click.option('--debug/--no-debug', 'debug_', default=False, show_default=True,
-              help='Enable / disable debug mode with verbose logging.')
-@click.option('--log', type=click.Path(writable=True),
-              help='Write debug-level information to a log file.')
-@click.option('--pdb', 'pdb_', default=False, is_flag=True, show_default=True,
-              help='Attach Python debugger when exceptions occur.')
+@click.option(
+    '--debug/--no-debug',
+    'debug_',
+    default=False,
+    show_default=True,
+    help='Enable / disable debug mode with verbose logging.',
+)
+@click.option(
+    '--log', type=click.Path(writable=True), help='Write debug-level information to a log file.'
+)
+@click.option(
+    '--pdb',
+    'pdb_',
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help='Attach Python debugger when exceptions occur.',
+)
 @click.pass_context
 def cli(ctx, debug_, log, pdb_):
     """
@@ -102,9 +114,17 @@ class RunOptions:
         The length for which the forecast should be run (default: None)
     """
 
-    def __init__(self, nproc=1, nthread=1, hyperthread=1, nproc_io=0,
-                 arch=None, launch_cmd=None, launch_options=None,
-                 forecast_length=None):
+    def __init__(
+        self,
+        nproc=1,
+        nthread=1,
+        hyperthread=1,
+        nproc_io=0,
+        arch=None,
+        launch_cmd=None,
+        launch_options=None,
+        forecast_length=None,
+    ):
 
         self.nproc = nproc
         self.nthread = nthread
@@ -147,22 +167,63 @@ def run_options(func):
             print(f'Running with {runopts.nproc} ranks and {runopts.nthread} threads')
     """
 
-    @click.option('-n', '--nproc', default=1, show_default=True, show_envvar=True,
-                  help='Number of MPI processes to lauch')
-    @click.option('-c', '--nthread', default=1, show_default=True, show_envvar=True,
-                  help='Number of OpenMP threads to use')
-    @click.option('--hyperthread', default=1, show_default=True, show_envvar=True,
-                  help='Number of hyperthreads to use per physical core')
-    @click.option('--nproc-io', default=0, show_default=True, show_envvar=True,
-                  help='Number of dedicated IO-server ranks to use')
-    @click.option('-a', '--arch', default=None, show_envvar=True,
-                  help='Architecture name for specialized invocation')
-    @click.option('-l', '--launch-cmd', default=None, show_envvar=True,
-                  help='Custom launcher command to prepend to run')
-    @click.option('--launch-options', default=None, show_envvar=True,
-                  help='User options to add to the launch command (ignored if using --launch-cmd')
-    @click.option('--forecast-length', '--fclen', default=None, show_envvar=True,
-                  help='Length of forecast (e.g., h240 or d10)')
+    @click.option(
+        '-n',
+        '--nproc',
+        default=1,
+        show_default=True,
+        show_envvar=True,
+        help='Number of MPI processes to lauch',
+    )
+    @click.option(
+        '-c',
+        '--nthread',
+        default=1,
+        show_default=True,
+        show_envvar=True,
+        help='Number of OpenMP threads to use',
+    )
+    @click.option(
+        '--hyperthread',
+        default=1,
+        show_default=True,
+        show_envvar=True,
+        help='Number of hyperthreads to use per physical core',
+    )
+    @click.option(
+        '--nproc-io',
+        default=0,
+        show_default=True,
+        show_envvar=True,
+        help='Number of dedicated IO-server ranks to use',
+    )
+    @click.option(
+        '-a',
+        '--arch',
+        default=None,
+        show_envvar=True,
+        help='Architecture name for specialized invocation',
+    )
+    @click.option(
+        '-l',
+        '--launch-cmd',
+        default=None,
+        show_envvar=True,
+        help='Custom launcher command to prepend to run',
+    )
+    @click.option(
+        '--launch-options',
+        default=None,
+        show_envvar=True,
+        help='User options to add to the launch command (ignored if using --launch-cmd',
+    )
+    @click.option(
+        '--forecast-length',
+        '--fclen',
+        default=None,
+        show_envvar=True,
+        help='Length of forecast (e.g., h240 or d10)',
+    )
     @click.option('--nproma', default=None, help='Override the value of NPROMA')
     @click.pass_context
     @wraps(func)
@@ -235,14 +296,33 @@ def reference_options(func):
             print(f'Validate against reference record in {refopts.path}')
     """
 
-    @click.option('-r', '--reference', type=click.Path(), default=None, show_envvar=True,
-                  help='Path to custom reference record for validation')
-    @click.option('--validate/--no-validate', default=True, show_envvar=True,
-                  help='Flag to enable validation against reference')
-    @click.option('--update-reference', default=False, is_flag=True, show_envvar=True,
-                  help='Flag to update reference record with result')
-    @click.option('--comment', default=None, show_envvar=True,
-                  help='Comment to store when updating reference record')
+    @click.option(
+        '-r',
+        '--reference',
+        type=click.Path(),
+        default=None,
+        show_envvar=True,
+        help='Path to custom reference record for validation',
+    )
+    @click.option(
+        '--validate/--no-validate',
+        default=True,
+        show_envvar=True,
+        help='Flag to enable validation against reference',
+    )
+    @click.option(
+        '--update-reference',
+        default=False,
+        is_flag=True,
+        show_envvar=True,
+        help='Flag to update reference record with result',
+    )
+    @click.option(
+        '--comment',
+        default=None,
+        show_envvar=True,
+        help='Comment to store when updating reference record',
+    )
     @click.pass_context
     @wraps(func)
     def process_reference_options(ctx, *args, **kwargs):

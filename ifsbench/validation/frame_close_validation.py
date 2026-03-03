@@ -112,21 +112,19 @@ def validate_result_identical(
     validator = FrameCloseValidation(atol, rtol)
 
     if isinstance(result, (str, Path)):
-        with Path(result).open("r", encoding="utf-8") as f:
+        with Path(result).open('r', encoding='utf-8') as f:
             result_data = result_type.from_config(yaml.safe_load(f))
     elif isinstance(result, result_type):
         result_data = result
     else:
-        raise RuntimeError(
-            f"Result is of wrong type, expected {result_type}, found {type(result)}"
-        )
+        raise RuntimeError(f'Result is of wrong type, expected {result_type}, found {type(result)}')
 
-    with reference_path.open("r", encoding="utf-8") as f:
+    with reference_path.open('r', encoding='utf-8') as f:
         reference_data = result_type.from_config(yaml.safe_load(f))
 
-    info(f"Validating result type {result_type} against {reference_path}")
+    info(f'Validating result type {result_type} against {reference_path}')
     if set(result_data.frames.keys()) != set(reference_data.frames.keys()):
-        raise RuntimeError("Results do not hold the same frames!")
+        raise RuntimeError('Results do not hold the same frames!')
     is_identical = True
 
     for key in result_data.frames.keys():
@@ -138,22 +136,20 @@ def validate_result_identical(
         if not equal and not mismatch:
             is_identical = False
             error(
-                f"Frames are not equal:\n"
-                f"shapes: result={frame.shape}, "
-                f"ref={frame_ref.shape}\nindex: result={frame.index}, ref={frame_ref.index}"
+                f'Frames are not equal:\n'
+                f'shapes: result={frame.shape}, '
+                f'ref={frame_ref.shape}\nindex: result={frame.index}, ref={frame_ref.index}'
             )
 
         if mismatch:
             is_identical = False
             idx, col = mismatch[0]
             error(
-                f"First mismatch at ({idx}, {col}): {frame.loc[idx,col]} != {frame_ref.loc[idx,col]}."
+                f'First mismatch at ({idx}, {col}): {frame.loc[idx, col]} != {frame_ref.loc[idx, col]}.'
             )
 
-            with pd.option_context(
-                "display.max_rows", None, "display.max_columns", None
-            ):
-                debug(f"result data:\n{frame}")
-                debug(f"reference data:\n{frame_ref}")
+            with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+                debug(f'result data:\n{frame}')
+                debug(f'reference data:\n{frame_ref}')
 
     return is_identical

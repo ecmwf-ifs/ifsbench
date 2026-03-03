@@ -106,9 +106,7 @@ def test_renamehandler_from_config_dump_config(pattern, repl, mode):
         ),
     ],
 )
-def test_renamehandler_from_filename(
-    tmp_path, pattern, repl, mode, files_in, files_out
-):
+def test_renamehandler_from_filename(tmp_path, pattern, repl, mode, files_in, files_out):
     """
     Test that a RenameHandler created via from_filename works correctly.
 
@@ -163,16 +161,16 @@ def test_renamehandler_symlink(tmp_path):
     Test that a RenameHandler deals with symlinks correctly.
     """
 
-    (tmp_path/'subdir').mkdir(parents=True, exist_ok=True)
-    (tmp_path/'subdir/file.txt').touch()
-    (tmp_path/'subdir/symlink').symlink_to(tmp_path/'subdir/file.txt')
+    (tmp_path / 'subdir').mkdir(parents=True, exist_ok=True)
+    (tmp_path / 'subdir/file.txt').touch()
+    (tmp_path / 'subdir/symlink').symlink_to(tmp_path / 'subdir/file.txt')
 
     handler = RenameHandler(pattern='file', repl='dir', mode=RenameMode.SYMLINK)
 
     handler.execute(tmp_path)
 
-    assert (tmp_path/'subdir/dir.txt').exists()
-    assert (tmp_path/'subdir/file.txt').exists()
-    assert (tmp_path/'subdir/symlink').exists()
+    assert (tmp_path / 'subdir/dir.txt').exists()
+    assert (tmp_path / 'subdir/file.txt').exists()
+    assert (tmp_path / 'subdir/symlink').exists()
 
-    assert (tmp_path/'subdir/symlink').resolve() == tmp_path/'subdir/file.txt'
+    assert (tmp_path / 'subdir/symlink').resolve() == tmp_path / 'subdir/file.txt'

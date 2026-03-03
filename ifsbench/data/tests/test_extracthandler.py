@@ -42,6 +42,7 @@ def test_extracthandler_from_config(archive_path, archive_valid, target_dir, tar
     with context:
         ExtractHandler.from_config(config)
 
+
 @pytest.mark.parametrize(
     'archive_path,archive_valid',
     [('somewhere/archive.tar', True), (None, False), (2, False)],
@@ -182,9 +183,7 @@ def test_extracthandler_execute(
     if Path(archive_path).is_absolute():
         archive_path = shutil.make_archive(archive_path, archive_type, pack_path)
     else:
-        archive_path = shutil.make_archive(
-            tmp_path / archive_path, archive_type, pack_path
-        )
+        archive_path = shutil.make_archive(tmp_path / archive_path, archive_type, pack_path)
 
         archive_path = Path(archive_path).relative_to(tmp_path)
 

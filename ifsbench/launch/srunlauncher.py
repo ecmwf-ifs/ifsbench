@@ -20,30 +20,30 @@ class SrunLauncher(Launcher):
     """
 
     _job_options_map = {
-        "nodes": "--nodes={}",
-        "tasks": "--ntasks={}",
-        "tasks_per_node": "--ntasks-per-node={}",
-        "tasks_per_socket": "--ntasks-per-socket={}",
-        "cpus_per_task": "--cpus-per-task={}",
-        "threads_per_core": "--ntasks-per-core={}",
-        "gpus_per_node": "--gpus-per-node={}",
-        "account": "--account={}",
-        "partition": "--partition={}",
+        'nodes': '--nodes={}',
+        'tasks': '--ntasks={}',
+        'tasks_per_node': '--ntasks-per-node={}',
+        'tasks_per_socket': '--ntasks-per-socket={}',
+        'cpus_per_task': '--cpus-per-task={}',
+        'threads_per_core': '--ntasks-per-core={}',
+        'gpus_per_node': '--gpus-per-node={}',
+        'account': '--account={}',
+        'partition': '--partition={}',
     }
 
     _bind_options_map = {
-        CpuBinding.BIND_NONE: ["--cpu-bind=none"],
-        CpuBinding.BIND_SOCKETS: ["--cpu-bind=sockets"],
-        CpuBinding.BIND_CORES: ["--cpu-bind=cores"],
-        CpuBinding.BIND_THREADS: ["--cpu-bind=threads"],
+        CpuBinding.BIND_NONE: ['--cpu-bind=none'],
+        CpuBinding.BIND_SOCKETS: ['--cpu-bind=sockets'],
+        CpuBinding.BIND_CORES: ['--cpu-bind=cores'],
+        CpuBinding.BIND_THREADS: ['--cpu-bind=threads'],
         CpuBinding.BIND_USER: [],
     }
 
     _distribution_options_map = {
-        None: "*",
-        CpuDistribution.DISTRIBUTE_DEFAULT: "*",
-        CpuDistribution.DISTRIBUTE_BLOCK: "block",
-        CpuDistribution.DISTRIBUTE_CYCLIC: "cyclic",
+        None: '*',
+        CpuDistribution.DISTRIBUTE_DEFAULT: '*',
+        CpuDistribution.DISTRIBUTE_BLOCK: 'block',
+        CpuDistribution.DISTRIBUTE_CYCLIC: 'cyclic',
     }
 
     def _get_distribution_options(self, job: Job) -> List[str]:
@@ -57,24 +57,24 @@ class SrunLauncher(Launcher):
         if distribute_remote is CpuDistribution.DISTRIBUTE_USER:
             debug(
                 (
-                    "Not applying task distribution options because remote distribution"
-                    " of tasks is set to use user-provided settings"
+                    'Not applying task distribution options because remote distribution'
+                    ' of tasks is set to use user-provided settings'
                 )
             )
             return []
         if distribute_local is CpuDistribution.DISTRIBUTE_USER:
             debug(
                 (
-                    "Not applying task distribution options because local distribution"
-                    " of tasks is set to use user-provided settings"
+                    'Not applying task distribution options because local distribution'
+                    ' of tasks is set to use user-provided settings'
                 )
             )
             return []
 
         return [
             (
-                f"--distribution={self._distribution_options_map[distribute_remote]}"
-                f":{self._distribution_options_map[distribute_local]}"
+                f'--distribution={self._distribution_options_map[distribute_remote]}'
+                f':{self._distribution_options_map[distribute_local]}'
             )
         ]
 
@@ -87,7 +87,7 @@ class SrunLauncher(Launcher):
         env_pipeline: Optional[EnvPipeline] = None,
         custom_flags: Optional[List[str]] = None,
     ) -> LaunchData:
-        executable = "srun"
+        executable = 'srun'
         if env_pipeline is None:
             env_pipeline = DefaultEnvPipeline()
         else:
@@ -112,9 +112,7 @@ class SrunLauncher(Launcher):
         if library_paths:
             for path in library_paths:
                 env_pipeline.add(
-                    EnvHandler(
-                        mode=EnvOperation.APPEND, key="LD_LIBRARY_PATH", value=str(path)
-                    )
+                    EnvHandler(mode=EnvOperation.APPEND, key='LD_LIBRARY_PATH', value=str(path))
                 )
 
         if job.cpus_per_task:
@@ -124,7 +122,7 @@ class SrunLauncher(Launcher):
             env_pipeline.add(
                 EnvHandler(
                     mode=EnvOperation.SET,
-                    key="OMP_NUM_THREADS",
+                    key='OMP_NUM_THREADS',
                     value=str(job.cpus_per_task),
                 )
             )

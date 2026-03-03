@@ -8,6 +8,7 @@
 """
 Collection of utility routines
 """
+
 from dataclasses import dataclass
 from io import StringIO
 from os import environ, getcwd
@@ -21,6 +22,7 @@ from ifsbench.logging import debug, info
 
 
 __all__ = ['ExecuteResult', 'execute', 'auto_post_mortem_debugger']
+
 
 @dataclass
 class ExecuteResult:
@@ -36,6 +38,7 @@ class ExecuteResult:
 
     #: The return code of the execution.
     exit_code: int
+
 
 def execute(command: List[str], **kwargs) -> ExecuteResult:
     """
@@ -62,7 +65,6 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     dryrun = kwargs.pop('dryrun', False)
     logfile = kwargs.pop('logfile', None)
 
-
     debug(f'[ifsbench] User env:\n{pformat(env, indent=2)}')
     if env is not None:
         # Inject user-defined environment
@@ -74,7 +76,6 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     else:
         run_env = None
 
-
     # Log the command we're about to execute
     cwd = getcwd() if cwd is None else str(cwd)
     debug('[ifsbench] Run directory: ' + cwd)
@@ -83,19 +84,13 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     if dryrun:
         # Only print the environment when in dryrun mode.
         info('[ifsbench] Environment: ' + str(run_env))
-        return ExecuteResult(
-            stdout="",
-            stderr="",
-            exit_code=0
-        )
+        return ExecuteResult(stdout='', stderr='', exit_code=0)
 
-    cmd_args = {
-        'cwd': cwd, 'env': run_env, 'text': True, 'stdout': PIPE, 'stderr': PIPE
-    }
+    cmd_args = {'cwd': cwd, 'env': run_env, 'text': True, 'stdout': PIPE, 'stderr': PIPE}
 
     if logfile:
         # If we're file-logging, intercept via pipe
-        _log_file = Path(logfile).open('w', encoding='utf-8') # pylint: disable=consider-using-with
+        _log_file = Path(logfile).open('w', encoding='utf-8')  # pylint: disable=consider-using-with
     else:
         _log_file = None
 
@@ -137,7 +132,6 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     try:
         # Execute with our args and outside args
         with Popen(command, **cmd_args, **kwargs) as p:
-
             # Intercept p.stdout and multiplex to file and sys.stdout
             while p.poll() is None:
                 _read_and_multiplex(p, stdout, stderr)
@@ -151,11 +145,8 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
         if _log_file:
             _log_file.close()
 
-    return ExecuteResult(
-        stdout=stdout.getvalue(),
-        stderr=stderr.getvalue(),
-        exit_code=ret
-    )
+    return ExecuteResult(stdout=stdout.getvalue(), stderr=stderr.getvalue(), exit_code=ret)
+
 
 def as_tuple(item, dtype=None, length=None):
     """
@@ -182,6 +173,7 @@ def as_tuple(item, dtype=None, length=None):
         raise TypeError(f'Items need to be of type {dtype}')
     return t
 
+
 def auto_post_mortem_debugger(type, value, tb):  # pylint: disable=redefined-builtin
     """
     Exception hook that automatically attaches a debugger
@@ -198,9 +190,10 @@ def auto_post_mortem_debugger(type, value, tb):  # pylint: disable=redefined-bui
         # device, so we call the default hook
         sys.__excepthook__(type, value, tb)
     else:
-        import traceback # pylint: disable=import-outside-toplevel
-        import pdb # pylint: disable=import-outside-toplevel
+        import traceback  # pylint: disable=import-outside-toplevel
+        import pdb  # pylint: disable=import-outside-toplevel
+
         # we are NOT in interactive mode, print the exception...
         traceback.print_exception(type, value, tb)
         # ...then start the debugger in post-mortem mode.
-        pdb.post_mortem(tb)   # pylint: disable=no-member
+        pdb.post_mortem(tb)  # pylint: disable=no-member
