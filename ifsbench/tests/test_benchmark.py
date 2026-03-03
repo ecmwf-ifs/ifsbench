@@ -10,14 +10,17 @@ Some sanity tests the Benchmark implementation.
 """
 
 from pathlib import Path
+from typing import List
 from time import sleep
 import sys
+import yaml
 
 import pytest
 from typing_extensions import Literal
 
 from ifsbench import (
     Benchmark,
+    BenchmarkSetup,
     ScienceSetup,
     TechSetup,
     DefaultApplication,
@@ -74,11 +77,13 @@ def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force, use_te
     """
 
     science, tech, science_list, tech_list = test_setup_files
+    job = Job(tasks=2)
 
     if use_tech:
-        benchmark = Benchmark(science=science, tech=tech)
+        setup = BenchmarkSetup(science=science, job=job, tech=tech)
     else:
-        benchmark = Benchmark(science=science)
+        setup = BenchmarkSetup(science=science, job=job)
+    benchmark = Benchmark(setup=setup)
 
     # Create the run directory and check that all files in file list
     # actually exist.
@@ -111,19 +116,28 @@ def test_defaultbenchmark_setup_rundir(tmp_path, test_setup_files, force, use_te
             assert stat.st_atime == stats[file].st_atime
 
 
+class DummyApplication(DefaultApplication):
+    def get_command(self, run_dir: Path, job: Job) -> List[str]:
+        job_config = job.dump_config()
+
+        command = [
+            sys.executable,
+            '-c',
+            'from pathlib import Path; import yaml; '
+            'f = open("test.txt", "w"); '
+            f'yaml.dump({job_config}, f); '
+            'f.close()',
+        ]
+        return command
+
+
 @pytest.fixture(name='test_run_setup')
 def fixture_test_run_setup():
     env_handlers = [
         EnvHandler(mode=EnvOperation.CLEAR),
     ]
 
-    application = DefaultApplication(
-        command=[
-            sys.executable,
-            '-c',
-            "from pathlib import Path; Path('test.txt').touch()",
-        ]
-    )
+    application = DummyApplication(command=['ignored'])
 
     science = ScienceSetup(
         application=application,
@@ -155,7 +169,7 @@ class _DummyLauncher(Launcher):
         return LaunchData(run_dir=run_dir, cmd=cmd)
 
 
-@pytest.mark.parametrize('job', [Job(tasks=2)])
+@pytest.mark.parametrize('job_override', [None, Job(tasks=2, account='override')])
 @pytest.mark.parametrize('use_arch', [False, True])
 @pytest.mark.parametrize(
     'use_launcher, launcher_flags',
@@ -163,7 +177,7 @@ class _DummyLauncher(Launcher):
 )
 @pytest.mark.parametrize('use_tech', [True, False])
 def test_defaultbenchmark_run(
-    tmp_path, test_run_setup, job, use_arch, use_launcher, launcher_flags, use_tech
+    tmp_path, test_run_setup, job_override, use_arch, use_launcher, launcher_flags, use_tech
 ):
     """
     Test the Benchmark.run function.
@@ -182,23 +196,20 @@ def test_defaultbenchmark_run(
     )
 
     science, tech = test_run_setup
+    job = Job(tasks=5, account='default')
 
     if use_tech:
-        benchmark = Benchmark(science=science, tech=tech)
-
+        setup = BenchmarkSetup(science=science, job=job, tech=tech)
     else:
-        benchmark = Benchmark(science=science)
-
-    # Create the run directory and check that all files in file list
-    # actually exist.
-    benchmark.setup_rundir(tmp_path)
+        setup = BenchmarkSetup(science=science, job=job)
+    benchmark = Benchmark(setup=setup)
 
     if arch is None and launcher is None:
         with pytest.raises(ValueError):
-            benchmark.run(tmp_path, job, arch, launcher, launcher_flags)
+            benchmark.run(tmp_path, job_override, arch, launcher, launcher_flags)
         return
 
-    benchmark.run(tmp_path, job, arch, launcher, launcher_flags)
+    benchmark.run(tmp_path, job_override, arch, launcher, launcher_flags)
 
     if launcher is not None:
         assert launcher._prepare_called is True
@@ -207,4 +218,12 @@ def test_defaultbenchmark_run(
     elif arch is not None:
         assert arch.get_default_launcher()._prepare_called is True
 
-    assert (tmp_path / 'test.txt').exists()
+    output_file = tmp_path / 'test.txt'
+    assert (output_file).exists()
+    with output_file.open('r') as f:
+        config = yaml.safe_load(f)
+    executed_job = Job.from_config(config)
+    if job_override:
+        assert executed_job == job_override
+    else:
+        assert executed_job == job
