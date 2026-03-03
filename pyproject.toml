@@ -28,6 +28,7 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = [
+  "pre-commit",
   "pytest",
   "pytest-cov",
   "pylint",
