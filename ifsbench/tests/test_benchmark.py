@@ -124,29 +124,41 @@ class DummyApplication(DefaultApplication):
             sys.executable,
             '-c',
             'from pathlib import Path; import yaml; '
-            'f = open("test.txt", "w"); '
+            f'f = open("{self.command[0]}", "w"); '
             f'yaml.dump({job_config}, f); '
             'f.close()',
         ]
         return command
 
 
-@pytest.fixture(name='test_run_setup')
-def fixture_test_run_setup():
+@pytest.fixture(name='tech_setup_application')
+def fixture_tech_setup_application(request):
+    tech_application = None
+    if request.param:
+        tech_application = DummyApplication(command=['tech.txt'])
+
+    tech = TechSetup(
+        application=tech_application,
+        env_handlers=[EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')],
+    )
+
+    return tech
+
+
+@pytest.fixture(name='test_run_science_setup')
+def fixture_test_run_science_setup():
     env_handlers = [
         EnvHandler(mode=EnvOperation.CLEAR),
     ]
 
-    application = DummyApplication(command=['ignored'])
+    science_application = DummyApplication(command=['science.txt'])
 
     science = ScienceSetup(
-        application=application,
+        application=science_application,
         env_handlers=env_handlers,
     )
 
-    tech = TechSetup(env_handlers=[EnvHandler(mode=EnvOperation.SET, key='KEY', value='VALUE')])
-
-    return science, tech
+    return science
 
 
 class _DummyLauncher(Launcher):
@@ -175,9 +187,20 @@ class _DummyLauncher(Launcher):
     'use_launcher, launcher_flags',
     [(False, None), (True, None), (True, ['something'])],
 )
-@pytest.mark.parametrize('use_tech', [True, False])
+@pytest.mark.parametrize(
+    'use_tech, tech_setup_application',
+    [(True, True), (True, False), (False, False)],
+    indirect=['tech_setup_application'],
+)
 def test_defaultbenchmark_run(
-    tmp_path, test_run_setup, job_override, use_arch, use_launcher, launcher_flags, use_tech
+    tmp_path,
+    test_run_science_setup,
+    job_override,
+    use_arch,
+    use_launcher,
+    launcher_flags,
+    use_tech,
+    tech_setup_application,
 ):
     """
     Test the Benchmark.run function.
@@ -195,7 +218,8 @@ def test_defaultbenchmark_run(
         else None
     )
 
-    science, tech = test_run_setup
+    science = test_run_science_setup
+    tech = tech_setup_application
     job = Job(tasks=5, account='default')
 
     if use_tech:
@@ -218,9 +242,13 @@ def test_defaultbenchmark_run(
     elif arch is not None:
         assert arch.get_default_launcher()._prepare_called is True
 
-    output_file = tmp_path / 'test.txt'
-    assert (output_file).exists()
-    with output_file.open('r') as f:
+    # Confirm the correct application was run, ScienceSetup vs TechSetup
+    out_file = 'tech.txt' if tech.application else 'science.txt'
+    output_path = tmp_path / out_file
+    assert (output_path).exists()
+
+    # Confirm the correct job was run, the benchmark member or the override
+    with output_path.open('r') as f:
         config = yaml.safe_load(f)
     executed_job = Job.from_config(config)
     if job_override:
