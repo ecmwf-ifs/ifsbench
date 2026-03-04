@@ -25,7 +25,7 @@ from ifsbench.job import Job
 from ifsbench.launch import Launcher
 
 
-__all__ = ['ScienceSetup', 'TechSetup', 'Benchmark']
+__all__ = ['ScienceSetup', 'TechSetup', 'Benchmark', 'BenchmarkSetup']
 
 
 class ScienceSetup(SerialisationMixin):
@@ -82,6 +82,18 @@ class TechSetup(SerialisationMixin):
     env_handlers: List[EnvHandler] = Field(default_factory=list)
 
 
+class BenchmarkSetup(SerialisationMixin):
+    #: The main (scientific) benchmark setup that describes _what_ gets benchmarked
+    # and _which data_ is used.
+    science: ScienceSetup
+
+    #: The parallel setup for the benchmark.
+    job: Job
+
+    #: Additional technical details that don't alter the results.
+    tech: Optional[TechSetup] = None
+
+
 class BenchmarkSummary(SerialisationMixin):
     """
     Summary of a benchmark run.
@@ -107,12 +119,8 @@ class Benchmark(SerialisationMixin):
       3. Create a result object, using the data in the run directory.
     """
 
-    #: The main (scientific) benchmark setup that describes _what_ gets benchmarked
-    # and _which data_ is used.
-    science: ScienceSetup
-
-    #: Additional technical details that don't alter the results.
-    tech: Optional[TechSetup] = None
+    #: The science and tech setup to run with the given job. The job can be overridden when running.
+    setup: BenchmarkSetup
 
     def setup_rundir(self, run_dir: Path, force: bool = False):
         """
@@ -137,9 +145,9 @@ class Benchmark(SerialisationMixin):
         if exists and not force:
             return
 
-        handlers = self.science.data_handlers_init
-        if self.tech:
-            handlers += self.tech.data_handlers_init
+        handlers = self.setup.science.data_handlers_init
+        if self.setup.tech:
+            handlers += self.setup.tech.data_handlers_init
 
         for handler in handlers:
             handler.execute(run_dir)
@@ -147,7 +155,7 @@ class Benchmark(SerialisationMixin):
     def run(
         self,
         run_dir: Path,
-        job: Job,
+        job: Optional[Job] = None,
         arch: Optional[Arch] = None,
         launcher: Optional[Launcher] = None,
         launcher_flags: Optional[List[str]] = None,
@@ -160,7 +168,7 @@ class Benchmark(SerialisationMixin):
         run_dir: pathlib.Path
             The path to the run directory.
         job: Job
-            The parallel setup for the benchmark.
+            The parallel setup for the benchmark. If None, the Job from the BenchmarkSetup is used.
         arch: Arch
             A specific architecture that is used.
         launcher: Launcher
@@ -175,11 +183,17 @@ class Benchmark(SerialisationMixin):
             of the benchmark.
         """
 
+        # Setup run directory without replacing the current contents if it already exists.
+        self.setup_rundir(run_dir, force=False)
+
         env_pipeline = DefaultEnvPipeline(
-            handlers=self.science.env_handlers, env_initial=os.environ
+            handlers=self.setup.science.env_handlers, env_initial=os.environ
         )
-        if self.tech:
-            env_pipeline.add(self.tech.env_handlers)
+        if self.setup.tech:
+            env_pipeline.add(self.setup.tech.env_handlers)
+
+        if not job:
+            job = self.setup.job
 
         if arch:
             arch_result = arch.process_job(job)
@@ -196,17 +210,17 @@ class Benchmark(SerialisationMixin):
         if launcher is None:
             raise ValueError('No launcher was specified!')
 
-        application = self.science.application
-        if self.tech is not None and self.tech.application is not None:
-            application = self.tech.application
+        application = self.setup.science.application
+        if self.setup.tech is not None and self.setup.tech.application is not None:
+            application = self.setup.tech.application
 
         cmd = application.get_command(run_dir, job)
 
         library_paths = application.get_library_paths(run_dir, job)
 
-        data_handlers = list(self.science.data_handlers_runtime)
-        if self.tech:
-            data_handlers += self.tech.data_handlers_runtime
+        data_handlers = list(self.setup.science.data_handlers_runtime)
+        if self.setup.tech:
+            data_handlers += self.setup.tech.data_handlers_runtime
         data_handlers += application.get_data_handlers(run_dir, job)
 
         for handler in data_handlers:
