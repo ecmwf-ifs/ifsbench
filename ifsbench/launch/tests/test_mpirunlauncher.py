@@ -123,7 +123,7 @@ def test_mpirunLauncher_prepare_run_dir(
             [],
             'test_env_none',
             [],
-            ['mpirun', '-n', '64', '--map-by', 'core:PE=4', 'ls', '-l'],
+            ['mpirun', '-n', '64', '--map-by', 'slot:PE=4', 'ls', '-l'],
         ),
         (
             ['something'],

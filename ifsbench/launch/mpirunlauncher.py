@@ -63,6 +63,9 @@ class MpirunLauncher(Launcher):
         # If multithreading is used, we have to specify the number of threads
         # per process in the map_by statement.
         if job.cpus_per_task:
+            if map_by == 'core':
+                map_by = 'slot'
+
             return ['--map-by', f'{map_by}:PE={job.cpus_per_task}']
 
         return ['--map-by', f'{map_by}']
