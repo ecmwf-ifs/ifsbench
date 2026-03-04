@@ -1,0 +1,8 @@
+repos:
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.15.4
+  hooks:
+    # Run the formatter (only on the ifsbench directory).
+    - id: ruff-format
+      files: ^ifsbench/
