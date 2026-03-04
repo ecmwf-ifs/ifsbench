@@ -63,6 +63,11 @@ class MpirunLauncher(Launcher):
         # If multithreading is used, we have to specify the number of threads
         # per process in the map_by statement.
         if job.cpus_per_task:
+            # Using --map-by core and specifying more than one thread does not
+            # seem to work with OpenMPI. There is some discussion here:
+            # https://github.com/open-mpi/ompi/issues/7717 but I am unable to
+            # find a really good explanation for how to avoid this.
+            # As a fix, we replace `map-by core` by `map-by slot` in this case.
             if map_by == 'core':
                 map_by = 'slot'
 
