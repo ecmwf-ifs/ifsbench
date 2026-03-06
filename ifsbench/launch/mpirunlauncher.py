@@ -59,8 +59,8 @@ class MpirunLauncher(Launcher):
             if job.cpus_per_task:
                 return ['--map-by', f'{map_by}:PE={job.cpus_per_task}']
             return ['--map-by', f'{map_by}']
-        else:
-            return []
+
+        return []
 
     def prepare(
         self,
