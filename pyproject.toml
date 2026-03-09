@@ -30,6 +30,7 @@ dependencies = [
 tests = [
   "pre-commit",
   "pytest",
+  "pytest-asyncio",
   "pytest-cov",
   "pylint",
   "ruff",

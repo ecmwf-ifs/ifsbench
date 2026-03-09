@@ -9,19 +9,20 @@
 Collection of utility routines
 """
 
+import asyncio
 from dataclasses import dataclass
+from enum import auto, Enum
 from io import StringIO
 from os import environ, getcwd
 from pathlib import Path
 from pprint import pformat
-from subprocess import Popen, PIPE
 import sys
 from typing import List
 
 from ifsbench.logging import debug, info
 
 
-__all__ = ['ExecuteResult', 'execute', 'auto_post_mortem_debugger']
+__all__ = ['ExecuteResult', 'execute', 'execute_async', 'auto_post_mortem_debugger']
 
 
 @dataclass
@@ -60,8 +61,37 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     ExecuteResult:
         The results of the execution (stdout, stderr, exit code)
     """
-    cwd = kwargs.pop('cwd', None)
-    env = kwargs.pop('env', None)
+
+    async def _async_task(command: List[str], **kwargs):
+        task = asyncio.create_task(execute_async(command, **kwargs))
+        result = await task
+        return result
+
+    return asyncio.run(_async_task(command, **kwargs))
+
+
+async def execute_async(command: List[str], **kwargs) -> ExecuteResult:
+    """
+    Async execution of a single command with a given directory or environment.
+
+    Parameters
+    ----------
+    command : list of str
+        The (components of the) command to execute.
+    cwd : str, optional
+        Directory in which to execute command.
+    dryrun : bool, optional
+        Do not actually run the command but log it (default: `False`).
+    logfile : str, optional
+        Write stdout to this file (default: `None`).
+
+    Returns
+    -------
+    ExecuteResult:
+        The results of the execution (stdout, stderr, exit code)
+    """
+    cwd = kwargs.get('cwd', None)
+    env = kwargs.get('env', None)
     dryrun = kwargs.pop('dryrun', False)
     logfile = kwargs.pop('logfile', None)
 
@@ -86,8 +116,6 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
         info('[ifsbench] Environment: ' + str(run_env))
         return ExecuteResult(stdout='', stderr='', exit_code=0)
 
-    cmd_args = {'cwd': cwd, 'env': run_env, 'text': True, 'stdout': PIPE, 'stderr': PIPE}
-
     if logfile:
         # If we're file-logging, intercept via pipe
         _log_file = Path(logfile).open('w', encoding='utf-8')  # pylint: disable=consider-using-with
@@ -97,55 +125,48 @@ def execute(command: List[str], **kwargs) -> ExecuteResult:
     stdout = StringIO()
     stderr = StringIO()
 
-    def _read_and_multiplex(p: Popen, stdout: StringIO, stderr: StringIO):
-        """
-        Read from ``p.stdout.read()`` and ``p.stderr.read()`` and
-          * forward it to sys.stdout/sys.stderr.
-          * add it to the stdout/stderr streams.
-          * (Optional) write it to the logfile.
-        """
-        line = p.stdout.read()
-        if line:
-            stdout.write(line)
+    class StreamType(Enum):
+        STDOUT = auto()
+        STDERR = auto()
 
-            # Forward to user output
-            sys.stdout.write(line)
+    result_streams = {
+        StreamType.STDOUT: (sys.stdout, stdout),
+        StreamType.STDERR: (sys.stderr, stderr),
+    }
+
+    async def _read_and_multiplex(stream: asyncio.StreamReader, stream_type: StreamType):
+        """
+        Redirect output to both file and terminal
+        """
+        while True:
+            line = await stream.readline()
+            if not line:
+                break
+            decoded = line.decode()  # .strip()
+            for st in result_streams[stream_type]:
+                st.write(decoded)
 
             if logfile:
                 # Also flush to logfile
-                _log_file.write(line)
+                _log_file.write(decoded)
                 _log_file.flush()
 
-        line = p.stderr.read()
-        if line:
-            stderr.write(line)
+    # Execute with our args and outside args
+    proc = await asyncio.create_subprocess_exec(
+        *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, **kwargs
+    )
 
-            # Forward to user output
-            sys.stderr.write(line)
+    task_out = asyncio.create_task(_read_and_multiplex(proc.stdout, StreamType.STDOUT))
+    task_err = asyncio.create_task(_read_and_multiplex(proc.stderr, StreamType.STDERR))
+    await proc.wait()
+    await task_out
+    await task_err
+    if _log_file:
+        _log_file.close()
 
-            if logfile:
-                # Also flush to logfile
-                _log_file.write(line)
-                _log_file.flush()
-
-    ret = 1
-    try:
-        # Execute with our args and outside args
-        with Popen(command, **cmd_args, **kwargs) as p:
-            # Intercept p.stdout and multiplex to file and sys.stdout
-            while p.poll() is None:
-                _read_and_multiplex(p, stdout, stderr)
-
-            # Check for successful completion
-            ret = p.wait()
-
-            # Read one last time to catch racy process output
-            _read_and_multiplex(p, stdout, stderr)
-    finally:
-        if _log_file:
-            _log_file.close()
-
-    return ExecuteResult(stdout=stdout.getvalue(), stderr=stderr.getvalue(), exit_code=ret)
+    return ExecuteResult(
+        stdout=stdout.getvalue(), stderr=stderr.getvalue(), exit_code=proc.returncode
+    )
 
 
 def as_tuple(item, dtype=None, length=None):

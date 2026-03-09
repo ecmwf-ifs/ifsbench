@@ -15,6 +15,8 @@ import pytest
 
 from ifsbench.launch import LaunchData
 
+pytest_plugins = ('pytest_asyncio',)
+
 
 @pytest.fixture(name='python_exec')
 def fixture_python():
@@ -42,7 +44,8 @@ def fixture_python():
         ),
     ],
 )
-def test_launchdata_launch_python(tmp_path, python_exec, flags, env, files):
+@pytest.mark.asyncio
+async def test_launchdata_launch_python(tmp_path, python_exec, flags, env, files):
     """
     Test the LaunchData.launch method.
 
@@ -52,7 +55,7 @@ def test_launchdata_launch_python(tmp_path, python_exec, flags, env, files):
     """
     launch_data = LaunchData(run_dir=tmp_path, env=env, cmd=[python_exec] + flags)
 
-    launch_data.launch()
+    await launch_data.launch()
 
     for file in files:
         assert (tmp_path / file).exists()

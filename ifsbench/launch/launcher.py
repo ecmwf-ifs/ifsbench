@@ -20,7 +20,7 @@ from ifsbench.serialisation_mixin import (
 from ifsbench.env import EnvPipeline
 from ifsbench.job import Job
 from ifsbench.logging import debug, info
-from ifsbench.util import execute, ExecuteResult
+from ifsbench.util import execute_async, ExecuteResult
 
 __all__ = ['CompositeLauncher', 'LaunchData', 'Launcher']
 
@@ -61,7 +61,7 @@ class LaunchData:
         for key, value in self.env.items():
             debug(f'\t{key}={value}')
 
-        return execute(
+        return execute_async(
             command=self.cmd,
             cwd=self.run_dir,
             env=self.env,

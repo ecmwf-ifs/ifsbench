@@ -9,6 +9,7 @@
 Generic benchmark implementation.
 """
 
+import asyncio
 import os
 from pathlib import Path
 from time import time
@@ -145,6 +146,8 @@ class Benchmark(SerialisationMixin):
         if exists and not force:
             return
 
+        os.makedirs(run_dir, exist_ok=True)
+
         handlers = self.setup.science.data_handlers_init
         if self.setup.tech:
             handlers += self.setup.tech.data_handlers_init
@@ -152,7 +155,7 @@ class Benchmark(SerialisationMixin):
         for handler in handlers:
             handler.execute(run_dir)
 
-    def run(
+    async def _run_async(
         self,
         run_dir: Path,
         job: Optional[Job] = None,
@@ -231,10 +234,59 @@ class Benchmark(SerialisationMixin):
         launch = launcher.prepare(run_dir, job, cmd, library_paths, env_pipeline, launcher_flags)
 
         start = time()
-        result = launch.launch()
+        result_task = launch.launch()
         elapsed = time() - start
 
+        result = await result_task
         if result.exit_code != 0:
             raise RuntimeError('Launching the executable failed!')
 
         return BenchmarkSummary(stdout=result.stdout, stderr=result.stderr, walltime=elapsed)
+
+    async def _run_async_task(
+        self,
+        run_dir: Path,
+        job: Optional[Job] = None,
+        arch: Optional[Arch] = None,
+        launcher: Optional[Launcher] = None,
+        launcher_flags: Optional[List[str]] = None,
+    ) -> BenchmarkSummary:
+
+        task = asyncio.create_task(self._run_async(run_dir, job, arch, launcher, launcher_flags))
+
+        result = await task
+        return result
+
+    def run(
+        self,
+        run_dir: Path,
+        job: Optional[Job] = None,
+        arch: Optional[Arch] = None,
+        launcher: Optional[Launcher] = None,
+        launcher_flags: Optional[List[str]] = None,
+    ) -> BenchmarkSummary:
+        """
+        Run the benchmark.
+
+        Parameters
+        ----------
+        run_dir: pathlib.Path
+            The path to the run directory.
+        job: Job
+            The parallel setup for the benchmark. If None, the Job from the BenchmarkSetup is used.
+        arch: Arch
+            A specific architecture that is used.
+        launcher: Launcher
+            A custom launcher to use. If None, the arch launcher is used.
+        launcher_flags: list[str]
+            Additional flags to be added to the launcher invocation.
+
+        Returns
+        -------
+        BenchmarkSummary:
+            BenchmarkSummary object that holds the output and the walltime
+            of the benchmark.
+        """
+
+        task = self._run_async_task(run_dir, job, arch, launcher, launcher_flags)
+        return asyncio.run(task)
