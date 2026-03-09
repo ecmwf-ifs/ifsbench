@@ -123,7 +123,15 @@ def test_mpirunLauncher_prepare_run_dir(
             [],
             'test_env_none',
             [],
-            ['mpirun', '-n', '64', '--map-by', 'core:PE=4', 'ls', '-l'],
+            ['mpirun', '-n', '64', 'ls', '-l'],
+        ),
+        (
+            ['ls', '-l'],
+            {'tasks': 64, 'cpus_per_task': 4, 'distribute_local': CpuDistribution.DISTRIBUTE_BLOCK},
+            [],
+            'test_env_none',
+            [],
+            ['mpirun', '-n', '64', '--map-by', 'slot:PE=4', 'ls', '-l'],
         ),
         (
             ['something'],

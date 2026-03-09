@@ -34,7 +34,7 @@ class MpirunLauncher(Launcher):
     }
 
     _distribution_options_map = {
-        CpuDistribution.DISTRIBUTE_BLOCK: 'core',
+        CpuDistribution.DISTRIBUTE_BLOCK: 'slot',
         CpuDistribution.DISTRIBUTE_CYCLIC: 'numa',
     }
 
@@ -45,27 +45,22 @@ class MpirunLauncher(Launcher):
             CpuDistribution.DISTRIBUTE_USER,
             None,
         ]
-        if hasattr(job, 'distribute_remote') and job.distribute_remote not in do_nothing:
-            warning('Specified remote distribution option ignored in MpirunLauncher')
 
-        # By default use core mapping. At least that's the default in the
-        # OpenMPI implementation
-        # (https://docs.open-mpi.org/en/main/man-openmpi/man1/mpirun.1.html#label-schizo-ompi-map-by).
-        map_by = 'core'
+        # Ignore remote distribution options. Mpirun doesn't distinguish
+        # between local/remote distribution as far as I know.
+        if job.distribute_remote is not None:
+            warning('Distribute_remote options is ignored in MpirunLauncher')
 
         if job.distribute_local and job.distribute_local not in do_nothing:
+            # Use map-by to control the distribution. If threads are used, we
+            # also have to set the PE:number-of-threads option.
+
             map_by = self._distribution_options_map[job.distribute_local]
-        elif job.cpus_per_task is None:
-            # If no local distribution must be set and the number of threads
-            # isn't specified, we don't have to add any flags.
-            return []
+            if job.cpus_per_task:
+                return ['--map-by', f'{map_by}:PE={job.cpus_per_task}']
+            return ['--map-by', f'{map_by}']
 
-        # If multithreading is used, we have to specify the number of threads
-        # per process in the map_by statement.
-        if job.cpus_per_task:
-            return ['--map-by', f'{map_by}:PE={job.cpus_per_task}']
-
-        return ['--map-by', f'{map_by}']
+        return []
 
     def prepare(
         self,
