@@ -234,7 +234,8 @@ def test_defaultbenchmark_run(
         return
 
     result = benchmark.run(tmp_path, job_override, arch, launcher, launcher_flags)
-    assert result.walltime > 0
+    print(f'[DEBUG] walltime: {result.walltime}')
+    assert result.walltime > 1
 
     if launcher is not None:
         assert launcher._prepare_called is True
@@ -256,3 +257,83 @@ def test_defaultbenchmark_run(
         assert executed_job == job_override
     else:
         assert executed_job == job
+
+
+@pytest.mark.parametrize('job_override', [None, Job(tasks=2, account='override')])
+@pytest.mark.parametrize('use_arch', [False, True])
+@pytest.mark.parametrize(
+    'use_launcher, launcher_flags',
+    [(False, None), (True, None), (True, ['something'])],
+)
+@pytest.mark.parametrize(
+    'use_tech, tech_setup_application',
+    [(True, True), (True, False), (False, False)],
+    indirect=['tech_setup_application'],
+)
+@pytest.mark.asyncio
+async def test_benchmark_run_async(
+    tmp_path,
+    test_run_science_setup,
+    job_override,
+    use_arch,
+    use_launcher,
+    launcher_flags,
+    use_tech,
+    tech_setup_application,
+):
+    """
+    Test the Benchmark.run function.
+    """
+
+    launcher = _DummyLauncher() if use_launcher else None
+    arch = (
+        DefaultArch.from_config(
+            {
+                'launcher': {'class_name': '_DummyLauncher'},
+                'cpu_config': CpuConfiguration(),
+            }
+        )
+        if use_arch
+        else None
+    )
+
+    science = test_run_science_setup
+    tech = tech_setup_application
+    job = Job(tasks=5, account='default')
+
+    if use_tech:
+        setup = BenchmarkSetup(science=science, job=job, tech=tech)
+    else:
+        setup = BenchmarkSetup(science=science, job=job)
+    benchmark = Benchmark(setup=setup)
+
+    if arch is None and launcher is None:
+        with pytest.raises(ValueError):
+            benchmark.run(tmp_path, job_override, arch, launcher, launcher_flags)
+        return
+
+    result = await benchmark.run_async(tmp_path, job_override, arch, launcher, launcher_flags)
+    print(f'[DEBUG] walltime: {result.walltime}')
+    assert result.walltime > 1
+
+    if launcher is not None:
+        assert launcher._prepare_called is True
+        if arch is not None:
+            assert arch.get_default_launcher()._prepare_called is False
+    elif arch is not None:
+        assert arch.get_default_launcher()._prepare_called is True
+
+    # Confirm the correct application was run, ScienceSetup vs TechSetup
+    out_file = 'tech.txt' if tech.application else 'science.txt'
+    output_path = tmp_path / out_file
+    assert (output_path).exists()
+
+    # Confirm the correct job was run, the benchmark member or the override
+    with output_path.open('r') as f:
+        config = yaml.safe_load(f)
+    executed_job = Job.from_config(config)
+    if job_override:
+        assert executed_job == job_override
+    else:
+        assert executed_job == job
+        

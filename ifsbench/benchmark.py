@@ -218,7 +218,7 @@ class Benchmark(SerialisationMixin):
         launcher_flags: Optional[List[str]] = None,
     ) -> BenchmarkSummary:
         """
-        Run the benchmark.
+        Run the benchmark asynchronously.
 
         Parameters
         ----------

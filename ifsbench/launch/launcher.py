@@ -71,7 +71,7 @@ class LaunchData:
 
     def launch_async(self) -> ExecuteResult:
         """
-        Launch the actual executable.
+        Launch the actual executable asynchronously.
 
         Returns
         -------
