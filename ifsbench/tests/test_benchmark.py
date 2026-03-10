@@ -123,10 +123,11 @@ class DummyApplication(DefaultApplication):
         command = [
             sys.executable,
             '-c',
-            'from pathlib import Path; import yaml; '
+            'from pathlib import Path; import yaml; import time; '
             f'f = open("{self.command[0]}", "w"); '
             f'yaml.dump({job_config}, f); '
-            'f.close()',
+            'f.close(); '
+            'time.sleep(0.2); ',
         ]
         return command
 
@@ -234,8 +235,7 @@ def test_defaultbenchmark_run(
         return
 
     result = benchmark.run(tmp_path, job_override, arch, launcher, launcher_flags)
-    print(f'[DEBUG] walltime: {result.walltime}')
-    assert result.walltime > 1
+    assert result.walltime > 0.2
 
     if launcher is not None:
         assert launcher._prepare_called is True
@@ -313,8 +313,7 @@ async def test_benchmark_run_async(
         return
 
     result = await benchmark.run_async(tmp_path, job_override, arch, launcher, launcher_flags)
-    print(f'[DEBUG] walltime: {result.walltime}')
-    assert result.walltime > 1
+    assert result.walltime > 0.2
 
     if launcher is not None:
         assert launcher._prepare_called is True
@@ -336,4 +335,3 @@ async def test_benchmark_run_async(
         assert executed_job == job_override
     else:
         assert executed_job == job
-        

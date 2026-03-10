@@ -11,7 +11,6 @@ Generic benchmark implementation.
 
 import os
 from pathlib import Path
-from time import time
 from typing import List, Optional
 
 from pydantic import Field
@@ -241,15 +240,15 @@ class Benchmark(SerialisationMixin):
         """
 
         launch = self._prepare_for_launch(run_dir, job, arch, launcher, launcher_flags)
-        start = time()
         result_task = launch.launch_async()
-        elapsed = time() - start
 
         result = await result_task
         if result.exit_code != 0:
             raise RuntimeError('Launching the executable failed!')
 
-        return BenchmarkSummary(stdout=result.stdout, stderr=result.stderr, walltime=elapsed)
+        return BenchmarkSummary(
+            stdout=result.stdout, stderr=result.stderr, walltime=result.wall_time
+        )
 
     def run(
         self,
@@ -283,11 +282,11 @@ class Benchmark(SerialisationMixin):
         """
 
         launch = self._prepare_for_launch(run_dir, job, arch, launcher, launcher_flags)
-        start = time()
         result = launch.launch()
-        elapsed = time() - start
 
         if result.exit_code != 0:
             raise RuntimeError('Launching the executable failed!')
 
-        return BenchmarkSummary(stdout=result.stdout, stderr=result.stderr, walltime=elapsed)
+        return BenchmarkSummary(
+            stdout=result.stdout, stderr=result.stderr, walltime=result.wall_time
+        )

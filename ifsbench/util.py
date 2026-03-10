@@ -17,6 +17,7 @@ from os import environ, getcwd
 from pathlib import Path
 from pprint import pformat
 import sys
+from time import time
 from typing import List
 
 from ifsbench.logging import debug, info
@@ -39,6 +40,9 @@ class ExecuteResult:
 
     #: The return code of the execution.
     exit_code: int
+
+    # Run time of the execution in [s].
+    wall_time: int
 
 
 def execute(command: List[str], **kwargs) -> ExecuteResult:
@@ -90,6 +94,8 @@ async def execute_async(command: List[str], **kwargs) -> ExecuteResult:
     ExecuteResult:
         The results of the execution (stdout, stderr, exit code)
     """
+    start = time()
+
     cwd = kwargs.get('cwd', None)
     env = kwargs.get('env', None)
     dryrun = kwargs.pop('dryrun', False)
@@ -114,7 +120,8 @@ async def execute_async(command: List[str], **kwargs) -> ExecuteResult:
     if dryrun:
         # Only print the environment when in dryrun mode.
         info('[ifsbench] Environment: ' + str(run_env))
-        return ExecuteResult(stdout='', stderr='', exit_code=0)
+        wall_time = time() - start
+        return ExecuteResult(stdout='', stderr='', exit_code=0, wall_time=wall_time)
 
     if logfile:
         # If we're file-logging, intercept via pipe
@@ -164,8 +171,12 @@ async def execute_async(command: List[str], **kwargs) -> ExecuteResult:
     if _log_file:
         _log_file.close()
 
+    wall_time = time() - start
     return ExecuteResult(
-        stdout=stdout.getvalue(), stderr=stderr.getvalue(), exit_code=proc.returncode
+        stdout=stdout.getvalue(),
+        stderr=stderr.getvalue(),
+        exit_code=proc.returncode,
+        wall_time=wall_time,
     )
 
 

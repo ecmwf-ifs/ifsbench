@@ -97,6 +97,9 @@ def test_multibenchmark_run(tmp_path, benchmark_setup):
         start_times[times[0]] = int(times[1])
         end_times[times[2]] = int(times[3])
 
+        # Process execution should take longer than the 1s sleep time.
+        assert stat.walltime > 1
+
     # The execution sleeps for 1 s;
     # the 2nd and 3rd benchmark are expected to start before the 1st one end
     # so their start times have to be considerably less than 1000 ms.
