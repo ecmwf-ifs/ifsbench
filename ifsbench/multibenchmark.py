@@ -24,11 +24,22 @@ from ifsbench.serialisation_mixin import SerialisationMixin
 __all__ = ['MultiBenchmark']
 
 
+SUBDIRECTORY_PREFIX = 'run_'
+
+
 class MultiBenchmark(SerialisationMixin):
+    """
+    Run several benchmarks asynchronously.
+
+    Each benchmark is defined by one BenchmarkSetup;
+    the output will be in subdirectories of the specified
+    run directory, named 'run_<number>'.
+    """
+
     setups: List[BenchmarkSetup]
 
     def _sub_run_dir(self, run_dir: Path, run_number: int) -> Path:
-        sub_dir = 'run_' + str(run_number)
+        sub_dir = SUBDIRECTORY_PREFIX + str(run_number)
         return run_dir / sub_dir
 
     async def _run_async(
@@ -36,7 +47,7 @@ class MultiBenchmark(SerialisationMixin):
     ) -> List[BenchmarkSummary]:
         tasks = [
             asyncio.create_task(
-                benchmark._run_async(
+                benchmark.run_async(
                     self._sub_run_dir(run_dir, i), job, arch, launcher, launcher_flags
                 )
             )

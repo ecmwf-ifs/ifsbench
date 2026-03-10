@@ -15,8 +15,6 @@ import pytest
 
 from ifsbench.launch import LaunchData
 
-pytest_plugins = ('pytest_asyncio',)
-
 
 @pytest.fixture(name='python_exec')
 def fixture_python():
@@ -44,8 +42,7 @@ def fixture_python():
         ),
     ],
 )
-@pytest.mark.asyncio
-async def test_launchdata_launch_python(tmp_path, python_exec, flags, env, files):
+def test_launchdata_launch_python(tmp_path, python_exec, flags, env, files):
     """
     Test the LaunchData.launch method.
 
@@ -55,7 +52,42 @@ async def test_launchdata_launch_python(tmp_path, python_exec, flags, env, files
     """
     launch_data = LaunchData(run_dir=tmp_path, env=env, cmd=[python_exec] + flags)
 
-    await launch_data.launch()
+    launch_data.launch()
+
+    for file in files:
+        assert (tmp_path / file).exists()
+
+
+@pytest.mark.parametrize(
+    'flags, env, files',
+    [
+        (
+            ['-c', "from pathlib import Path; Path('test.txt').touch()"],
+            {},
+            ['test.txt'],
+        ),
+        (
+            [
+                '-c',
+                "import os; from pathlib import Path; Path(os.environ['TARGET_FILE']).touch()",
+            ],
+            {'TARGET_FILE': 'env_file.txt'},
+            ['env_file.txt'],
+        ),
+    ],
+)
+@pytest.mark.asyncio
+async def test_launchdata_launch_async_python(tmp_path, python_exec, flags, env, files):
+    """
+    Test the LaunchData.launch method.
+
+    To do this, we launch an external Python executable which creates files,
+    based on the given flags and environment variables. Afterwards we check the
+    existence of these files.
+    """
+    launch_data = LaunchData(run_dir=tmp_path, env=env, cmd=[python_exec] + flags)
+
+    await launch_data.launch_async()
 
     for file in files:
         assert (tmp_path / file).exists()

@@ -233,7 +233,8 @@ def test_defaultbenchmark_run(
             benchmark.run(tmp_path, job_override, arch, launcher, launcher_flags)
         return
 
-    benchmark.run(tmp_path, job_override, arch, launcher, launcher_flags)
+    result = benchmark.run(tmp_path, job_override, arch, launcher, launcher_flags)
+    assert result.walltime > 0
 
     if launcher is not None:
         assert launcher._prepare_called is True
