@@ -45,6 +45,9 @@ class MultiBenchmark(SerialisationMixin):
     async def _run_async(
         self, run_dir, job, arch, launcher, launcher_flags, benchmarks: List[Benchmark]
     ) -> List[BenchmarkSummary]:
+
+        run_dir.mkdir(parents=True, exist_ok=True)
+
         tasks = [
             asyncio.create_task(
                 benchmark.run_async(
