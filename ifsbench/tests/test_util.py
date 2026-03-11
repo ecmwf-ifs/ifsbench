@@ -21,8 +21,14 @@ def test_execute():
     Test some aspects of the execute() utility.
     """
     # Very trivial executables with success/error exit codes
-    assert execute('true').exit_code == 0
-    assert execute('false').exit_code == 1
+    assert execute(['true']).exit_code == 0
+    assert execute(['false']).exit_code == 1
+
+
+def test_execute_logfile():
+    """
+    Test some aspects of the execute() utility.
+    """
 
     with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
         # basic logfile capture validation
@@ -31,6 +37,16 @@ def test_execute():
         assert logfile.read_text() == 'foo bar\n'
         assert result.stdout == 'foo bar\n'
 
+
+def test_execute_env():
+    """
+    Test some aspects of the execute() utility.
+    """
+
+    with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
+        # basic logfile capture validation
+        logfile = Path(tmp_dir) / 'test_execute.log'
+
         # verify env
         execute(['env'], logfile=logfile, env={'FOO': 'bar', 'BAR': 'foo'})
         with logfile.open('r') as f:
@@ -38,14 +54,43 @@ def test_execute():
             assert 'FOO=bar' in env_str
             assert 'BAR=foo' in env_str
 
+
+def test_execute_no_output():
+    """
+    Test some aspects of the execute() utility.
+    """
+
+    with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
+        # basic logfile capture validation
+        logfile = Path(tmp_dir) / 'test_execute.log'
+
         # no output executable
         execute(['true'], logfile=logfile)
         assert logfile.read_text() == ''
+
+
+def test_execute_long_output():
+    """
+    Test some aspects of the execute() utility.
+    """
+    with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
+        # basic logfile capture validation
+        logfile = Path(tmp_dir) / 'test_execute.log'
 
         # Output a lot of lines
         text = 'abc\n' * 100
         execute(['echo', text], logfile=logfile)
         assert logfile.read_text() == text + '\n'
+
+
+def test_execute_stderr():
+    """
+    Test some aspects of the execute() utility.
+    """
+
+    with tempfile.TemporaryDirectory(prefix='ifsbench') as tmp_dir:
+        # basic logfile capture validation
+        logfile = Path(tmp_dir) / 'test_execute.log'
 
         # Write to stderr
         result = execute(

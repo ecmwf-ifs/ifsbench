@@ -20,7 +20,7 @@ from ifsbench.serialisation_mixin import (
 from ifsbench.env import EnvPipeline
 from ifsbench.job import Job
 from ifsbench.logging import debug, info
-from ifsbench.util import execute, ExecuteResult
+from ifsbench.util import execute, execute_async, ExecuteResult
 
 __all__ = ['CompositeLauncher', 'LaunchData', 'Launcher']
 
@@ -45,6 +45,13 @@ class LaunchData:
     cmd: List[str]
     env: dict = field(default_factory=dict)
 
+    def _launch_output(self):
+        info(f'Launch command {self.cmd} in {self.run_dir}.')
+
+        debug('Environment variables:')
+        for key, value in self.env.items():
+            debug(f'\t{key}={value}')
+
     def launch(self) -> ExecuteResult:
         """
         Launch the actual executable.
@@ -55,13 +62,25 @@ class LaunchData:
             The results of the execution.
         """
 
-        info(f'Launch command {self.cmd} in {self.run_dir}.')
-
-        debug('Environment variables:')
-        for key, value in self.env.items():
-            debug(f'\t{key}={value}')
-
+        self._launch_output()
         return execute(
+            command=self.cmd,
+            cwd=self.run_dir,
+            env=self.env,
+        )
+
+    def launch_async(self) -> ExecuteResult:
+        """
+        Launch the actual executable asynchronously.
+
+        Returns
+        -------
+        ifsbench.ExecuteResult:
+            The results of the execution.
+        """
+
+        self._launch_output()
+        return execute_async(
             command=self.cmd,
             cwd=self.run_dir,
             env=self.env,

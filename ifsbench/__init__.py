@@ -29,6 +29,7 @@ from ifsbench.launch import *  # noqa
 from ifsbench.logging import *  # noqa
 from ifsbench.namelist import *  # noqa
 from ifsbench.netcdf_file_reader import *  # noqa
+from ifsbench.multibenchmark import *  # noqa
 from ifsbench.paths import *  # noqa
 from ifsbench.pydantic_utils import *  # noqa
 from ifsbench.serialisation_mixin import *  # noqa
