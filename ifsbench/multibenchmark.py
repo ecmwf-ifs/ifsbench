@@ -11,13 +11,14 @@ Implementation for running multiple benchmarks in parallel.
 
 import asyncio
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 
 from ifsbench.arch import Arch
 from ifsbench.benchmark import Benchmark, BenchmarkSetup, BenchmarkSummary
 from ifsbench.job import Job
 from ifsbench.launch import Launcher
+from ifsbench.logging import debug
 from ifsbench.serialisation_mixin import SerialisationMixin
 
 
@@ -43,16 +44,17 @@ class MultiBenchmark(SerialisationMixin):
         return run_dir / sub_dir
 
     async def _run_async(
-        self, run_dir, job, arch, launcher, launcher_flags, benchmarks: List[Benchmark]
+        self,
+        benchmarks: List[Tuple[Benchmark, Path]],
+        job: Optional[Job] = None,
+        arch: Optional[Arch] = None,
+        launcher: Optional[Launcher] = None,
+        launcher_flags: Optional[List[str]] = None,
     ) -> List[BenchmarkSummary]:
-
-        run_dir.mkdir(parents=True, exist_ok=True)
 
         tasks = [
             asyncio.create_task(
-                benchmark.run_async(
-                    self._sub_run_dir(run_dir, i), job, arch, launcher, launcher_flags
-                )
+                benchmark[0].run_async(benchmark[1], job, arch, launcher, launcher_flags)
             )
             for i, benchmark in enumerate(benchmarks)
         ]
@@ -65,6 +67,7 @@ class MultiBenchmark(SerialisationMixin):
         arch: Optional[Arch] = None,
         launcher: Optional[Launcher] = None,
         launcher_flags: Optional[List[str]] = None,
+        max_parallel: Optional[int] = None,
     ) -> List[BenchmarkSummary]:
         """
         Run the benchmark.
@@ -81,6 +84,11 @@ class MultiBenchmark(SerialisationMixin):
             A custom launcher to use. If None, the arch launcher is used.
         launcher_flags: list[str]
             Additional flags to be added to the launcher invocation.
+        max_parallel: int
+            Maximum number of benchmark to run in parallel.
+            If None, all benchmark will be run together.
+            Otherwise, the list will be split into chunks of the specified size.
+            The benchmark in each chunk will run in parallel, and the chunks will run one after the other.
 
         Returns
         -------
@@ -89,10 +97,32 @@ class MultiBenchmark(SerialisationMixin):
             of the benchmarks.
         """
 
+        run_dir.mkdir(parents=True, exist_ok=True)
+
+        if max_parallel is not None and max_parallel < 1:
+            raise RuntimeError(
+                f'Invalid value for maximum value of parallel runs, must be larger 0, was max_parallel={max_parallel}'
+            )
+
         benchmarks = []
-        for setup in self.setups:
-            benchmarks.append(Benchmark(setup=setup))
+        for i, setup in enumerate(self.setups):
+            benchmarks.append((Benchmark(setup=setup), self._sub_run_dir(run_dir, i)))
 
-        tasks = self._run_async(run_dir, job, arch, launcher, launcher_flags, benchmarks)
+        chunks = []
 
-        return asyncio.run(tasks)
+        if max_parallel:
+            for i in range(0, len(benchmarks), max_parallel):
+                chunks.append(benchmarks[i : i + max_parallel])
+        else:
+            chunks.append(benchmarks)
+
+        debug(f'Running benchmarks in {len(chunks)} set(s) of size {len(chunks[0])}')
+
+        results = []
+
+        for chunk in chunks:
+            tasks = self._run_async(chunk, job, arch, launcher, launcher_flags)
+            chunk_result = asyncio.run(tasks)
+            results.extend(chunk_result)
+
+        return results
