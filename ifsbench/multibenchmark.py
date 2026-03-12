@@ -10,8 +10,9 @@ Implementation for running multiple benchmarks in parallel.
 """
 
 import asyncio
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 
 from ifsbench.arch import Arch
@@ -39,13 +40,18 @@ class MultiBenchmark(SerialisationMixin):
 
     setups: List[BenchmarkSetup]
 
+    @dataclass
+    class BenchmarkAndPath:
+        benchmark: Benchmark
+        run_dir: Path
+
     def _sub_run_dir(self, run_dir: Path, run_number: int) -> Path:
         sub_dir = SUBDIRECTORY_PREFIX + str(run_number)
         return run_dir / sub_dir
 
     async def _run_async(
         self,
-        benchmarks: List[Tuple[Benchmark, Path]],
+        benchmarks: List[BenchmarkAndPath],
         job: Optional[Job] = None,
         arch: Optional[Arch] = None,
         launcher: Optional[Launcher] = None,
@@ -54,9 +60,11 @@ class MultiBenchmark(SerialisationMixin):
 
         tasks = [
             asyncio.create_task(
-                benchmark[0].run_async(benchmark[1], job, arch, launcher, launcher_flags)
+                benchmark_and_path.benchmark.run_async(
+                    benchmark_and_path.run_dir, job, arch, launcher, launcher_flags
+                )
             )
-            for i, benchmark in enumerate(benchmarks)
+            for benchmark_and_path in benchmarks
         ]
         return await asyncio.gather(*tasks)
 
@@ -106,7 +114,11 @@ class MultiBenchmark(SerialisationMixin):
 
         benchmarks = []
         for i, setup in enumerate(self.setups):
-            benchmarks.append((Benchmark(setup=setup), self._sub_run_dir(run_dir, i)))
+            benchmarks.append(
+                self.BenchmarkAndPath(
+                    benchmark=Benchmark(setup=setup), run_dir=self._sub_run_dir(run_dir, i)
+                )
+            )
 
         chunks = []
 
