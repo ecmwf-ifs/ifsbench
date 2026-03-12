@@ -10,6 +10,7 @@ Implementation for running multiple benchmarks in parallel.
 """
 
 import asyncio
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
@@ -18,6 +19,7 @@ from ifsbench.arch import Arch
 from ifsbench.benchmark import Benchmark, BenchmarkSetup, BenchmarkSummary
 from ifsbench.job import Job
 from ifsbench.launch import Launcher
+from ifsbench.logging import debug
 from ifsbench.serialisation_mixin import SerialisationMixin
 
 
@@ -38,23 +40,31 @@ class MultiBenchmark(SerialisationMixin):
 
     setups: List[BenchmarkSetup]
 
+    @dataclass
+    class BenchmarkAndPath:
+        benchmark: Benchmark
+        run_dir: Path
+
     def _sub_run_dir(self, run_dir: Path, run_number: int) -> Path:
         sub_dir = SUBDIRECTORY_PREFIX + str(run_number)
         return run_dir / sub_dir
 
     async def _run_async(
-        self, run_dir, job, arch, launcher, launcher_flags, benchmarks: List[Benchmark]
+        self,
+        benchmarks: List[BenchmarkAndPath],
+        job: Optional[Job] = None,
+        arch: Optional[Arch] = None,
+        launcher: Optional[Launcher] = None,
+        launcher_flags: Optional[List[str]] = None,
     ) -> List[BenchmarkSummary]:
-
-        run_dir.mkdir(parents=True, exist_ok=True)
 
         tasks = [
             asyncio.create_task(
-                benchmark.run_async(
-                    self._sub_run_dir(run_dir, i), job, arch, launcher, launcher_flags
+                benchmark_and_path.benchmark.run_async(
+                    benchmark_and_path.run_dir, job, arch, launcher, launcher_flags
                 )
             )
-            for i, benchmark in enumerate(benchmarks)
+            for benchmark_and_path in benchmarks
         ]
         return await asyncio.gather(*tasks)
 
@@ -65,6 +75,7 @@ class MultiBenchmark(SerialisationMixin):
         arch: Optional[Arch] = None,
         launcher: Optional[Launcher] = None,
         launcher_flags: Optional[List[str]] = None,
+        max_parallel: Optional[int] = None,
     ) -> List[BenchmarkSummary]:
         """
         Run the benchmark.
@@ -81,6 +92,11 @@ class MultiBenchmark(SerialisationMixin):
             A custom launcher to use. If None, the arch launcher is used.
         launcher_flags: list[str]
             Additional flags to be added to the launcher invocation.
+        max_parallel: int
+            Maximum number of benchmark to run in parallel.
+            If None, all benchmark will be run together.
+            Otherwise, the list will be split into chunks of the specified size.
+            The benchmark in each chunk will run in parallel, and the chunks will run one after the other.
 
         Returns
         -------
@@ -89,10 +105,36 @@ class MultiBenchmark(SerialisationMixin):
             of the benchmarks.
         """
 
+        run_dir.mkdir(parents=True, exist_ok=True)
+
+        if max_parallel is not None and max_parallel < 1:
+            raise RuntimeError(
+                f'Invalid value for maximum value of parallel runs, must be larger 0, was max_parallel={max_parallel}'
+            )
+
         benchmarks = []
-        for setup in self.setups:
-            benchmarks.append(Benchmark(setup=setup))
+        for i, setup in enumerate(self.setups):
+            benchmarks.append(
+                self.BenchmarkAndPath(
+                    benchmark=Benchmark(setup=setup), run_dir=self._sub_run_dir(run_dir, i)
+                )
+            )
 
-        tasks = self._run_async(run_dir, job, arch, launcher, launcher_flags, benchmarks)
+        chunks = []
 
-        return asyncio.run(tasks)
+        if max_parallel:
+            for i in range(0, len(benchmarks), max_parallel):
+                chunks.append(benchmarks[i : i + max_parallel])
+        else:
+            chunks.append(benchmarks)
+
+        debug(f'Running benchmarks in {len(chunks)} set(s) of size {len(chunks[0])}')
+
+        results = []
+
+        for chunk in chunks:
+            tasks = self._run_async(chunk, job, arch, launcher, launcher_flags)
+            chunk_result = asyncio.run(tasks)
+            results.extend(chunk_result)
+
+        return results
