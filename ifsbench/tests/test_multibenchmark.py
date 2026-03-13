@@ -12,6 +12,7 @@ Some sanity tests the Benchmark implementation.
 import logging
 import re
 import sys
+from typing import Literal
 
 import pytest
 
@@ -23,7 +24,9 @@ from ifsbench import (
     Job,
     MultiBenchmark,
     ScienceSetup,
+    TechSetup,
 )
+from ifsbench.data import DataHandler
 from ifsbench.launch import Launcher, LaunchData
 
 
@@ -204,3 +207,152 @@ def test_multibenchmark_run_invalid_max_parallel(tmp_path, benchmark_setup):
         'Invalid value for maximum value of parallel runs, must be larger 0, was max_parallel=0'
         in str(exceptinfo.value)
     )
+
+
+def test_from_setup_lists():
+    # 2 science setups
+    science_setups = [
+        ScienceSetup(
+            application=DefaultApplication(
+                command=[
+                    str(i),
+                ]
+            )
+        )
+        for i in range(2)
+    ]
+
+    class DummyHandler(DataHandler):
+        handler_type: Literal['DummyHandler'] = 'DummyHandler'
+        dummy: str
+
+        def execute(self, wdir, **kwargs):
+            pass
+
+    # 3 tech setups
+    tech_setups = [
+        TechSetup(
+            data_handlers_init=[
+                DummyHandler(dummy=str(i)),
+            ]
+        )
+        for i in range(3)
+    ]
+
+    # 4 jobs
+    jobs = [Job(tasks=i) for i in range(1, 5)]
+
+    multi_benchmark = MultiBenchmark.from_setup_lists(science_setups, jobs, tech_setups)
+
+    setups = multi_benchmark.setups
+    assert len(setups) == 24
+
+    # Spot check some setups
+    assert setups[0].science == ScienceSetup(
+        application=DefaultApplication(
+            command=[
+                '0',
+            ]
+        )
+    )
+    assert setups[0].job == Job(tasks=1)
+    assert setups[0].tech == TechSetup(
+        data_handlers_init=[
+            DummyHandler(dummy='0'),
+        ]
+    )
+
+    assert setups[1].science == ScienceSetup(
+        application=DefaultApplication(
+            command=[
+                '0',
+            ]
+        )
+    )
+    assert setups[1].job == Job(tasks=1)
+    assert setups[1].tech == TechSetup(
+        data_handlers_init=[
+            DummyHandler(dummy='1'),
+        ]
+    )
+
+    assert setups[22].science == ScienceSetup(
+        application=DefaultApplication(
+            command=[
+                '1',
+            ]
+        )
+    )
+    assert setups[22].job == Job(tasks=4)
+    assert setups[22].tech == TechSetup(
+        data_handlers_init=[
+            DummyHandler(dummy='1'),
+        ]
+    )
+
+    assert setups[23].science == ScienceSetup(
+        application=DefaultApplication(
+            command=[
+                '1',
+            ]
+        )
+    )
+    assert setups[23].job == Job(tasks=4)
+    assert setups[23].tech == TechSetup(
+        data_handlers_init=[
+            DummyHandler(dummy='2'),
+        ]
+    )
+
+
+def test_from_setup_lists_no_tech():
+    # 2 science setups
+    science_setups = [
+        ScienceSetup(
+            application=DefaultApplication(
+                command=[
+                    str(i),
+                ]
+            )
+        )
+        for i in range(2)
+    ]
+
+    # 4 jobs
+    jobs = [Job(tasks=i) for i in range(1, 5)]
+
+    multi_benchmark = MultiBenchmark.from_setup_lists(science_setups, jobs)
+
+    setups = multi_benchmark.setups
+    assert len(setups) == 8
+
+    # Spot check some setups
+    assert setups[0].science == ScienceSetup(
+        application=DefaultApplication(
+            command=[
+                '0',
+            ]
+        )
+    )
+    assert setups[0].job == Job(tasks=1)
+    assert setups[0].tech is None
+
+    assert setups[1].science == ScienceSetup(
+        application=DefaultApplication(
+            command=[
+                '0',
+            ]
+        )
+    )
+    assert setups[1].job == Job(tasks=2)
+    assert setups[1].tech is None
+
+    assert setups[7].science == ScienceSetup(
+        application=DefaultApplication(
+            command=[
+                '1',
+            ]
+        )
+    )
+    assert setups[7].job == Job(tasks=4)
+    assert setups[7].tech is None

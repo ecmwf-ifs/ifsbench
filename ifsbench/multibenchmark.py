@@ -11,12 +11,13 @@ Implementation for running multiple benchmarks in parallel.
 
 import asyncio
 from dataclasses import dataclass
+import itertools
 from pathlib import Path
 from typing import List, Optional
 
 
 from ifsbench.arch import Arch
-from ifsbench.benchmark import Benchmark, BenchmarkSetup, BenchmarkSummary
+from ifsbench.benchmark import Benchmark, BenchmarkSetup, BenchmarkSummary, ScienceSetup, TechSetup
 from ifsbench.job import Job
 from ifsbench.launch import Launcher
 from ifsbench.logging import debug
@@ -78,7 +79,7 @@ class MultiBenchmark(SerialisationMixin):
         max_parallel: Optional[int] = None,
     ) -> List[BenchmarkSummary]:
         """
-        Run the benchmark.
+        Run the benchmarks.
 
         Parameters
         ----------
@@ -138,3 +139,38 @@ class MultiBenchmark(SerialisationMixin):
             results.extend(chunk_result)
 
         return results
+
+    @classmethod
+    def from_setup_lists(
+        cls,
+        science_setups: List[ScienceSetup],
+        jobs: List[Job],
+        tech_setups: Optional[List[TechSetup]] = None,
+    ) -> 'MultiBenchmark':
+        """
+        Create MultiBenchmark with setups from the cartesian product of the lists.
+
+        Parameters
+        ----------
+        science_setups: list[ScienceSetup]
+            The science setups used to create the BenchmarkSetup
+        jobs: list[Job]
+            The jobs used to create the BenchmarkSetup
+        tech_setups: list[TechSetup]
+            Optional tech setups used to create the BenchmarkSetup
+
+        Returns
+        -------
+        MultiBenchmark:
+            MultiBenchmark with list of setups based on all possible combinations of the input lists.
+        """
+
+        if tech_setups is None:
+            tech_setups = [None]
+        setup_combos = itertools.product(science_setups, jobs, tech_setups)
+
+        setups = [
+            BenchmarkSetup(science=science, job=job, tech=tech)
+            for science, job, tech in setup_combos
+        ]
+        return cls(setups=setups)
