@@ -168,7 +168,6 @@ class MultiBenchmark(SerialisationMixin):
         if tech_setups is None:
             tech_setups = [None]
         setup_combos = itertools.product(science_setups, jobs, tech_setups)
-        print(f'setup_combos: {setup_combos}')
 
         setups = [
             BenchmarkSetup(science=science, job=job, tech=tech)
