@@ -103,7 +103,11 @@ class DataFileStats(SerialisationMixin):
             else:
                 raise ValueError(f'Unable to determine data file type for {self.input_path}')
 
-        dss = reader_type().read_data(self.input_path)
+        try:
+            dss = reader_type().read_data(self.input_path)
+        except OSError as ose:
+            raise OSError(f'Unable to read file {self.input_path} as type {reader_type}') from ose
+
         for ds in dss:
             _stat_dims = list(set(ds.sizes.keys()) & self.stat_dims)
             stats_dss = [
