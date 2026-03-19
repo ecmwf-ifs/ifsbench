@@ -19,12 +19,27 @@ __all__ = ['PerturbationHandler', 'RandomNoise', 'UniformNoise', 'GaussianNoise'
 
 
 class RandomNoise(SubclassableSerialisationMixin):
+    """
+    Abstract class for generating arrays of random numbers.
+    """
+
     @abstractmethod
     def generate(self, rng: np.random.Generator, size: Union[int, Tuple[int]]) -> np.ndarray:
+        """
+        Generate array of specified size of random numbers using the provided Generator.
+        """
         return NotImplemented
 
 
 class UniformNoise(RandomNoise):
+    """
+    Generate uniform noise in the given interval [min_value, max_value)
+
+    Parameters:
+        min_value: The lower bound of the interval.
+        max_value: The upper bound of the interval.
+    """
+
     min_value: float
     max_value: float
 
@@ -33,6 +48,14 @@ class UniformNoise(RandomNoise):
 
 
 class GaussianNoise(RandomNoise):
+    """
+    Generate random noise from a normal distribution.
+
+    Parameters:
+        mean: The centre of the distribution.
+        width: The width (sigma) of the distribution.
+    """
+
     mean: float
     width: float
 
@@ -41,6 +64,24 @@ class GaussianNoise(RandomNoise):
 
 
 class PerturbationHandler(DataHandler):
+    """
+    DataHandler to add random noise to data. Uses a netCDF file as input and writes output to a new netCDF file.
+
+    Parameters
+    ----------
+    data_file: :any:`pathlib.Path`
+        NetCDF file containing the data to be modified.
+    perturbations: RandomNoise or dict[str, RandomNoise]
+        Either a RandomNoise implementation which will be applied to all data variables in the input file,
+        or a dictionary of {variable: RandomNoise} where the RandomNoise instance will be applied to that variable.
+        Variables not in the dictionary will not be modified.
+    output_file: :any:`pathlib.Path`
+        Path to output file.
+    random_seed: int or None
+        Optional random seed to use for Generator.
+        If None, system default will be used which changes every time.
+    """
+
     data_file: pathlib.Path
     perturbations: Union[Dict[str, RandomNoise], RandomNoise]
     output_file: pathlib.Path
