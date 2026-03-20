@@ -22,4 +22,8 @@ class NetcdfFileReader(DataFileReader):
         # will determine the file type, but we want to use the grib implementation
         # for GRIB files, otherwise this code can fail in cryptic ways.
         # Explicitly setting the engine results in a clearer error.
-        return [xr.open_dataset(input_path, engine='netcdf4')]
+        try:
+            ds = xr.open_dataset(input_path, engine='netcdf4')
+        except OSError as ose:
+            raise OSError(f'Unable to read file {input_path} as netcdf4') from ose
+        return [ds]

@@ -262,7 +262,9 @@ def test_get_stats_netcdf_specify_wrong_filetype_fails(grib_location):
     with pytest.raises(OSError) as exceptinfo:
         nf.get_stats()
 
-    assert 'NetCDF: Unknown file format' in str(exceptinfo.value)
+    assert 'Unable to read file' in str(exceptinfo.value)
+    assert 'model_output_data_spectral.grb2' in str(exceptinfo.value)
+    assert 'NetcdfFileReader' in str(exceptinfo.value)
 
 
 def test_get_stats_netcdf_gg(netcdf_location):
