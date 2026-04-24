@@ -46,4 +46,4 @@ def test_netcdffilereader_read_data_wrong_filetype_fails(grib_location):
 
     assert 'Unable to read file' in str(exceptinfo.value)
     assert 'model_output_data_spectral.grb2' in str(exceptinfo.value)
-    assert 'netcdf4' in str(exceptinfo.value)
+    assert 'NetCDF' in str(exceptinfo.value)

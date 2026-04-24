@@ -102,8 +102,8 @@ def test_perturbationhandler_execute_single_noise(tmp_path, datafiles):
     output_path = tmp_path / output_file
     assert output_path.exists()
 
-    original = xr.open_dataset(input_path, engine='netcdf4', decode_times=False)
-    modified = xr.open_dataset(output_path, engine='netcdf4', decode_times=False)
+    original = xr.open_dataset(input_path, engine='h5netcdf', decode_times=False)
+    modified = xr.open_dataset(output_path, engine='h5netcdf', decode_times=False)
     difference = modified - original
 
     for var in original.data_vars:
@@ -128,8 +128,8 @@ def test_perturbationhandler_execute_seed_reproducible(tmp_path, datafiles):
     output_path_1 = tmp_path / output_file_1
     output_path_2 = tmp_path / output_file_2
 
-    modified_1 = xr.open_dataset(output_path_1, engine='netcdf4', decode_times=False)
-    modified_2 = xr.open_dataset(output_path_2, engine='netcdf4', decode_times=False)
+    modified_1 = xr.open_dataset(output_path_1, engine='h5netcdf', decode_times=False)
+    modified_2 = xr.open_dataset(output_path_2, engine='h5netcdf', decode_times=False)
 
     assert modified_1 == modified_2
 
@@ -148,8 +148,8 @@ def test_perturbationhandler_execute_noise_pert(tmp_path, datafiles):
     output_path = tmp_path / output_file
     assert output_path.exists()
 
-    original = xr.open_dataset(input_path, engine='netcdf4', decode_times=False)
-    modified = xr.open_dataset(output_path, engine='netcdf4', decode_times=False)
+    original = xr.open_dataset(input_path, engine='h5netcdf', decode_times=False)
+    modified = xr.open_dataset(output_path, engine='h5netcdf', decode_times=False)
     difference = modified - original
 
     for var in original.data_vars:
