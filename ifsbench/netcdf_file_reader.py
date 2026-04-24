@@ -5,6 +5,7 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
+import warnings
 from typing import List
 
 import xarray as xr
@@ -23,7 +24,16 @@ class NetcdfFileReader(DataFileReader):
         # for GRIB files, otherwise this code can fail in cryptic ways.
         # Explicitly setting the engine results in a clearer error.
         try:
-            ds = xr.open_dataset(input_path, engine='netcdf4')
+            # Suppress the benign RuntimeWarning about numpy.ndarray size change
+            # that can occur when importing the netCDF4 C extension compiled
+            # against a different numpy ABI version.
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message="numpy.ndarray size changed",
+                    category=RuntimeWarning,
+                )
+                ds = xr.open_dataset(input_path, engine='netcdf4')
         except OSError as ose:
             raise OSError(f'Unable to read file {input_path} as netcdf4') from ose
         return [ds]

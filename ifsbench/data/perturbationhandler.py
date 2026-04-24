@@ -8,6 +8,7 @@
 from abc import abstractmethod
 import pathlib
 from typing import Dict, Optional, Tuple, Union
+import warnings
 
 import numpy as np
 import xarray as xr
@@ -95,7 +96,16 @@ class PerturbationHandler(DataHandler):
 
         # decode_times = False due to issues with encoding of 'month' in cftime.
         # Times are not needed here, so leave them as is.
-        data = xr.open_dataset(input_path, engine='netcdf4', decode_times=False)
+        # Suppress the benign RuntimeWarning about numpy.ndarray size change
+        # that can occur when importing the netCDF4 C extension compiled
+        # against a different numpy ABI version.
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="numpy.ndarray size changed",
+                category=RuntimeWarning,
+            )
+            data = xr.open_dataset(input_path, engine='netcdf4', decode_times=False)
 
         pert_data = data.copy()
 

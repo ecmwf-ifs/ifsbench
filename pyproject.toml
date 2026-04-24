@@ -74,6 +74,15 @@ namespaces = false
 # Enable SCM versioning
 [tool.setuptools_scm]
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    # Suppress benign RuntimeWarning from netCDF4 C extension about numpy ABI compatibility.
+    # This occurs when netCDF4 is compiled against a different numpy version than the one
+    # installed at runtime, but does not affect correctness.
+    "ignore:numpy.ndarray size changed:RuntimeWarning",
+    "ignore:numpy.dtype size changed:RuntimeWarning",
+]
+
 [tool.ruff]
 line-length = 100
 
