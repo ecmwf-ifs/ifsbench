@@ -17,13 +17,13 @@ requires-python = ">=3.8"
 license = {text = "Apache-2.0"}
 dynamic = ["version", "readme"]
 dependencies = [
-  "numpy >= 1.24.0",    # essential for numerical operations
+  "numpy >= 2.0.0",    # essential for numerical operations
   "pandas >= 1.4.0",   # essential for benchmarking data
   "pyyaml",   # essential for file handling
   "pydantic", # essential for typing and configs
   "click",    # essential for CLI scripts
   "f90nml",   # essential for namelist handling
-  "netcdf4 >= 1.6.2",  # essential for reading netcdf files, >= 1.6.2 for numpy 2.x support
+  "netcdf4 >= 1.7.0",  # essential for reading netcdf files, >= 1.7.0 for numpy 2.x support
   "xarray",   # essential for data handling
 ]
 
