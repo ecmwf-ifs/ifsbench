@@ -33,6 +33,11 @@ class NetcdfFileReader(DataFileReader):
                     message="numpy.ndarray size changed",
                     category=RuntimeWarning,
                 )
+                warnings.filterwarnings(
+                    "ignore",
+                    message="numpy.dtype size changed",
+                    category=RuntimeWarning,
+                )
                 ds = xr.open_dataset(input_path, engine='netcdf4')
         except OSError as ose:
             raise OSError(f'Unable to read file {input_path} as netcdf4') from ose

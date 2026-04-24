@@ -105,6 +105,11 @@ class PerturbationHandler(DataHandler):
                 message="numpy.ndarray size changed",
                 category=RuntimeWarning,
             )
+            warnings.filterwarnings(
+                "ignore",
+                message="numpy.dtype size changed",
+                category=RuntimeWarning,
+            )
             data = xr.open_dataset(input_path, engine='netcdf4', decode_times=False)
 
         pert_data = data.copy()
