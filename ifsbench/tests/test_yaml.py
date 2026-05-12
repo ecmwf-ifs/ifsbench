@@ -22,8 +22,6 @@ def yaml_dir(tmp_path):
     return tmp_path
 
 
-# -- basic loading -----------------------------------------------------------
-
 def test_read_yaml_basic(yaml_dir):
     """read_yaml loads a simple YAML file."""
     f = yaml_dir / 'basic.yaml'
@@ -39,6 +37,7 @@ def test_read_yaml_file_not_found():
 
 
 # -- !import -----------------------------------------------------------------
+
 
 def test_import_basic(yaml_dir):
     """!import includes another YAML file."""
@@ -76,12 +75,13 @@ def test_import_nested(yaml_dir):
 
 # -- !configure --------------------------------------------------------------
 
+
 def test_configure_basic(yaml_dir):
     """!configure substitutes template placeholders."""
     content = textwrap.dedent("""\
         templates:
           greeting:
-            message: Hello, {name}!
+            message: Hello, ${name}!
 
         instances:
           welcome: !configure:templates/greeting
@@ -97,8 +97,8 @@ def test_configure_multiple_values(yaml_dir):
     content = textwrap.dedent("""\
         templates:
           point:
-            x: "{x}"
-            y: "{y}"
+            x: ${x}
+            y: "${y}"
 
         instances:
           origin: !configure:templates/point
@@ -107,7 +107,7 @@ def test_configure_multiple_values(yaml_dir):
     """)
     (yaml_dir / 'cfg.yaml').write_text(content)
     result = read_yaml(str(yaml_dir / 'cfg.yaml'))
-    assert result['instances']['origin'] == {'x': '0', 'y': '0'}
+    assert result['instances']['origin'] == {'x': 0, 'y': 0}
 
 
 def test_configure_preserves_template(yaml_dir):
@@ -115,7 +115,7 @@ def test_configure_preserves_template(yaml_dir):
     content = textwrap.dedent("""\
         templates:
           item:
-            value: "{value}"
+            value: ${value}
 
         instances:
           a: !configure:templates/item
@@ -125,10 +125,10 @@ def test_configure_preserves_template(yaml_dir):
     """)
     (yaml_dir / 'cfg.yaml').write_text(content)
     result = read_yaml(str(yaml_dir / 'cfg.yaml'))
-    assert result['instances']['a'] == {'value': '1'}
-    assert result['instances']['b'] == {'value': '2'}
+    assert result['instances']['a'] == {'value': 1}
+    assert result['instances']['b'] == {'value': 2}
     # Template is untouched
-    assert result['templates']['item'] == {'value': '{value}'}
+    assert result['templates']['item'] == {'value': '${value}'}
 
 
 def test_configure_missing_template(yaml_dir):
@@ -148,7 +148,7 @@ def test_configure_nested_template(yaml_dir):
     content = textwrap.dedent("""\
         some_template:
           default_template:
-            value: "{value}"
+            value: ${value}
 
         instances:
           my_instance: !configure:some_template/default_template
@@ -156,10 +156,50 @@ def test_configure_nested_template(yaml_dir):
     """)
     (yaml_dir / 'cfg.yaml').write_text(content)
     result = read_yaml(str(yaml_dir / 'cfg.yaml'))
-    assert result['instances']['my_instance'] == {'value': '5'}
+    assert result['instances']['my_instance'] == {'value': 5}
+
+
+def test_read_yaml_reference(yaml_dir):
+    """
+    Create custom YAML files and check the result explicitly.
+    """
+    content_include = textwrap.dedent("""\
+        my_template:
+          value: ${value}
+          str_value: some_${str_value}
+          list:
+            - ${first_value}
+            - ${second_value}
+    """)
+
+    content_main = textwrap.dedent("""\
+        templates: !import include.yaml
+
+        instances:
+            my_instance: !configure:templates/my_template
+                value: 5
+                str_value: thing
+                first_value: True
+                second_value:
+                    - 1
+                    - 2
+    """)
+
+    (yaml_dir / 'include.yaml').write_text(content_include)
+    (yaml_dir / 'main.yaml').write_text(content_main)
+
+    result = read_yaml(yaml_dir / 'main.yaml')
+
+    my_instance = result['instances']['my_instance']
+
+    assert my_instance['value'] == 5
+    assert my_instance['str_value'] == 'some_thing'
+    assert my_instance['list'][0] == True
+    assert my_instance['list'][1] == [1, 2]
 
 
 # -- encoding ----------------------------------------------------------------
+
 
 def test_read_yaml_custom_encoding(yaml_dir):
     """read_yaml respects a custom encoding parameter."""
