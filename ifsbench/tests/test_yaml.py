@@ -73,6 +73,35 @@ def test_import_nested(yaml_dir):
     assert result == {'top': {'nested': {'level': 2}}}
 
 
+def test_import_relative(yaml_dir):
+    """!import only accepts relative paths."""
+    (yaml_dir / 'subdir').mkdir()
+
+    (yaml_dir / 'import1.yaml').write_text('level: 2\n')
+    (yaml_dir / 'subdir/import2.yaml').write_text('level: 2\n')
+
+    (yaml_dir / 'relative1.yaml').write_text('nested: !import import1.yaml\n')
+    (yaml_dir / 'relative2.yaml').write_text('nested: !import subdir/import2.yaml\n')
+    (yaml_dir / 'relative3.yaml').write_text('nested: !import subdir/../import1.yaml\n')
+
+    # Read the files with the relative imports and just make sure that it
+    # doesn't crash.
+    for i in range(1, 4):
+        read_yaml(yaml_dir / f'relative{i}.yaml')
+
+    (yaml_dir / 'not_relative1.yaml').write_text('top: !import /etc/something.yaml\n')
+    (yaml_dir / 'not_relative2.yaml').write_text('top: !import ../other_dir/something.yaml\n')
+    (yaml_dir / 'not_relative3.yaml').write_text(
+        'top: !import subdir/../../other_dir/something.yaml\n'
+    )
+
+    # Read the files with the non-relative imports and make sure that it
+    # raises a ValueError.
+    for i in range(1, 4):
+        with pytest.raises(ValueError):
+            read_yaml(yaml_dir / f'not_relative{i}.yaml')
+
+
 # -- !configure --------------------------------------------------------------
 
 

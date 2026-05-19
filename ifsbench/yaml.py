@@ -10,6 +10,7 @@ Utilities for loading YAML files.
 """
 
 import copy
+import os
 from pathlib import Path
 from typing import Any, Dict, Union
 
@@ -41,13 +42,32 @@ def _make_loader(base_dir, encoding):
         pass
 
     def _import_constructor(loader, node):
-        """Handle ``!import other_file.yaml``."""
+        """
+        Handle ``!import other_file.yaml``.
+
+        Raises ValueError if the import path isn't relative.
+        Raises FileNotFoundError if the file does not exist.
+        """
 
         # Load the import path.
         rel_path = loader.construct_scalar(node)
 
-        # Only use the path relative to the base dir.
-        import_path = (base_dir / rel_path).resolve()
+        # Only use the path relative to the base dir. Apply os.path.normpath to
+        # get rid of all ../ magic without resolving symlinks.
+        import_path = Path(os.path.normpath(base_dir / rel_path))
+
+        try:
+            # Check whether the import path is relative to base_dir.
+            # Path.is_relative_to doesn't exist in Python 3.8 and can't deal
+            # with relative paths like ../some_other_dir/my_yaml.yaml which
+            # would allow escaping from the main directory.
+            # Therefore we use relative_to here and check whether the path
+            # differene starts with ..
+            path_diff = import_path.relative_to(base_dir)
+            if str(path_diff).startswith('..'):
+                raise ValueError
+        except ValueError as ve:
+            raise ValueError('The !import path must be relative to the main YAML file!')
 
         if not import_path.is_file():
             raise FileNotFoundError(f'Imported YAML file not found: {import_path}')
@@ -120,7 +140,7 @@ def _resolve_markers(obj, root):
     return obj
 
 
-def read_yaml(filename: Union[str, Path], encoding='utf-8') -> Dict[str, Any]:
+def read_yaml(filename: Union[str, Path], encoding='utf-8') -> Any:
     """
     Parse a YAML file and return the resulting dictionary.
 
@@ -128,7 +148,7 @@ def read_yaml(filename: Union[str, Path], encoding='utf-8') -> Dict[str, Any]:
 
       * ``!import`` (includes the content of another file)
       * ``!configure:reference`` (copies an existing YAML block and replaces
-        ${name} entries with specified values.
+        ${name} entries with specified values.)
 
     Parameters
     ----------
