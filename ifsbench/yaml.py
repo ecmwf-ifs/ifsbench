@@ -11,7 +11,7 @@ Utilities for loading YAML files.
 
 import copy
 from pathlib import Path
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, Union
 
 import yaml
 
@@ -36,6 +36,7 @@ def _make_loader(base_dir, encoding):
     constructors that resolve paths relative to *base_dir*.
     """
 
+    # pylint: disable=R0901
     class _Loader(yaml.SafeLoader):
         pass
 
@@ -61,7 +62,7 @@ def _make_loader(base_dir, encoding):
         # Extract the template from the !configure:<template> line.
         template_ref = tag_suffix.lstrip(':')
 
-        return _ConfigureMarker(tag_suffix.lstrip(':'), overrides)
+        return _ConfigureMarker(template_ref, overrides)
 
     _Loader.add_constructor('!import', _import_constructor)
     _Loader.add_multi_constructor('!configure:', _configure_constructor)
@@ -78,8 +79,8 @@ def _resolve_template(root, template_path):
     for key in template_path.split('/'):
         try:
             current = current[key]
-        except (KeyError, TypeError):
-            raise KeyError(f'Template path {template_path!r} not found in YAML document')
+        except (KeyError, TypeError) as ex:
+            raise KeyError(f'Template path {template_path!r} not found in YAML document') from ex
     return current
 
 

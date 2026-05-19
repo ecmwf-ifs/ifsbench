@@ -16,8 +16,8 @@ import pytest
 from ifsbench.yaml import read_yaml
 
 
-@pytest.fixture
-def yaml_dir(tmp_path):
+@pytest.fixture(name='yaml_dir')
+def fixture_yaml_dir(tmp_path):
     """Provide a temporary directory for YAML test files."""
     return tmp_path
 
@@ -194,7 +194,7 @@ def test_read_yaml_reference(yaml_dir):
 
     assert my_instance['value'] == 5
     assert my_instance['str_value'] == 'some_thing'
-    assert my_instance['list'][0] == True
+    assert my_instance['list'][0] is True
     assert my_instance['list'][1] == [1, 2]
 
 
