@@ -12,7 +12,7 @@ Utilities for loading YAML files.
 import copy
 import os
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Union
 
 import yaml
 
@@ -66,7 +66,8 @@ def _make_loader(base_dir, encoding):
             path_diff = import_path.relative_to(base_dir)
             if str(path_diff).startswith('..'):
                 raise ValueError
-        except ValueError as ve:
+        except ValueError:
+            # pylint: disable=W0707
             raise ValueError('The !import path must be relative to the main YAML file!')
 
         if not import_path.is_file():
