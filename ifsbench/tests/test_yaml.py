@@ -36,66 +36,66 @@ def test_read_yaml_file_not_found():
         read_yaml('/nonexistent/path/missing.yaml')
 
 
-# -- !import -----------------------------------------------------------------
+# -- !include -----------------------------------------------------------------
 
 
-def test_import_basic(yaml_dir):
-    """!import includes another YAML file."""
+def test_include_basic(yaml_dir):
+    """!include includes another YAML file."""
     (yaml_dir / 'child.yaml').write_text('child_key: child_value\n')
-    (yaml_dir / 'parent.yaml').write_text('included: !import child.yaml\n')
+    (yaml_dir / 'parent.yaml').write_text('included: !include child.yaml\n')
     result = read_yaml(str(yaml_dir / 'parent.yaml'))
     assert result == {'included': {'child_key': 'child_value'}}
 
 
-def test_import_subdirectory(yaml_dir):
-    """!import resolves relative to the main file's directory."""
+def test_include_subdirectory(yaml_dir):
+    """!include resolves relative to the main file's directory."""
     sub = yaml_dir / 'sub'
     sub.mkdir()
     (sub / 'nested.yaml').write_text('nested: true\n')
-    (yaml_dir / 'main.yaml').write_text('data: !import sub/nested.yaml\n')
+    (yaml_dir / 'main.yaml').write_text('data: !include sub/nested.yaml\n')
     result = read_yaml(str(yaml_dir / 'main.yaml'))
     assert result == {'data': {'nested': True}}
 
 
-def test_import_missing_file(yaml_dir):
-    """!import raises FileNotFoundError when the referenced file is missing."""
-    (yaml_dir / 'main.yaml').write_text('data: !import nonexistent.yaml\n')
+def test_include_missing_file(yaml_dir):
+    """!include raises FileNotFoundError when the referenced file is missing."""
+    (yaml_dir / 'main.yaml').write_text('data: !include nonexistent.yaml\n')
     with pytest.raises(FileNotFoundError, match='nonexistent.yaml'):
         read_yaml(str(yaml_dir / 'main.yaml'))
 
 
-def test_import_nested(yaml_dir):
-    """!import works recursively (imported file can import another)."""
+def test_include_nested(yaml_dir):
+    """!include works recursively (included file can include another)."""
     (yaml_dir / 'c.yaml').write_text('level: 2\n')
-    (yaml_dir / 'b.yaml').write_text('nested: !import c.yaml\n')
-    (yaml_dir / 'a.yaml').write_text('top: !import b.yaml\n')
+    (yaml_dir / 'b.yaml').write_text('nested: !include c.yaml\n')
+    (yaml_dir / 'a.yaml').write_text('top: !include b.yaml\n')
     result = read_yaml(str(yaml_dir / 'a.yaml'))
     assert result == {'top': {'nested': {'level': 2}}}
 
 
-def test_import_relative(yaml_dir):
-    """!import only accepts relative paths."""
+def test_include_relative(yaml_dir):
+    """!include only accepts relative paths."""
     (yaml_dir / 'subdir').mkdir()
 
     (yaml_dir / 'import1.yaml').write_text('level: 2\n')
     (yaml_dir / 'subdir/import2.yaml').write_text('level: 2\n')
 
-    (yaml_dir / 'relative1.yaml').write_text('nested: !import import1.yaml\n')
-    (yaml_dir / 'relative2.yaml').write_text('nested: !import subdir/import2.yaml\n')
-    (yaml_dir / 'relative3.yaml').write_text('nested: !import subdir/../import1.yaml\n')
+    (yaml_dir / 'relative1.yaml').write_text('nested: !include import1.yaml\n')
+    (yaml_dir / 'relative2.yaml').write_text('nested: !include subdir/import2.yaml\n')
+    (yaml_dir / 'relative3.yaml').write_text('nested: !include subdir/../import1.yaml\n')
 
-    # Read the files with the relative imports and just make sure that it
+    # Read the files with the relative includes and just make sure that it
     # doesn't crash.
     for i in range(1, 4):
         read_yaml(yaml_dir / f'relative{i}.yaml')
 
-    (yaml_dir / 'not_relative1.yaml').write_text('top: !import /etc/something.yaml\n')
-    (yaml_dir / 'not_relative2.yaml').write_text('top: !import ../other_dir/something.yaml\n')
+    (yaml_dir / 'not_relative1.yaml').write_text('top: !include /etc/something.yaml\n')
+    (yaml_dir / 'not_relative2.yaml').write_text('top: !include ../other_dir/something.yaml\n')
     (yaml_dir / 'not_relative3.yaml').write_text(
-        'top: !import subdir/../../other_dir/something.yaml\n'
+        'top: !include subdir/../../other_dir/something.yaml\n'
     )
 
-    # Read the files with the non-relative imports and make sure that it
+    # Read the files with the non-relative includes and make sure that it
     # raises a ValueError.
     for i in range(1, 4):
         with pytest.raises(ValueError):
@@ -202,7 +202,7 @@ def test_read_yaml_reference(yaml_dir):
     """)
 
     content_main = textwrap.dedent("""\
-        templates: !import include.yaml
+        templates: !include include.yaml
 
         instances:
             my_instance: !configure:templates/my_template

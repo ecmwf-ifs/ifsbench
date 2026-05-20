@@ -33,7 +33,7 @@ class _ConfigureMarker:
 
 def _make_loader(base_dir, encoding):
     """
-    Create a custom YAML loader with ``!import`` and ``!configure``
+    Create a custom YAML loader with ``!include`` and ``!configure``
     constructors that resolve paths relative to *base_dir*.
     """
 
@@ -41,40 +41,40 @@ def _make_loader(base_dir, encoding):
     class _Loader(yaml.SafeLoader):
         pass
 
-    def _import_constructor(loader, node):
+    def _include_constructor(loader, node):
         """
-        Handle ``!import other_file.yaml``.
+        Handle ``!include other_file.yaml``.
 
-        Raises ValueError if the import path isn't relative.
+        Raises ValueError if the include path isn't relative.
         Raises FileNotFoundError if the file does not exist.
         """
 
-        # Load the import path.
+        # Load the include path.
         rel_path = loader.construct_scalar(node)
 
         # Only use the path relative to the base dir. Apply os.path.normpath to
         # get rid of all ../ magic without resolving symlinks.
-        import_path = Path(os.path.normpath(base_dir / rel_path))
+        include_path = Path(os.path.normpath(base_dir / rel_path))
 
         try:
-            # Check whether the import path is relative to base_dir.
+            # Check whether the include path is relative to base_dir.
             # Path.is_relative_to doesn't exist in Python 3.8 and can't deal
             # with relative paths like ../some_other_dir/my_yaml.yaml which
             # would allow escaping from the main directory.
             # Therefore we use relative_to here and check whether the path
             # differene starts with ..
-            path_diff = import_path.relative_to(base_dir)
+            path_diff = include_path.relative_to(base_dir)
             if str(path_diff).startswith('..'):
                 raise ValueError
         except ValueError:
             # pylint: disable=W0707
-            raise ValueError('The !import path must be relative to the main YAML file!')
+            raise ValueError('The !include path must be relative to the main YAML file!')
 
-        if not import_path.is_file():
-            raise FileNotFoundError(f'Imported YAML file not found: {import_path}')
+        if not include_path.is_file():
+            raise FileNotFoundError(f'Imported YAML file not found: {include_path}')
 
-        # Parse the imported file in the same way as everything else.
-        return read_yaml(str(import_path), encoding)
+        # Parse the included file in the same way as everything else.
+        return read_yaml(str(include_path), encoding)
 
     def _configure_constructor(loader, tag_suffix, node):
         """Handle ``!configure:template/path`` mapping nodes."""
@@ -85,7 +85,7 @@ def _make_loader(base_dir, encoding):
 
         return _ConfigureMarker(template_ref, overrides)
 
-    _Loader.add_constructor('!import', _import_constructor)
+    _Loader.add_constructor('!include', _include_constructor)
     _Loader.add_multi_constructor('!configure:', _configure_constructor)
 
     return _Loader
@@ -147,7 +147,7 @@ def read_yaml(filename: Union[str, Path], encoding='utf-8') -> Any:
 
     In addition to standard YAML files, using this function adds support for
 
-      * ``!import`` (includes the content of another file)
+      * ``!include`` (includes the content of another file)
       * ``!configure:reference`` (copies an existing YAML block and replaces
         ${name} entries with specified values.)
 
@@ -166,11 +166,11 @@ def read_yaml(filename: Union[str, Path], encoding='utf-8') -> Any:
     Raises
     ------
     FileNotFoundError
-        If *filename* or any ``!import``-ed file does not exist.
+        If *filename* or any ``!include``-ed file does not exist.
 
     Example
     -------
-        included: !import other_file.yaml
+        included: !include other_file.yaml
 
         templates:
           greeting:
@@ -187,7 +187,7 @@ def read_yaml(filename: Union[str, Path], encoding='utf-8') -> Any:
         raise FileNotFoundError(f'YAML file not found: {filepath}')
 
     # Get the base_dir of the YAML file. This will be used as the reference
-    # directory for finding other YAML files to import.
+    # directory for finding other YAML files to include.
     base_dir = filepath.parent
     loader_cls = _make_loader(base_dir, encoding)
 
