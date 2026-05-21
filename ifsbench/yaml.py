@@ -158,11 +158,6 @@ def read_yaml(filename: Union[str, Path], encoding='utf-8') -> Any:
     encoding: str
         The encoding that is used when opening the YAML file.
 
-    Returns
-    -------
-    Dict
-        The parsed values as a YAML file.
-
     Raises
     ------
     FileNotFoundError
@@ -179,7 +174,10 @@ def read_yaml(filename: Union[str, Path], encoding='utf-8') -> Any:
         instances:
           welcome: !configure:templates/greeting
             name: World
-
+    Returns
+    -------
+    Dict
+        The parsed values as a YAML file.
     """
 
     filepath = Path(filename).resolve()
