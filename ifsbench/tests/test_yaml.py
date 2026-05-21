@@ -126,17 +126,19 @@ def test_configure_multiple_values(yaml_dir):
     content = textwrap.dedent("""\
         templates:
           point:
-            x: ${x}
-            y: "${y}"
+            first: ${x}
+            second: "${y}"
+            third: "Hello ${z}"
 
         instances:
           origin: !configure:templates/point
             x: 0
-            y: 0
+            y: True
+            z: World
     """)
     (yaml_dir / 'cfg.yaml').write_text(content)
     result = read_yaml(str(yaml_dir / 'cfg.yaml'))
-    assert result['instances']['origin'] == {'x': 0, 'y': 0}
+    assert result['instances']['origin'] == {'first': 0, 'second': True, 'third': 'Hello World'}
 
 
 def test_configure_preserves_template(yaml_dir):
@@ -144,20 +146,20 @@ def test_configure_preserves_template(yaml_dir):
     content = textwrap.dedent("""\
         templates:
           item:
-            value: ${value}
+            value: ${passed_value}
 
         instances:
           a: !configure:templates/item
-            value: 1
+            passed_value: 1
           b: !configure:templates/item
-            value: 2
+            passed_value: 2
     """)
     (yaml_dir / 'cfg.yaml').write_text(content)
     result = read_yaml(str(yaml_dir / 'cfg.yaml'))
     assert result['instances']['a'] == {'value': 1}
     assert result['instances']['b'] == {'value': 2}
     # Template is untouched
-    assert result['templates']['item'] == {'value': '${value}'}
+    assert result['templates']['item'] == {'value': '${passed_value}'}
 
 
 def test_configure_missing_template(yaml_dir):
@@ -177,11 +179,11 @@ def test_configure_nested_template(yaml_dir):
     content = textwrap.dedent("""\
         some_template:
           default_template:
-            value: ${value}
+            value: ${passed_value}
 
         instances:
           my_instance: !configure:some_template/default_template
-            value: 5
+            passed_value: 5
     """)
     (yaml_dir / 'cfg.yaml').write_text(content)
     result = read_yaml(str(yaml_dir / 'cfg.yaml'))
