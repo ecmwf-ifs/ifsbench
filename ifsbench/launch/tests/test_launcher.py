@@ -17,6 +17,7 @@ import pytest
 from ifsbench import (
     Job,
     BashLauncher,
+    CommandWrapOverride,
     CompositeLauncher,
     DDTLauncher,
     DefaultEnvPipeline,
@@ -249,3 +250,67 @@ def test_compositelauncher_wrap_ddt_bash(
     )
 
     assert result == bash_data
+
+
+@pytest.mark.parametrize('cmd', [['ls', '-l'], ['something']])
+@pytest.mark.parametrize('job', [Job(tasks=64), Job()])
+@pytest.mark.parametrize('library_paths', [None, [], ['/library/path/something']])
+@pytest.mark.parametrize('env_pipeline_name', ['test_env_none', 'test_env'])
+@pytest.mark.parametrize('base_launcher', [SrunLauncher(), DirectLauncher(), MpirunLauncher()])
+@pytest.mark.parametrize(
+    'command_overrides',
+    [
+        [],
+        [CommandWrapOverride(prepend_cmd=['valgrind'])],
+        [CommandWrapOverride(append_cmd=['--postflag'])],
+        [
+            CommandWrapOverride(prepend_cmd=['wrapper']),
+            CommandWrapOverride(append_cmd=['--last']),
+        ],
+    ],
+)
+def test_compositelauncher_command_overrides(
+    tmp_path,
+    cmd,
+    job,
+    library_paths,
+    env_pipeline_name,
+    base_launcher,
+    command_overrides,
+    request,
+):
+    """
+    Test that CompositeLauncher applies command_overrides to the command before
+    passing it to the base launcher.
+    """
+    env_pipeline = request.getfixturevalue(env_pipeline_name)
+
+    launcher = CompositeLauncher(
+        base_launcher=base_launcher,
+        command_overrides=command_overrides,
+    )
+
+    result = launcher.prepare(
+        run_dir=tmp_path,
+        job=job,
+        cmd=cmd,
+        library_paths=library_paths,
+        env_pipeline=env_pipeline,
+        custom_flags=[],
+    )
+
+    # Build the expected command by applying overrides manually.
+    overridden_cmd = list(cmd)
+    for override in command_overrides:
+        overridden_cmd = override.override(overridden_cmd)
+
+    expected = base_launcher.prepare(
+        run_dir=tmp_path,
+        job=job,
+        cmd=overridden_cmd,
+        library_paths=library_paths,
+        env_pipeline=env_pipeline,
+        custom_flags=[],
+    )
+
+    assert result == expected
