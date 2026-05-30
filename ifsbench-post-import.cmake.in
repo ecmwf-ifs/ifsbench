@@ -1,0 +1,37 @@
+# (C) Copyright 2020- ECMWF.
+# This software is licensed under the terms of the Apache Licence Version 2.0
+# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+# In applying this licence, ECMWF does not waive the privileges and immunities
+# granted to it by virtue of its status as an intergovernmental organisation
+# nor does it submit to any jurisdiction.
+
+# Basic path setup
+if( @PROJECT_NAME@_IS_BUILD_DIR_EXPORT )
+    set( ifsbench_MACROS_DIR @CMAKE_CURRENT_SOURCE_DIR@/cmake )
+    set( ifsbench_VENV_PATH @CMAKE_CURRENT_BINARY_DIR@/ifsbench_env )
+else()
+    set( ifsbench_MACROS_DIR ${ifsbench_BASE_DIR}/share/ifsbench/cmake )
+    set( ifsbench_VENV_PATH ${ifsbench_BASE_DIR}/var/ifsbench_env )
+endif()
+
+# Make ifsbench CMake macro scripts available on the search path
+if( NOT ${ifsbench_MACROS_DIR} IN_LIST CMAKE_MODULE_PATH )
+    list( INSERT CMAKE_MODULE_PATH 0 ${ifsbench_MACROS_DIR} )
+endif()
+
+# Carry over variables from the build
+set( ifsbench_HAVE_EDITABLE @ifsbench_HAVE_EDITABLE@ )
+set( ifsbench_HAVE_GRIB @ifsbench_HAVE_GRIB@ )
+set( IFSBENCH_EXECUTABLES @IFSBENCH_EXECUTABLES@ )
+
+# Find Python environment
+include( ifsbench_python_macros )
+ifsbench_find_python_venv(
+    VENV_PATH ${ifsbench_VENV_PATH}
+    PYTHON_VERSION @PYTHON_VERSION@
+)
+set( IFSBENCH_Python3_EXECUTABLE ${Python3_EXECUTABLE} )
+
+# Discover ifsbench executables and make available as CMake targets
+include( ifsbench_find_executables )
+ifsbench_find_executables()
