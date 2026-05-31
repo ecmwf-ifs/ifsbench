@@ -31,7 +31,7 @@
 # though, and use 3.17 for conda support anyway)
 # Version 3.19 for support of file(CHMOD)
 cmake_minimum_required( VERSION 3.19 FATAL_ERROR )
-find_package( ecbuild 3.7 REQUIRED HINTS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../ecbuild)
+find_package( ecbuild 3.7 REQUIRED )
 
 # Specify project and configuration options
 project( ifsbench LANGUAGES NONE )
