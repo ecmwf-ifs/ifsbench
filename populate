@@ -9,15 +9,15 @@
 # nor does it submit to any jurisdiction.
 
 if [[ $BASH_SOURCE = */* ]]; then
-    SOURCE_DIR=${BASH_SOURCE%/*}/
+    SOURCE_DIR=${BASH_SOURCE%/*}
 else
-    SOURCE_DIR=./
+    SOURCE_DIR=.
 fi
 
 ARTIFACTS_DIR=${ARTIFACTS_DIR:-"${SOURCE_DIR}/artifacts"}
 
 # Download dependencies for Python packages in this repository
 cmake \
-    -DWHEELS_DIR=${ARTIFACTS_DIR} -DREQUIREMENT_SPEC=${SOURCE_DIR}${IFSBENCH_INSTALL_OPTIONS:-} \
-    -DIFSBENCH_WHEEL_ARCH=${IFSBENCH_WHEEL_ARCH:-None} -DIFSBENCH_WHEEL_PYTHON_VERSION=${IFSBENCH_WHEEL_PYTHON_VERSION:-None} \
-    -P ${SOURCE_DIR}/cmake/ifsbench_get_python_wheels.cmake
+    -DWHEELS_DIR="${ARTIFACTS_DIR}" -DREQUIREMENT_SPEC="${SOURCE_DIR}${IFSBENCH_INSTALL_OPTIONS:-}" \
+    -DIFSBENCH_WHEEL_ARCH="${IFSBENCH_WHEEL_ARCH:-None}" -DIFSBENCH_WHEEL_PYTHON_VERSION="${IFSBENCH_WHEEL_PYTHON_VERSION:-None}" \
+    -P "${SOURCE_DIR}/cmake/ifsbench_get_python_wheels.cmake"
