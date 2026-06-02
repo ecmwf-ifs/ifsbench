@@ -105,8 +105,9 @@ function( ifsbench_create_python_venv )
     endif()
 
     # Create a virtualenv
+    # Create a virtualenv
     message( STATUS "Create Python virtual environment ${VENV_PATH}" )
-    execute_process( COMMAND ${Python3_EXECUTABLE} -m venv "${VENV_PATH}" )
+    execute_process( COMMAND ${Python3_EXECUTABLE} -m venv "${VENV_PATH}" COMMAND_ERROR_IS_FATAL ANY )
     set( Python3_VENV_NAME "${_PAR_VENV_NAME}" PARENT_SCOPE )
 
     # Upon installation, we create an equivalent Python venv in the installation directory
@@ -314,7 +315,7 @@ endfunction()
 function( ifsbench_build_python_wheels )
 
     set( options "" )
-    set( oneValueArgs REQUIREMENT_SPEC WHEELS_DIR BUILD_DIR )
+    set( oneValueArgs REQUIREMENT_SPEC WHEELS_DIR BUILD_DIR PYTHON_VERSION )
     set( multiValueArgs "" )
 
     cmake_parse_arguments( _PAR "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -327,11 +328,10 @@ function( ifsbench_build_python_wheels )
         message( FATAL_ERROR "No REQUIREMENT_SPEC provided to ifsbench_build_python_wheels()" )
     endif()
 
-    message( STATUS "Building wheel for ${REQUIREMENT_SPEC}" )
+    message( STATUS "Building wheel for ${_PAR_REQUIREMENT_SPEC}" )
 
     # Check for a suitable python interpreter
     find_package( Python3 ${_PAR_PYTHON_VERSION} COMPONENTS Interpreter REQUIRED QUIET )
-
     # If no build dir is given, create one in the current binary directory
     if( _PAR_BUILD_DIR )
         set( BUILD_DIR "${_PAR_BUILD_DIR}" )
@@ -371,7 +371,7 @@ endfunction()
 function( ifsbench_install_python_package )
 
     set( options EDITABLE )
-    set( oneValueArgs REQUIREMENT_SPEC WHEELS_DIR )
+    set( oneValueArgs REQUIREMENT_SPEC WHEELS_DIR PYTHON_VERSION )
     set( multiValueArgs "" )
 
     cmake_parse_arguments( _PAR "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -427,7 +427,7 @@ function( ifsbench_install_python_package )
         endif()
         install(
             CODE
-                "execute_process( COMMAND \${CMAKE_INSTALL_PREFIX}/var/${Python3_VENV_NAME}/bin/python -m pip install ${INSTALL_OPTS} ${_PAR_REQUIREMENT_SPEC} )"
+                "execute_process( COMMAND \${CMAKE_INSTALL_PREFIX}/var/${Python3_VENV_NAME}/bin/python -m pip install ${INSTALL_OPTS} ${_PAR_REQUIREMENT_SPEC} COMMAND_ERROR_IS_FATAL ANY )"
         )
     endif()
 

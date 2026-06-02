@@ -15,8 +15,8 @@ else()
 endif()
 
 # Make ifsbench CMake macro scripts available on the search path
-if( NOT ${ifsbench_MACROS_DIR} IN_LIST CMAKE_MODULE_PATH )
-    list( INSERT CMAKE_MODULE_PATH 0 ${ifsbench_MACROS_DIR} )
+if( NOT "${ifsbench_MACROS_DIR}" IN_LIST CMAKE_MODULE_PATH )
+    list( INSERT CMAKE_MODULE_PATH 0 "${ifsbench_MACROS_DIR}" )
 endif()
 
 # Carry over variables from the build
