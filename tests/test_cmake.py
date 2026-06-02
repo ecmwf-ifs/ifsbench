@@ -52,7 +52,13 @@ def fixture_ecbuild_cmake_dir(tmp_path_factory):
     tmp_dir = tmp_path_factory.mktemp('ecbuild')
     ecbuild_dir = tmp_dir/'ecbuild'
     ecbuild_version = '3.11.0'
-    execute(['git', 'clone', '--depth', '1', '-b', ecbuild_version, 'https://github.com/ecmwf/ecbuild.git', str(ecbuild_dir)])
+    execute([
+        'git', 'clone',
+        '--depth', '1',
+        '-b', ecbuild_version,
+        'https://github.com/ecmwf/ecbuild.git',
+        str(ecbuild_dir)
+    ])
     return ecbuild_dir/'cmake'
 
 
