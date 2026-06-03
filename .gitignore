@@ -5,3 +5,4 @@
 build*/
 
 ifsbench.egg-info/*
+artifacts/

@@ -29,8 +29,9 @@
 # Version 3.12 required to use FindPython
 # Version 3.15 officially required to use Python3_FIND_VIRTUALENV (not working on 3.15.3,
 # though, and use 3.17 for conda support anyway)
-cmake_minimum_required( VERSION 3.17 FATAL_ERROR )
-find_package( ecbuild 3.4 REQUIRED HINTS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../ecbuild)
+# Version 3.19 for support of file(CHMOD)
+cmake_minimum_required( VERSION 3.19 FATAL_ERROR )
+find_package( ecbuild 3.11 REQUIRED )
 
 # Specify project and configuration options
 project( ifsbench LANGUAGES NONE )
@@ -49,12 +50,24 @@ ecbuild_add_option(
     REQUIRED_PACKAGES "eccodes"
 )
 
+# Make CMake script files available in build and install directory
+add_subdirectory( cmake )
+install( DIRECTORY cmake DESTINATION ${INSTALL_DATA_DIR} PATTERN "CMakeLists.txt" EXCLUDE )
+
+# The list of ifsbench frontend scripts
+set( IFSBENCH_EXECUTABLES ifs-bench.py nml-diff.py )
+
 # Setup Python virtual environment
-include( python_venv )
-python_venv( ifsbench_env )
+include( ifsbench_python_macros )
+set( PYTHON_VERSION 3.8 )
+ifsbench_setup_python_venv(
+    VENV_NAME ifsbench_env
+    PYTHON_VERSION ${PYTHON_VERSION}
+    INSTALL_VENV
+)
 
 # Enable Pytest testing
-if( ${ENABLE_TESTS} )
+if( HAVE_TESTS )
 
     ecbuild_add_test(
         TARGET ifsbench_tests
@@ -72,29 +85,44 @@ if( HAVE_GRIB )
 endif()
 
 # Install ifsbench with dependencies
-if( NOT ${CMAKE_VERBOSE_MAKEFILE} )
-    list ( APPEND PIP_OPTIONS "-q" )
-endif()
-if( ${HAVE_EDITABLE} )
-    list( APPEND PIP_OPTIONS "-e" )
-endif()
-
 set( _INSTALL_OPTIONS "" )
 if( IFSBENCH_INSTALL_OPTIONS )
     list( JOIN IFSBENCH_INSTALL_OPTIONS "," _INSTALL_OPT_STR )
     set( _INSTALL_OPTIONS "[${_INSTALL_OPT_STR}]" )
 endif()
 
-add_custom_target( ifsbench ALL ${Python3_EXECUTABLE} -m pip install ${PIP_OPTIONS} ${CMAKE_CURRENT_SOURCE_DIR}${_INSTALL_OPTIONS} )
-
-add_executable( ifs-bench.py IMPORTED GLOBAL )
-set_property( TARGET ifs-bench.py PROPERTY IMPORTED_LOCATION ${Python3_VENV_BIN}/ifs-bench.py )
-add_dependencies( ifs-bench.py ifsbench )
-
-# Make certain variables available
-if( NOT PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME )
-    set( IFSBENCH_Python3_EXECUTABLE ${Python3_EXECUTABLE} PARENT_SCOPE )
+# Optionally use the ARTIFACTS_DIR as wheelhouse, if provided
+if( DEFINED ARTIFACTS_DIR )
+    set( WHEELS_DIR_OPTION WHEELS_DIR "${ARTIFACTS_DIR}" )
+else()
+    set( WHEELS_DIR_OPTION "" )
 endif()
+
+if( HAVE_EDITABLE )
+   set( EDITABLE_OPTION "EDITABLE" )
+else()
+   set( EDITABLE_OPTION "" )
+endif()
+
+# Determine whether this is a Git worktree or if we have to provide
+# the version number to setuptools_scm
+if( NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git )
+    set( ENV{SETUPTOOLS_SCM_PRETEND_VERSION} ${ifsbench_VERSION} )
+endif()
+
+# We install ifsbench at configure time to make the CLI targets immediately
+# available to later CMake projects in the bundle.
+ecbuild_info( "Install ifsbench in virtual environment" )
+ifsbench_install_python_package(
+    REQUIREMENT_SPEC ${CMAKE_CURRENT_SOURCE_DIR}${_INSTALL_OPTIONS}
+    ${EDITABLE_OPTION}
+    ${WHEELS_DIR_OPTION}
+)
+ecbuild_info( "Install ifsbench in virtual environment - done" )
+
+# Discover ifsbench executables and make available as CMake targets
+include( ifsbench_find_executables )
+ifsbench_find_executables()
 
 # Install the project so it can be used within the bundle
 ecbuild_install_project( NAME ifsbench )
