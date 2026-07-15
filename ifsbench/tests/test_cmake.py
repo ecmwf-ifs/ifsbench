@@ -199,3 +199,12 @@ def test_cmake_install_and_exports(tmp_path, ifsbench_install, ecbuild_cmake_dir
             ],
             env=env,
         )
+
+
+def test_cmake_reconfigure(ifsbench_install):
+    """
+    Verify that CMake reconfiguration works (e.g., doesn't throw up errors when recreating the ifsbench venv).
+    """
+    build_dir, _ = ifsbench_install
+    result = execute(['cmake', str(build_dir)])
+    assert result.exit_code == 0, f'CMake reconfiguration failed: {result.stderr}'
