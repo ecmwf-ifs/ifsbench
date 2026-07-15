@@ -75,7 +75,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['**/tests/']
+exclude_patterns = ['**/tests/', '**/test_*', '**/*tests*']
 
 # Prefix each section label with the document it is in, followed by a colon
 autosectionlabel_prefix_document = True
@@ -120,3 +120,16 @@ autodoc_default_options = {
     'show-inheritance': True,  # list base classes
     'undoc-members': True,  # show also undocumented members
 }
+
+
+# -- Exclude test modules from autosummary/autodoc ---------------------------
+
+def autodoc_skip_tests(app, what, name, obj, skip, options):
+    """Skip test packages and modules during autodoc/autosummary processing."""
+    if name == 'tests' or name.startswith('test_'):
+        return True
+    return skip
+
+
+def setup(app):
+    app.connect('autodoc-skip-member', autodoc_skip_tests)
