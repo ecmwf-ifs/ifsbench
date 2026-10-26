@@ -116,11 +116,18 @@ function( ifsbench_create_python_venv )
     execute_process( COMMAND ${Python3_EXECUTABLE} -m venv "${VENV_PATH}" COMMAND_ERROR_IS_FATAL ANY )
     set( Python3_VENV_NAME "${_PAR_VENV_NAME}" PARENT_SCOPE )
 
+    # Make sure the venv starts with an up-to-date pip
+    execute_process(
+        COMMAND "${VENV_PATH}/bin/python" -m pip install --upgrade pip
+        COMMAND_ERROR_IS_FATAL ANY
+    )
+
     # Upon installation, we create an equivalent Python venv in the installation directory
     if( _PAR_INSTALL_VENV )
         install(
             CODE
-                "execute_process( COMMAND ${Python3_EXECUTABLE} -m venv \${CMAKE_INSTALL_PREFIX}/var/${_PAR_VENV_NAME} RESULT_VARIABLE _RET )"
+                "execute_process( COMMAND ${Python3_EXECUTABLE} -m venv \${CMAKE_INSTALL_PREFIX}/var/${_PAR_VENV_NAME} RESULT_VARIABLE _RET )
+                execute_process( COMMAND \${CMAKE_INSTALL_PREFIX}/var/${_PAR_VENV_NAME}/bin/python -m pip install --upgrade pip COMMAND_ERROR_IS_FATAL ANY )"
         )
         set( Python3_INSTALL_VENV TRUE PARENT_SCOPE )
     endif()
